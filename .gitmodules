@@ -1,0 +1,12 @@
+[submodule "lib/sdl"]
+	path = lib/sdl
+	url = https://github.com/libsdl-org/SDL.git
+[submodule "lib/essencio"]
+	path = lib/essencio
+	url = https://github.com/bottledlactose/essencio.git
+[submodule "lib/glm"]
+	path = lib/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "lib/gli"]
+	path = lib/gli
+	url = https://github.com/g-truc/gli.git
