@@ -27,7 +27,7 @@ namespace fs = std::filesystem;
 
 #include "essencio/BinReader.hpp"
 #include "essencio/model/WindowsModel.hpp"
-#include "essencio/material/kingdom/Material.hpp"
+#include "essencio/material/Material.hpp"
 
 #define VERTEX_SHADER_SOURCE "#version 330 core\n" \
     "layout(location = 0) in vec3 aPos;\n" \
@@ -205,13 +205,13 @@ void Context::LoadModel(const char *path) {
         std::vector<uint8_t> materialData = File::ReadFile(materialPath.string().c_str());
         essencio::BinReader materialReader(materialData.data(), materialData.size());
 
-        essencio::kingdom::Material material;
-        essencio::kingdom::Material::Read(material, materialReader);
+        essencio::Material material;
+        essencio::Material::Read(material, materialReader, essencio::GameType::KINGDOM);
 
         // Read material
         for (const auto &param : material.data.params) {
             switch (param.valueType) {
-                case essencio::kingdom::MaterialParameterType::RESOURCE_KEY:
+                case essencio::MaterialParameterType::RESOURCE_KEY:
                     {
                         std::string texturePath = File::GetResourceKeyPath(param.mapKey, "dds");
                         texturePath = (mGameRoot / "GameData_Win64/Textures/Objects" / texturePath).string();
