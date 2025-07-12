@@ -121,15 +121,15 @@ bool Context::Initialize(const std::optional<fs::path> &gameRoot) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    //io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+
     // Setup style
     ImGui::StyleColorsDark();
     // Initialize backends
     ImGui_ImplSDL3_InitForOpenGL(mWindow, mGLContext);
     ImGui_ImplOpenGL3_Init("#version 330");
-
-
-    // TODO: Show warning in case no game root is found...
-    // Or allow user to choose game directory and game type from here
 
     SDL_ShowWindow(mWindow);
     return true;
@@ -148,10 +148,13 @@ void Context::Render() {
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
+    UI::DrawDockSpace();
+    UI::DrawFileExplorer();
     UI::DrawMainMenuBar();
 
-
     ImGui::Render();
+    // ImGui::UpdatePlatformWindows();
+    // ImGui::RenderPlatformWindowsDefault();
 
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
