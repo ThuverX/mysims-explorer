@@ -5,6 +5,7 @@
 #include "Renderer.hpp"
 #include "SDL3/SDL_init.h"
 #include "SDL3/SDL_video.h"
+#include "UI.hpp"
 #include "glad/gl.h"
 
 #include "Context.hpp"
@@ -12,8 +13,6 @@
 #include <filesystem>
 
 namespace fs = std::filesystem;
-
-#include "File.hpp"
 
 #include "SDL3/SDL_init.h"
 
@@ -25,9 +24,9 @@ namespace fs = std::filesystem;
 
 #include <gli/gli.hpp>
 
-#include "essencio/BinReader.hpp"
-#include "essencio/model/WindowsModel.hpp"
-#include "essencio/material/Material.hpp"
+#include "imgui.h"
+#include "backends/imgui_impl_sdl3.h"
+#include "backends/imgui_impl_opengl3.h"
 
 #define VERTEX_SHADER_SOURCE "#version 330 core\n" \
     "layout(location = 0) in vec3 aPos;\n" \
@@ -90,7 +89,7 @@ bool Context::Initialize(const std::optional<fs::path> &gameRoot) {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-    mWindow = SDL_CreateWindow("MySims Viewer", 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
+    mWindow = SDL_CreateWindow("MySims Explorer", 1280, 720, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
     if (!mWindow) {
         std::cerr << "Failed to create SDL window: " << SDL_GetError() << std::endl;
         return false;
@@ -118,14 +117,51 @@ bool Context::Initialize(const std::optional<fs::path> &gameRoot) {
         FRAGMENT_SHADER_SOURCE
     });
 
-    // TODO: Show warning in case no game root is found...
-    // Or allow user to choose game directory and game type from here
+    // Create main viewport framebuffer (maybe allow multiple later on?)
+    mViewport = Renderer::CreateFramebuffer(1280, 720);
+    
+    // Setup ImGui
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    //io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+
+    // Setup style
+    ImGui::StyleColorsDark();
+    // Initialize backends
+    ImGui_ImplSDL3_InitForOpenGL(mWindow, mGLContext);
+    ImGui_ImplOpenGL3_Init("#version 330");
 
     SDL_ShowWindow(mWindow);
     return true;
 }
 
+void Context::Update() {
+    // TODO
+}
+
+void Context::ProcessEvent(SDL_Event *event) {
+    ImGui_ImplSDL3_ProcessEvent(event);
+}
+
 void Context::Render() {
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplSDL3_NewFrame();
+    ImGui::NewFrame();
+
+    UI::DrawDockSpace();
+    UI::DrawFileExplorer();
+    UI::DrawMainMenuBar();
+
+    // ImGui::UpdatePlatformWindows();
+    // ImGui::RenderPlatformWindowsDefault();
+
+    glBindFramebuffer(GL_FRAMEBUFFER, mViewport.FBO);
+    glViewport(0, 0, mViewport.width, mViewport.height);
+    glEnable(GL_DEPTH_TEST);
+
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -139,11 +175,10 @@ void Context::Render() {
 
     // Build MVP using glm
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
     model = glm::rotate(model, time, glm::vec3(0.f, 1.f, 0.f));
 
     //glm::mat4 view = glm::mat4(1.0f); // no camera yet
-    glm::mat4 proj = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+    glm::mat4 proj = glm::perspective(glm::radians(45.0f), static_cast<float>(mViewport.width) / mViewport.height, 0.1f, 100.0f);
     glm::mat4 view = glm::lookAt(
         glm::vec3(0.0f, 0.0f, 3.0f), // camera position
         glm::vec3(0.0f, 0.5f, 0.0f), // look at center
@@ -168,10 +203,20 @@ void Context::Render() {
         }
     }
 
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    UI::DrawViewport(mViewport);
+
+    ImGui::Render();
+
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     SDL_GL_SwapWindow(mWindow);
 }
 
 void Context::Shutdown() {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
+    ImGui::DestroyContext();
 
     mLoader.UnloadAll();
     Renderer::DestroyShader(mShaderHandle);

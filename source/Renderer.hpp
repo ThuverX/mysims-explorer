@@ -35,6 +35,14 @@ struct MeshCreateInfo {
     std::vector<uint32_t> indices;
 };
 
+struct FramebufferHandle {
+    GLuint FBO;
+    TextureHandle texture;
+    GLuint depth;
+    int width;
+    int height;
+};
+
 namespace Renderer {
 
 ShaderHandle CreateShader(const ShaderCreateInfo &info);
@@ -45,5 +53,8 @@ void DestroyTexture(TextureHandle &handle);
 
 MeshHandle CreateMesh(const MeshCreateInfo &info);
 void DestroyMesh(MeshHandle &mesh);
+
+FramebufferHandle CreateFramebuffer(int width, int height);
+void DestroyFramebuffer(const FramebufferHandle &framebuffer);
 
 };

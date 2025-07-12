@@ -23,6 +23,7 @@ SDL_AppResult SDL_AppInit([[maybe_unused]] void **appstate, int argc, char **arg
 }
 
 SDL_AppResult SDL_AppIterate([[maybe_unused]] void *appstate) {
+    Context::Get().Update();
     Context::Get().Render();
     return SDL_APP_CONTINUE;
 }
@@ -33,6 +34,7 @@ SDL_AppResult SDL_AppEvent([[maybe_unused]] void *appstate, SDL_Event *event) {
             return SDL_APP_FAILURE;
     }
 
+    Context::Get().ProcessEvent(event);
     return SDL_APP_CONTINUE;
 }
 
