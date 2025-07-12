@@ -5,6 +5,7 @@
 #include "Renderer.hpp"
 #include "SDL3/SDL_init.h"
 #include "SDL3/SDL_video.h"
+#include "UI.hpp"
 #include "glad/gl.h"
 
 #include "Context.hpp"
@@ -12,8 +13,6 @@
 #include <filesystem>
 
 namespace fs = std::filesystem;
-
-#include "File.hpp"
 
 #include "SDL3/SDL_init.h"
 
@@ -25,9 +24,9 @@ namespace fs = std::filesystem;
 
 #include <gli/gli.hpp>
 
-#include "essencio/BinReader.hpp"
-#include "essencio/model/WindowsModel.hpp"
-#include "essencio/material/Material.hpp"
+#include "imgui.h"
+#include "backends/imgui_impl_sdl3.h"
+#include "backends/imgui_impl_opengl3.h"
 
 #define VERTEX_SHADER_SOURCE "#version 330 core\n" \
     "layout(location = 0) in vec3 aPos;\n" \
@@ -117,6 +116,17 @@ bool Context::Initialize(const std::optional<fs::path> &gameRoot) {
         VERTEX_SHADER_SOURCE,
         FRAGMENT_SHADER_SOURCE
     });
+    
+    // Setup ImGui
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    // Setup style
+    ImGui::StyleColorsDark();
+    // Initialize backends
+    ImGui_ImplSDL3_InitForOpenGL(mWindow, mGLContext);
+    ImGui_ImplOpenGL3_Init("#version 330");
+
 
     // TODO: Show warning in case no game root is found...
     // Or allow user to choose game directory and game type from here
@@ -125,9 +135,27 @@ bool Context::Initialize(const std::optional<fs::path> &gameRoot) {
     return true;
 }
 
+void Context::Update() {
+    // TODO
+}
+
+void Context::ProcessEvent(SDL_Event *event) {
+    ImGui_ImplSDL3_ProcessEvent(event);
+}
+
 void Context::Render() {
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplSDL3_NewFrame();
+    ImGui::NewFrame();
+
+    UI::DrawMainMenuBar();
+
+
+    ImGui::Render();
+
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe
 
@@ -168,10 +196,14 @@ void Context::Render() {
         }
     }
 
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     SDL_GL_SwapWindow(mWindow);
 }
 
 void Context::Shutdown() {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
+    ImGui::DestroyContext();
 
     mLoader.UnloadAll();
     Renderer::DestroyShader(mShaderHandle);

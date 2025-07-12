@@ -6,6 +6,8 @@
 namespace fs = std::filesystem;
 
 #include "SDL3/SDL_video.h"
+#include "SDL3/SDL_events.h"
+
 #include "Renderer.hpp"
 #include "Loader.hpp"
 
@@ -28,6 +30,8 @@ public:
     static std::optional<fs::path> FindGameRoot(const fs::path &path);
 
     bool Initialize(const std::optional<fs::path> &gameRoot);
+    void Update();
+    void ProcessEvent(SDL_Event *event);
     void Render();
     void Shutdown();
 
