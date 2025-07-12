@@ -2,7 +2,9 @@
 
 #include "Context.hpp"
 
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
+#include "imgui_internal.h"
 #include "ImGuiFileDialog.h"
 
 void UI::DrawDockSpace() {
@@ -11,30 +13,70 @@ void UI::DrawDockSpace() {
 
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
 
-    if (opt_fullscreen)
-    {
+    if (opt_fullscreen) {
         ImGuiViewport* viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos(viewport->WorkPos);
         ImGui::SetNextWindowSize(viewport->WorkSize);
         ImGui::SetNextWindowViewport(viewport->ID);
         window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
-            ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+                        ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
         window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
     }
 
-    // Important: Begin a full-screen window with no decoration
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+
     ImGui::Begin("DockSpace", nullptr, window_flags);
 
-    // Create the actual dockspace node
+    ImGui::PopStyleVar(2);
+
     ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+
+    // 🧠 Initialize default layout ONCE
+    static bool initialized = false;
+    if (!initialized) {
+        initialized = true;
+
+        ImGui::DockBuilderRemoveNode(dockspace_id); // clear any previous layout
+        ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace);
+        ImGui::DockBuilderSetNodeSize(dockspace_id, ImGui::GetMainViewport()->Size);
+
+        // Split: Left 20% (File Explorer), Right 80%
+        ImGuiID dock_main_id = dockspace_id;
+        ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.2f, nullptr, &dock_main_id);
+        ImGuiID dock_id_down = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, 0.25f, nullptr, &dock_main_id);
+
+        // Dock windows by name
+        ImGui::DockBuilderDockWindow("File Explorer", dock_id_left);
+        ImGui::DockBuilderDockWindow("Viewport", dock_main_id);
+        ImGui::DockBuilderDockWindow("Console", dock_id_down);
+
+        ImGui::DockBuilderFinish(dockspace_id);
+    }
 
     ImGui::End();
 }
 
 void UI::DrawFileExplorer() {
-    ImGui::Begin("Window A");
-    ImGui::Text("Hello from A!");
+    ImGui::Begin("File Explorer");
+    ImGui::End();
+}
+
+void UI::DrawViewport(FramebufferHandle &framebuffer) {
+    ImGui::Begin("Viewport");
+
+    ImVec2 size = ImGui::GetContentRegionAvail();
+    int width = static_cast<int>(size.x);
+    int height = static_cast<int>(size.y);
+
+    if (width > 0 && height > 0 && (width != framebuffer.width || height != framebuffer.height)) {
+        Renderer::DestroyFramebuffer(framebuffer);
+        framebuffer = Renderer::CreateFramebuffer(width, height);
+    }
+
+    ImGui::Image((ImTextureID)(intptr_t)framebuffer.texture, size, ImVec2(0, 1), ImVec2(1, 0));
+
     ImGui::End();
 }
 

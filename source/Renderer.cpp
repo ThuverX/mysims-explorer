@@ -114,3 +114,39 @@ void Renderer::DestroyMesh(MeshHandle &mesh) {
     glDeleteBuffers(1, &mesh.VBO);
     glDeleteVertexArrays(1, &mesh.VAO);
 }
+
+FramebufferHandle Renderer::CreateFramebuffer(int width, int height) {
+    FramebufferHandle framebuffer;
+    framebuffer.width = width;
+    framebuffer.height = height;
+
+    glGenFramebuffers(1, &framebuffer.FBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer.FBO);
+
+    // Create color texture
+    glGenTextures(1, &framebuffer.texture);
+    glBindTexture(GL_TEXTURE_2D, framebuffer.texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer.texture, 0);
+
+    // Create depth renderbuffer
+    glGenRenderbuffers(1, &framebuffer.depth);
+    glBindRenderbuffer(GL_RENDERBUFFER, framebuffer.depth);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER,framebuffer.depth);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        std::cerr << "ERROR: Framebuffer is not complete!" << std::endl;
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    return framebuffer;
+}
+
+void Renderer::DestroyFramebuffer(const FramebufferHandle &framebuffer) {
+    glDeleteFramebuffers(1, &framebuffer.FBO);
+    glDeleteTextures(1, &framebuffer.texture);
+    glDeleteRenderbuffers(1, &framebuffer.depth);
+}

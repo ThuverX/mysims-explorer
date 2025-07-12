@@ -17,6 +17,8 @@ private:
     SDL_GLContext mGLContext;
 
     GLuint mShaderHandle;
+    FramebufferHandle mViewport;
+
     std::optional<fs::path> mGameRoot;
     Loader mLoader;
 

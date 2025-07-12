@@ -89,7 +89,7 @@ bool Context::Initialize(const std::optional<fs::path> &gameRoot) {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-    mWindow = SDL_CreateWindow("MySims Viewer", 800, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
+    mWindow = SDL_CreateWindow("MySims Explorer", 1280, 720, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
     if (!mWindow) {
         std::cerr << "Failed to create SDL window: " << SDL_GetError() << std::endl;
         return false;
@@ -116,6 +116,9 @@ bool Context::Initialize(const std::optional<fs::path> &gameRoot) {
         VERTEX_SHADER_SOURCE,
         FRAGMENT_SHADER_SOURCE
     });
+
+    // Create main viewport framebuffer (maybe allow multiple later on?)
+    mViewport = Renderer::CreateFramebuffer(1280, 720);
     
     // Setup ImGui
     IMGUI_CHECKVERSION();
@@ -152,13 +155,15 @@ void Context::Render() {
     UI::DrawFileExplorer();
     UI::DrawMainMenuBar();
 
-    ImGui::Render();
     // ImGui::UpdatePlatformWindows();
     // ImGui::RenderPlatformWindowsDefault();
 
+    glBindFramebuffer(GL_FRAMEBUFFER, mViewport.FBO);
+    glViewport(0, 0, mViewport.width, mViewport.height);
+    glEnable(GL_DEPTH_TEST);
+
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe
 
@@ -170,11 +175,10 @@ void Context::Render() {
 
     // Build MVP using glm
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
     model = glm::rotate(model, time, glm::vec3(0.f, 1.f, 0.f));
 
     //glm::mat4 view = glm::mat4(1.0f); // no camera yet
-    glm::mat4 proj = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+    glm::mat4 proj = glm::perspective(glm::radians(45.0f), static_cast<float>(mViewport.width) / mViewport.height, 0.1f, 100.0f);
     glm::mat4 view = glm::lookAt(
         glm::vec3(0.0f, 0.0f, 3.0f), // camera position
         glm::vec3(0.0f, 0.5f, 0.0f), // look at center
@@ -198,6 +202,12 @@ void Context::Render() {
             glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
         }
     }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    UI::DrawViewport(mViewport);
+
+    ImGui::Render();
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     SDL_GL_SwapWindow(mWindow);
