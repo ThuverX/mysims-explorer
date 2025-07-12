@@ -35,4 +35,14 @@ private:
 public:
     std::optional<ModelData> LoadModel(const std::string &path);
     std::optional<MaterialData> LoadMaterial(const std::string &path);
+
+    void UnloadAll();
+
+    inline std::unordered_map<std::string, ModelData> &GetModels() {
+        return models;
+    }
+
+    inline std::unordered_map<std::string, MaterialData> &GetMaterials() {
+        return materials;
+    }
 };

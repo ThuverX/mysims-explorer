@@ -77,7 +77,9 @@ std::optional<fs::path> Context::FindGameRoot(const fs::path &path) {
     return std::nullopt;
 }
 
-bool Context::Initialize() {
+bool Context::Initialize(const std::optional<fs::path> &gameRoot) {
+
+    mGameRoot = gameRoot;
     
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         std::cerr << "Failed to initialize SDL: " << SDL_GetError() << std::endl;
@@ -116,27 +118,11 @@ bool Context::Initialize() {
         FRAGMENT_SHADER_SOURCE
     });
 
+    // TODO: Show warning in case no game root is found...
+    // Or allow user to choose game directory and game type from here
+
     SDL_ShowWindow(mWindow);
     return true;
-}
-
-// TODO: Get rid of this function
-void Context::LoadModel(const char *path) {
-    // TODO: Move this to somewhere more central
-    auto gameRoot = FindGameRoot(fs::path(path));
-
-    if (gameRoot) {
-        mGameRoot = gameRoot->string();
-    }
-
-    auto model = mLoader.LoadModel(path);
-
-    if (model) {
-        // Load the mesh handles into the global state for now
-        for (const auto &mesh : model->meshes) {
-            mMeshHandles.push_back(mesh);
-        }
-    }
 }
 
 void Context::Render() {
@@ -170,14 +156,16 @@ void Context::Render() {
     GLint mvpLoc = glGetUniformLocation(mShaderHandle, "uMVP");
     glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
 
-    for (const auto &handle : mMeshHandles) {
-        // Bind texture
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, handle.texture);
-        glUniform1i(glGetUniformLocation(mShaderHandle, "uTexture"), 0);
+    for (const auto &model : mLoader.GetModels()) {
+        for (const auto &mesh : model.second.meshes) {
+            // Bind texture
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, mesh.texture);
+            glUniform1i(glGetUniformLocation(mShaderHandle, "uTexture"), 0);
 
-        glBindVertexArray(handle.VAO);
-        glDrawElements(GL_TRIANGLES, handle.indexCount, GL_UNSIGNED_INT, 0);
+            glBindVertexArray(mesh.VAO);
+            glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
+        }
     }
 
     SDL_GL_SwapWindow(mWindow);
@@ -185,18 +173,7 @@ void Context::Render() {
 
 void Context::Shutdown() {
 
-    // TODO: Replace this with Loader unloading
-    for (auto &mesh : mMeshHandles) {
-        // Delete texture if available
-        // NOTE: This is slighty hacky since technically textures could be loaded
-        // that are never getting deleted
-        if (mesh.texture != 0) {
-            Renderer::DestroyTexture(mesh.texture);
-        }
-
-        Renderer::DestroyMesh(mesh);
-    }
-
+    mLoader.UnloadAll();
     Renderer::DestroyShader(mShaderHandle);
 
     SDL_GL_DestroyContext(mGLContext);

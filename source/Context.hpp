@@ -15,9 +15,7 @@ private:
     SDL_GLContext mGLContext;
 
     GLuint mShaderHandle;
-    std::vector<MeshHandle> mMeshHandles;
-    fs::path mGameRoot;
-
+    std::optional<fs::path> mGameRoot;
     Loader mLoader;
 
     Context() = default;
@@ -26,16 +24,19 @@ private:
     Context &operator=(const Context &) = delete;
     Context &operator=(Context &&) = delete;
 
+public:
     static std::optional<fs::path> FindGameRoot(const fs::path &path);
 
-public:
-    bool Initialize();
-    void LoadModel(const char *path);
+    bool Initialize(const std::optional<fs::path> &gameRoot);
     void Render();
     void Shutdown();
 
-    inline fs::path GetGameRoot() const {
+    inline std::optional<fs::path> GetGameRoot() const {
         return mGameRoot;
+    }
+
+    inline Loader &GetLoader() {
+        return mLoader;
     }
 
     static Context &Get() {

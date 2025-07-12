@@ -12,11 +12,13 @@ SDL_AppResult SDL_AppInit([[maybe_unused]] void **appstate, int argc, char **arg
         return SDL_APP_SUCCESS;
     }
 
-    if (!Context::Get().Initialize()) {
+    auto gameRoot = Context::FindGameRoot(argv[1]);
+
+    if (!Context::Get().Initialize(gameRoot)) {
         return SDL_APP_FAILURE;
     }
 
-    Context::Get().LoadModel(argv[1]);
+    Context::Get().GetLoader().LoadModel(argv[1]);
     return SDL_APP_CONTINUE;
 }
 

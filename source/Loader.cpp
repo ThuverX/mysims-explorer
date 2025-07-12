@@ -2,6 +2,7 @@
 
 #include <filesystem>
 
+#include "Renderer.hpp"
 #include "essencio/BinReader.hpp"
 #include "essencio/model/WindowsModel.hpp"
 #include "essencio/material/Material.hpp"
@@ -101,10 +102,13 @@ std::optional<std::string> Loader::FindTexturePath(const std::string &fileName) 
     };
 
     for (const auto &path : searchPaths) {
-        const fs::path gameRoot = Context::Get().GetGameRoot();
-        const fs::path texturePath = gameRoot / path / fileName;
+        const std::optional<fs::path> gameRoot = Context::Get().GetGameRoot();
 
-        std::cout << "texturePath: " << texturePath;
+        if (!gameRoot) {
+            return std::nullopt;
+        }
+
+        const fs::path texturePath = *gameRoot / path / fileName;
 
         if (fs::exists(texturePath) && !fs::is_directory(texturePath)) {
             return texturePath.string();
@@ -203,4 +207,18 @@ std::optional<MaterialData> Loader::LoadMaterial(const std::string &path) {
 
     materials.insert({data.path, data});
     return data;
+}
+
+void Loader::UnloadAll() {
+    for (auto &material : materials) {
+        Renderer::DestroyTexture(material.second.texture);
+    }
+    materials.clear();
+
+    for (auto &model : models) {
+        for (auto &mesh : model.second.meshes) {
+            Renderer::DestroyMesh(mesh);
+        }
+    }
+    models.clear();
 }
