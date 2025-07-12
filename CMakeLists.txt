@@ -28,6 +28,8 @@ add_executable(mysims-explorer source/main.cpp
     # ImGui SDL3 + OpenGL 3.3
     lib/imgui/backends/imgui_impl_sdl3.cpp
     lib/imgui/backends/imgui_impl_opengl3.cpp
+    # ImGui File Dialog
+    lib/imguifiledialog/ImGuiFileDialog.cpp
     # GLAD
     lib/glad/src/gl.c)
 
@@ -37,6 +39,7 @@ target_include_directories(mysims-explorer SYSTEM PRIVATE
     lib/glm
     lib/gli
     lib/imgui
+    lib/imguifiledialog
     lib/essencio/include)
 target_link_libraries(mysims-explorer PRIVATE SDL3-static)
 

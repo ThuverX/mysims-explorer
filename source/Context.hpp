@@ -39,6 +39,11 @@ public:
         return mGameRoot;
     }
 
+    inline void SetGameRoot(const std::optional<fs::path> value) {
+        // TODO: Actually reload the current viewer state
+        mGameRoot = value;
+    }
+
     inline Loader &GetLoader() {
         return mLoader;
     }

@@ -14,3 +14,6 @@
 	path = lib/imgui
 	url = https://github.com/ocornut/imgui.git
 	branch = docking
+[submodule "lib/imguifiledialog"]
+	path = lib/imguifiledialog
+	url = https://github.com/aiekick/ImGuiFileDialog.git
