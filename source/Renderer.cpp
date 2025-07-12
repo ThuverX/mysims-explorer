@@ -50,7 +50,9 @@ GLuint Renderer::CreateShader(const ShaderCreateInfo &info) {
 }
 
 void Renderer::DestroyShader(ShaderHandle &shader) {
-    glDeleteProgram(shader);
+    if (shader != 0) {
+        glDeleteProgram(shader);
+    }
 }
 
 GLuint Renderer::CreateTexture(const TextureCreateInfo &info) {
@@ -77,7 +79,9 @@ GLuint Renderer::CreateTexture(const TextureCreateInfo &info) {
 }
 
 void Renderer::DestroyTexture(TextureHandle &texture) {
-    glDeleteTextures(1, &texture);
+    if (texture != 0) {
+        glDeleteTextures(1, &texture);
+    }
 }
 
 MeshHandle Renderer::CreateMesh(const MeshCreateInfo &info) {
