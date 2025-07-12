@@ -89,7 +89,8 @@ bool Context::Initialize(const std::optional<fs::path> &gameRoot) {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-    mWindow = SDL_CreateWindow("MySims Explorer", 1280, 720, SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
+    mWindow = SDL_CreateWindow("MySims Explorer", 1280, 720, 
+        SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE);
     if (!mWindow) {
         std::cerr << "Failed to create SDL window: " << SDL_GetError() << std::endl;
         return false;
@@ -127,6 +128,7 @@ bool Context::Initialize(const std::optional<fs::path> &gameRoot) {
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     //io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+    io.IniFilename = nullptr;
 
     // Setup style
     ImGui::StyleColorsDark();
