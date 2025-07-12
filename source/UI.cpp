@@ -58,8 +58,40 @@ void UI::DrawDockSpace() {
     ImGui::End();
 }
 
+void UI::DrawDirectory(const fs::path &directory) {
+    for (const auto& entry : fs::directory_iterator(directory)) {
+        const auto& path = entry.path();
+        std::string name = path.filename().string();
+
+        if (entry.is_directory()) {
+            if (ImGui::TreeNodeEx(name.c_str(), ImGuiTreeNodeFlags_OpenOnArrow)) {
+                DrawDirectory(path);
+                ImGui::TreePop();
+            }
+        } else {
+            // Only display models for now
+            if (path.extension() == ".0xb359c791") {
+                if (ImGui::Selectable(name.c_str())) {
+                    // Hacky way to quickly reload the model...
+                    // TODO: Add checks to detemine how to load the currently selected file
+                    Context::Get().GetLoader().UnloadAll();
+                    Context::Get().GetLoader().LoadModel(path.string());
+                }
+            }
+        }
+    }
+}
+
 void UI::DrawFileExplorer() {
     ImGui::Begin("File Explorer");
+
+    auto gameRoot = Context::Get().GetGameRoot();
+    if (gameRoot && fs::exists(*gameRoot)) {
+        DrawDirectory(*gameRoot);
+    } else {
+        ImGui::TextUnformatted("No valid game root selected.");
+    }
+
     ImGui::End();
 }
 
