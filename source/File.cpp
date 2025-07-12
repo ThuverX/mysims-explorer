@@ -6,7 +6,7 @@
 #include <iomanip>
 
 // TODO: Use better error handling system
-std::vector<uint8_t> File::ReadFile(const char *path) {
+std::vector<uint8_t> File::ReadFile(const std::string &path) {
 
     std::ifstream in_file(path, std::ios::binary | std::ios::ate);
     if (!in_file) {

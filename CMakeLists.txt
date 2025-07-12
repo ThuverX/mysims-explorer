@@ -14,6 +14,8 @@ add_executable(mysims-explorer source/main.cpp
     source/Context.cpp
     source/File.hpp
     source/File.cpp
+    source/Loader.hpp
+    source/Loader.cpp
     source/Renderer.hpp
     source/Renderer.cpp
     lib/glad/src/gl.c)

@@ -120,6 +120,7 @@ bool Context::Initialize() {
     return true;
 }
 
+// TODO: Get rid of this function
 void Context::LoadModel(const char *path) {
     // TODO: Move this to somewhere more central
     auto gameRoot = FindGameRoot(fs::path(path));
@@ -128,122 +129,13 @@ void Context::LoadModel(const char *path) {
         mGameRoot = gameRoot->string();
     }
 
-    std::vector<uint8_t> file = File::ReadFile(path);
-    essencio::BinReader reader(file.data(), file.size());
+    auto model = mLoader.LoadModel(path);
 
-    essencio::WindowsModel model;
-    essencio::WindowsModel::Read(model, reader);
-
-    for (const auto &mesh : model.meshes) {
-        std::vector<float> vertices;
-        std::vector<uint32_t> indices;
-
-        uint32_t positionOffset = 0xFFFFFFFF;
-        uint32_t uvOffset = 0xFFFFFFFF;
-
-        for (const auto& key : mesh.vertexKeys) {
-            //if (key.index == 0 && key.type == essencio::VertexKeyType::FLOAT3) {
-            if (key.type == essencio::VertexKeyType::FLOAT3 && positionOffset == 0xFFFFFFFF) {
-                positionOffset = key.offset;
-            } else if (key.type == essencio::VertexKeyType::FLOAT2 && uvOffset == 0xFFFFFFFF) {
-                uvOffset = key.offset;
-            }
+    if (model) {
+        // Load the mesh handles into the global state for now
+        for (const auto &mesh : model->meshes) {
+            mMeshHandles.push_back(mesh);
         }
-
-        // TODO: Throw exceptions instead?
-        if (positionOffset == 0xFFFFFFFF) {
-            std::cerr << "No FLOAT3 position key found in vertexKeys!" << std::endl;
-            return;
-        }
-        if (uvOffset == 0xFFFFFFFF) {
-            std::cerr << "No FLOAT2 UV key found in vertexKeys!" << std::endl;
-            return;
-        }
-
-        size_t stride = mesh.vertexArraySize / mesh.numVertices;
-        vertices.reserve(mesh.numVertices * 5); // 3 for pos + 2 for UV
-
-        for (size_t i = 0; i < mesh.numVertices; ++i) {
-            size_t base = i * stride;
-
-            float x = *reinterpret_cast<const float*>(&mesh.vertices[base + positionOffset + 0]);
-            float y = *reinterpret_cast<const float*>(&mesh.vertices[base + positionOffset + 4]);
-            float z = *reinterpret_cast<const float*>(&mesh.vertices[base + positionOffset + 8]);
-
-            float u = *reinterpret_cast<const float*>(&mesh.vertices[base + uvOffset + 0]);
-            float v = *reinterpret_cast<const float*>(&mesh.vertices[base + uvOffset + 4]);
-
-            vertices.push_back(x);
-            vertices.push_back(y);
-            vertices.push_back(z);
-            vertices.push_back(u);
-            vertices.push_back(v);
-        }
-
-        // Load indices
-        indices.reserve(mesh.numFaces * 3);
-
-        for (const auto& face : mesh.faces) {
-            indices.push_back(face.a);
-            indices.push_back(face.b);
-            indices.push_back(face.c);
-        }
-
-        MeshHandle meshHandle = Renderer::CreateMesh({
-            vertices,
-            indices,
-        });
-
-        // Load material
-        fs::path parentDirectory = fs::path(path).parent_path();
-        std::string texturePath = File::GetResourceKeyPath(mesh.material, "Material");
-
-        // Get the final path string
-        fs::path materialPath = parentDirectory / texturePath;
-        std::cout << materialPath.string() << std::endl;
-
-        std::vector<uint8_t> materialData = File::ReadFile(materialPath.string().c_str());
-        essencio::BinReader materialReader(materialData.data(), materialData.size());
-
-        essencio::Material material;
-        essencio::Material::Read(material, materialReader, essencio::GameType::KINGDOM);
-
-        // Read material
-        for (const auto &param : material.data.params) {
-            switch (param.valueType) {
-                case essencio::MaterialParameterType::RESOURCE_KEY:
-                    {
-                        std::string texturePath = File::GetResourceKeyPath(param.mapKey, "dds");
-                        texturePath = (mGameRoot / "GameData_Win64/Textures/Objects" / texturePath).string();
-
-                        // Load the DDS texture using gli
-                        gli::texture texture = gli::load(texturePath);
-                        if (texture.empty()) {
-                            std::cerr << "Failed to load texture: " << texturePath << std::endl;
-                            return;
-                        }
-
-                        gli::gl GL(gli::gl::PROFILE_GL33);
-                        gli::gl::format const format = GL.translate(texture.format(), texture.swizzles());
-                        GLsizei const levels = static_cast<GLsizei>(texture.levels());
-
-                        GLuint textureID = Renderer::CreateTexture({
-                            texture,
-                            format,
-                            levels,
-                        });
-
-                        // just assign to current mesh...
-                        meshHandle.textureID = textureID;
-                    }
-                    break;
-                default:
-                    // Just do nothing for now
-                    break;
-            }
-        }
-
-        mMeshHandles.emplace_back(meshHandle);
     }
 }
 
@@ -281,7 +173,7 @@ void Context::Render() {
     for (const auto &handle : mMeshHandles) {
         // Bind texture
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, handle.textureID);
+        glBindTexture(GL_TEXTURE_2D, handle.texture);
         glUniform1i(glGetUniformLocation(mShaderHandle, "uTexture"), 0);
 
         glBindVertexArray(handle.VAO);
@@ -293,12 +185,13 @@ void Context::Render() {
 
 void Context::Shutdown() {
 
+    // TODO: Replace this with Loader unloading
     for (auto &mesh : mMeshHandles) {
         // Delete texture if available
         // NOTE: This is slighty hacky since technically textures could be loaded
         // that are never getting deleted
-        if (mesh.textureID != 0) {
-            Renderer::DestroyTexture(mesh.textureID);
+        if (mesh.texture != 0) {
+            Renderer::DestroyTexture(mesh.texture);
         }
 
         Renderer::DestroyMesh(mesh);

@@ -8,7 +8,7 @@
 
 namespace File {
 
-std::vector<uint8_t> ReadFile(const char *path);
+std::vector<uint8_t> ReadFile(const std::string &path);
 std::string GetResourceKeyPath(const essencio::ResourceKey &key, const std::string &extension);
 
 } // namespace File

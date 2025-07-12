@@ -27,7 +27,7 @@ struct MeshHandle {
     GLuint VBO;
     GLuint EBO;
     GLsizei indexCount;
-    GLuint textureID;
+    TextureHandle texture;
 };
 
 struct MeshCreateInfo {

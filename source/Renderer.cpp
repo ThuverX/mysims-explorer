@@ -83,7 +83,7 @@ void Renderer::DestroyTexture(TextureHandle &texture) {
 MeshHandle Renderer::CreateMesh(const MeshCreateInfo &info) {
     MeshHandle mesh;
 
-    mesh.textureID = 0;
+    mesh.texture = 0;
     mesh.indexCount = info.indices.size();
     
     glGenVertexArrays(1, &mesh.VAO);
