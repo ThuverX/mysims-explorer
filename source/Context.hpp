@@ -41,6 +41,8 @@ private:
     Context &operator=(Context &&) = delete;
 
 public:
+    bool mWireframeMode = false;
+
     static std::optional<fs::path> FindGameRoot(const fs::path &path);
 
     bool Initialize(const std::optional<fs::path> &gameRoot);

@@ -171,7 +171,11 @@ void Context::Render() {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe
+    if (mWireframeMode) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    } else {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
 
     switch (mViewportType) {
         case ViewportType::MODEL:

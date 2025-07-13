@@ -293,6 +293,14 @@ void UI::MainMenuBar() {
             ImGui::EndMenu();
         }
 
+        if (ImGui::BeginMenu("View")) {
+            if (ImGui::MenuItem("Wireframe Mode", nullptr, Context::Get().mWireframeMode)) {
+                Context::Get().mWireframeMode = !Context::Get().mWireframeMode;
+            }
+
+            ImGui::EndMenu();
+        }
+
         ImGui::EndMainMenuBar();
     }
 
