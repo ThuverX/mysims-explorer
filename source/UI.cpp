@@ -80,8 +80,20 @@ void UI::DrawDirectory(const fs::path &directory) {
                 ImGui::TreePop();
             }
         } else {
+            const ContextType type = Context::GetExtensionContextType(path.extension().string());
+
+            if (type == ContextType::NONE) {
+                ImGui::BeginDisabled(true);
+                ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+            }
+
             if (ImGui::Selectable(name.c_str())) {
                 Context::Get().LoadViewportFile(path);
+            }
+
+            if (type == ContextType::NONE) {
+                ImGui::PopStyleColor();
+                ImGui::EndDisabled();
             }
         }
     }
