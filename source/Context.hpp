@@ -54,9 +54,7 @@ public:
     void Update();
     void ProcessEvent(SDL_Event *event);
     void Render();
-    
-    void RenderLoadedModel();
-    void RenderLoadedMaterial();
+    void RenderScene();
 
     void Shutdown();
 

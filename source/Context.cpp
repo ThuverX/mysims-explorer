@@ -177,6 +177,20 @@ void Context::Render() {
     // ImGui::UpdatePlatformWindows();
     // ImGui::RenderPlatformWindowsDefault();
 
+    // Any 3D scenes that should be displayed are rendered to a framebuffer first
+    if (mViewportType == ViewportType::MODEL) {
+        RenderScene();
+    }
+
+    UI::Viewport(mViewportType, mViewport);
+    ImGui::Render();
+
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    SDL_GL_SwapWindow(mWindow);
+}
+
+void Context::RenderScene() {
+
     glBindFramebuffer(GL_FRAMEBUFFER, mViewport.FBO);
     glViewport(0, 0, mViewport.width, mViewport.height);
     glEnable(GL_DEPTH_TEST);
@@ -190,29 +204,6 @@ void Context::Render() {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
-    switch (mViewportType) {
-        case ViewportType::MODEL:
-            RenderLoadedModel();
-            break;
-        case ViewportType::MATERIAL:
-            RenderLoadedMaterial();
-            break;
-        default:
-            // Nothing to render to the viewport...
-            break;
-    }
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    UI::Viewport(mViewport);
-
-    ImGui::Render();
-
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    SDL_GL_SwapWindow(mWindow);
-}
-
-void Context::RenderLoadedModel() {
     glUseProgram(mShaderHandle);
 
     glm::mat4 model = glm::mat4(1.0f);
@@ -237,10 +228,8 @@ void Context::RenderLoadedModel() {
             glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
         }
     }
-}
 
-void Context::RenderLoadedMaterial() {
-    // TODO: Render a quad showing the current material texture if available
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Context::Shutdown() {

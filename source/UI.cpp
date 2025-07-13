@@ -6,7 +6,6 @@
 #include <essencio/model/WindowsModel.hpp>
 #include <string>
 
-#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "ImGuiFileDialog.h"
@@ -242,14 +241,13 @@ void UI::Console() {
     ImGui::End();
 }
 
-void UI::Viewport(FramebufferHandle &framebuffer) {
-    ImGui::Begin("Viewport");
+void UI::DrawSceneViewport(FramebufferHandle &framebuffer, const ImVec2 &size) {
 
-    ImVec2 size = ImGui::GetContentRegionAvail();
     int width = static_cast<int>(size.x);
     int height = static_cast<int>(size.y);
 
     if (width > 0 && height > 0 && (width != framebuffer.width || height != framebuffer.height)) {
+        // TODO: Handle framebuffer resizing through Context
         Renderer::DestroyFramebuffer(framebuffer);
         framebuffer = Renderer::CreateFramebuffer(width, height);
     }
@@ -279,6 +277,26 @@ void UI::Viewport(FramebufferHandle &framebuffer) {
 
             camera.Pan(deltaX * deltaTime * 0.2f, deltaY * deltaTime * 0.2f);
         }
+    }
+}
+
+void UI::Viewport(ViewportType type, FramebufferHandle &framebuffer) {
+    ImGui::Begin("Viewport");
+    ImVec2 size = ImGui::GetContentRegionAvail();
+
+    switch (type) {
+        case ViewportType::MODEL:
+            UI::DrawSceneViewport(framebuffer, size);
+            break;
+        case ViewportType::MATERIAL:
+            {
+                auto &materials = Context::Get().GetLoader().GetMaterials();
+                ImGui::Image(materials.begin()->second.texture, ImVec2(256, 256));
+            }            
+            break;
+        default:
+            // Nothing to do here
+            break;
     }
 
     ImGui::End();
