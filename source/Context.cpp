@@ -173,23 +173,13 @@ void Context::Render() {
 
     glUseProgram(mShaderHandle);
 
-    // Animate rotation
-    static float time = 0.0f;
-    time += 0.01f; // radians per frame
-
     // Build MVP using glm
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::rotate(model, time, glm::vec3(0.f, 1.f, 0.f));
 
-    //glm::mat4 view = glm::mat4(1.0f); // no camera yet
-    glm::mat4 proj = glm::perspective(glm::radians(45.0f), static_cast<float>(mViewport.width) / mViewport.height, 0.1f, 100.0f);
-    glm::mat4 view = glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 3.0f), // camera position
-        glm::vec3(0.0f, 0.5f, 0.0f), // look at center
-        glm::vec3(0.0f, 1.0f, 0.0f)  // up vector
-    );
+    glm::mat4 projection = mCamera.GetProjectionMatrix(glm::vec2(mViewport.width, mViewport.height));
+    glm::mat4 view = mCamera.GetViewMatrix();
 
-    glm::mat4 mvp = proj * view * model;
+    glm::mat4 mvp = projection * view * model;
 
     // Upload to shader
     GLint mvpLoc = glGetUniformLocation(mShaderHandle, "uMVP");

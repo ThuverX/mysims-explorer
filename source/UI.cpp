@@ -78,7 +78,6 @@ void UI::DrawDirectory(const fs::path &directory) {
             // Only display models for now
             if (path.extension() == ".0xb359c791") {
                 if (ImGui::Selectable(name.c_str())) {
-
                     auto gameType = Context::Get().GetGameType();
                     // Hacky way to quickly reload the model...
                     // TODO: Add checks to detemine how to load the currently selected file
@@ -130,6 +129,33 @@ void UI::DrawViewport(FramebufferHandle &framebuffer) {
     }
 
     ImGui::Image((ImTextureID)(intptr_t)framebuffer.texture, size, ImVec2(0, 1), ImVec2(1, 0));
+
+    auto &camera = Context::Get().GetCamera();
+
+    bool hovered = ImGui::IsWindowHovered();
+    bool focused = ImGui::IsWindowFocused();
+
+    if (hovered && focused) {
+        ImGuiIO& io = ImGui::GetIO();
+
+        if (ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
+            float deltaX = io.MouseDelta.x;
+            float deltaY = io.MouseDelta.y;
+
+            camera.Orbit(deltaX * 0.2f, deltaY * 0.2f);
+        }
+
+        if (io.MouseWheel != 0.0f) {
+            camera.Zoom(io.MouseWheel * 0.5f);
+        }
+
+        if (ImGui::IsMouseDragging(ImGuiMouseButton_Right)) {
+            float deltaX = io.MouseDelta.x;
+            float deltaY = io.MouseDelta.y;
+
+            camera.Pan(deltaX * 0.0075f, deltaY * 0.0075f);
+        }
+    }
 
     ImGui::End();
 }

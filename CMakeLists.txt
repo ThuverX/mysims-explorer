@@ -10,6 +10,8 @@ set(SDL_SHARED OFF CACHE BOOL "")
 add_subdirectory(lib/sdl)
 
 add_executable(mysims-explorer source/main.cpp
+    source/Camera.hpp
+    source/Camera.cpp
     source/Context.hpp
     source/Context.cpp
     source/File.hpp

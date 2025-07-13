@@ -10,6 +10,7 @@ namespace fs = std::filesystem;
 
 #include "Renderer.hpp"
 #include "Loader.hpp"
+#include "Camera.hpp"
 
 #include "essencio/GameType.hpp"
 
@@ -24,6 +25,7 @@ private:
     std::optional<fs::path> mGameRoot;
     essencio::GameType mGameType;
     Loader mLoader;
+    Camera mCamera;
 
     Context() = default;
     Context(const Context&) = delete;
@@ -53,6 +55,10 @@ public:
 
     inline Loader &GetLoader() {
         return mLoader;
+    }
+
+    inline Camera &GetCamera() {
+        return mCamera;
     }
 
     static Context &Get() {
