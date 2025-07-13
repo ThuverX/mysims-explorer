@@ -77,13 +77,13 @@ std::optional<fs::path> Context::FindGameRoot(const fs::path &path) {
     return std::nullopt;
 }
 
-ViewportType Context::GetExtensionViewportType(const std::string &extension) {
+ContextType Context::GetExtensionContextType(const std::string &extension) {
     if (extension == ".0xb359c791") {
-        return ViewportType::MODEL;
+        return ContextType::MODEL;
     } else if (extension == ".Material") {
-        return ViewportType::MATERIAL;
+        return ContextType::MATERIAL;
     }
-    return ViewportType::NONE;
+    return ContextType::NONE;
 }
 
 bool Context::Initialize(const std::optional<fs::path> &gameRoot) {
@@ -187,11 +187,11 @@ void Context::Render() {
     // ImGui::RenderPlatformWindowsDefault();
 
     // Any 3D scenes that should be displayed are rendered to a framebuffer first
-    if (mViewportType == ViewportType::MODEL) {
+    if (mContextType == ContextType::MODEL) {
         RenderScene();
     }
 
-    UI::Viewport(mViewportType, mViewport);
+    UI::Viewport(mContextType, mViewport);
     ImGui::Render();
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -291,13 +291,13 @@ void Context::LoadViewportFile(const fs::path &path) {
     mLoader.UnloadAll();
     mCamera.Reset();
 
-    mViewportType = GetExtensionViewportType(path.extension().string());
+    mContextType = GetExtensionContextType(path.extension().string());
 
-    switch (mViewportType) {
-        case ViewportType::MODEL:
+    switch (mContextType) {
+        case ContextType::MODEL:
             mLoader.LoadModel(path.string(), mGameType);
             break;
-        case ViewportType::MATERIAL:
+        case ContextType::MATERIAL:
             mLoader.LoadMaterial(path.string(), mGameType);
             break;
         default:

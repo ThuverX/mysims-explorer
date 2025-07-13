@@ -23,7 +23,7 @@ void Properties();
 void Console();
 
 void DrawSceneViewport(FramebufferHandle &framebuffer, const ImVec2 &size);
-void Viewport(ViewportType type, FramebufferHandle &framebuffer);
+void Viewport(ContextType type, FramebufferHandle &framebuffer);
 
 void MainMenuBar();
 

@@ -15,7 +15,7 @@ namespace fs = std::filesystem;
 
 #include "essencio/GameType.hpp"
 
-enum class ViewportType {
+enum class ContextType {
     NONE,
     MODEL,
     MATERIAL
@@ -32,7 +32,7 @@ private:
 
     std::optional<fs::path> mGameRoot;
     essencio::GameType mGameType;
-    ViewportType mViewportType;
+    ContextType mContextType;
     Loader mLoader;
     Camera mCamera;
     
@@ -49,7 +49,7 @@ public:
     bool mWireframeMode = false;
 
     static std::optional<fs::path> FindGameRoot(const fs::path &path);
-    static ViewportType GetExtensionViewportType(const std::string &extension);
+    static ContextType GetExtensionContextType(const std::string &extension);
 
     bool Initialize(const std::optional<fs::path> &gameRoot);
     void Update();
@@ -72,8 +72,8 @@ public:
         return mGameType;
     }
 
-    inline ViewportType GetViewportType() const {
-        return mViewportType;
+    inline ContextType GetContextType() const {
+        return mContextType;
     }
 
     inline Loader &GetLoader() {

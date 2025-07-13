@@ -195,11 +195,11 @@ void UI::Properties() {
 
     auto &loader = Context::Get().GetLoader();
 
-    switch (Context::Get().GetViewportType()) {
-        case ViewportType::MODEL:
+    switch (Context::Get().GetContextType()) {
+        case ContextType::MODEL:
             DrawModelProperties(loader);
             break;
-        case ViewportType::MATERIAL:
+        case ContextType::MATERIAL:
             DrawMaterialProperties(loader);
             break;
         default:
@@ -281,17 +281,17 @@ void UI::DrawSceneViewport(FramebufferHandle &framebuffer, const ImVec2 &size) {
     }
 }
 
-void UI::Viewport(ViewportType type, FramebufferHandle &framebuffer) {
+void UI::Viewport(ContextType type, FramebufferHandle &framebuffer) {
     ImGui::Begin("Viewport");
 
     auto &loader = Context::Get().GetLoader();
     ImVec2 size = ImGui::GetContentRegionAvail();
 
     switch (type) {
-        case ViewportType::MODEL:
+        case ContextType::MODEL:
             UI::DrawSceneViewport(framebuffer, size);
             break;
-        case ViewportType::MATERIAL:
+        case ContextType::MATERIAL:
             {
                 const auto &materials = loader.GetMaterials();
 
