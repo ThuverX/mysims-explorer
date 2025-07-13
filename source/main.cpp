@@ -1,4 +1,4 @@
-#include <iostream>
+#include "macros/log.hpp"
 
 #define SDL_MAIN_USE_CALLBACKS
 #include <SDL3/SDL_main.h>
@@ -11,7 +11,7 @@ SDL_AppResult SDL_AppInit([[maybe_unused]] void **appstate, int argc, char **arg
         auto gameRoot = Context::FindGameRoot(argv[1]);
 
         if (!gameRoot) {
-            std::cerr << "Failed to find game root at " << argv[1] << std::endl;
+            LOG_ERROR("Failed to find game root at %s", argv[1]);
             return SDL_APP_FAILURE;
         }
 

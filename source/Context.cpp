@@ -9,6 +9,7 @@
 #include "glad/gl.h"
 
 #include "Context.hpp"
+#include "macros/log.hpp"
 #include <iostream>
 #include <filesystem>
 
@@ -78,10 +79,11 @@ std::optional<fs::path> Context::FindGameRoot(const fs::path &path) {
 
 bool Context::Initialize(const std::optional<fs::path> &gameRoot) {
 
+    LOG_INFO("MySims Explorer is initializing...");
     ChangeGameRoot(gameRoot);
     
     if (!SDL_Init(SDL_INIT_VIDEO)) {
-        std::cerr << "Failed to initialize SDL: " << SDL_GetError() << std::endl;
+        LOG_ERROR("Failed to initialize SDL: %s", SDL_GetError());
         return false;
     }
 
@@ -92,13 +94,13 @@ bool Context::Initialize(const std::optional<fs::path> &gameRoot) {
     mWindow = SDL_CreateWindow("MySims Explorer", 1280, 720, 
         SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE);
     if (!mWindow) {
-        std::cerr << "Failed to create SDL window: " << SDL_GetError() << std::endl;
+        LOG_ERROR("Failed to create SDL window: %s", SDL_GetError());
         return false;
     }
 
     mGLContext = SDL_GL_CreateContext(mWindow);
     if (!mGLContext) {
-        std::cerr << "Failed to create GL context: " << SDL_GetError() << std::endl;
+        LOG_ERROR("Failed to create GL context: %s", SDL_GetError());
         return false;
     }
 
@@ -106,7 +108,7 @@ bool Context::Initialize(const std::optional<fs::path> &gameRoot) {
 
     int version = gladLoadGL(SDL_GL_GetProcAddress);
     if (version == 0) {
-        std::cerr << "Failed to initialize OpenGL context" << std::endl;
+        LOG_ERROR("Failed to initialize OpenGL loader");
         return false;
     }
     
@@ -117,9 +119,11 @@ bool Context::Initialize(const std::optional<fs::path> &gameRoot) {
         VERTEX_SHADER_SOURCE,
         FRAGMENT_SHADER_SOURCE
     });
+    // TODO: Add error checking
 
     // Create main viewport framebuffer (maybe allow multiple later on?)
     mViewport = Renderer::CreateFramebuffer(1280, 720);
+    // TODO: Add error checking
     
     // Setup ImGui
     IMGUI_CHECKVERSION();
@@ -137,6 +141,8 @@ bool Context::Initialize(const std::optional<fs::path> &gameRoot) {
     ImGui_ImplOpenGL3_Init("#version 330");
 
     SDL_ShowWindow(mWindow);
+
+    LOG_INFO("MySims Explorer was successfully initialized!");
     return true;
 }
 
@@ -158,8 +164,7 @@ void Context::Render() {
 
     if (mShowExplorer) UI::Explorer();
     if (mShowProperties) UI::Properties();
-    //UI::DrawConsole();
-    
+    if (mShowConsole) UI::Console();
 
     // ImGui::UpdatePlatformWindows();
     // ImGui::RenderPlatformWindowsDefault();
@@ -251,6 +256,8 @@ void Context::ChangeGameRoot(const std::optional<fs::path> &gameRoot) {
     mLoader.UnloadAll();
     mGameRoot = gameRoot;
 
+    LOG_INFO("Data directory was changed to %s", (*gameRoot).string().c_str());
+
     if (mGameRoot) {
         // Try to determine game type
         if (fs::exists(*mGameRoot / "GameData" / "Vaults")) {
@@ -258,6 +265,8 @@ void Context::ChangeGameRoot(const std::optional<fs::path> &gameRoot) {
         } else {
             mGameType = essencio::GameType::MYSIMS;
         }
+
+        LOG_DEBUG("Automatically detected game type %d", static_cast<int>(mGameType));
     }
 }
 
@@ -268,6 +277,8 @@ void Context::ChangeGameType(const essencio::GameType &gameType) {
 
     mLoader.UnloadAll();
     mGameType = gameType;
+
+    LOG_INFO("Game type was changed to %d", static_cast<int>(mGameType));
 }
 
 void Context::LoadViewportFile(const fs::path &path) {

@@ -18,6 +18,8 @@ add_executable(mysims-explorer source/main.cpp
     source/File.cpp
     source/Loader.hpp
     source/Loader.cpp
+    source/Logger.hpp
+    source/Logger.cpp
     source/Renderer.hpp
     source/Renderer.cpp
     source/UI.hpp

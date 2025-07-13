@@ -12,8 +12,7 @@
 
 #include <gli/load.hpp>
 
-// TODO: Replace with logging system
-#include <iostream>
+#include "macros/log.hpp"
 
 namespace fs = std::filesystem;
 
@@ -34,11 +33,11 @@ std::vector<float> Loader::GetMeshVertices(const essencio::WindowsMesh &mesh) {
 
     // TODO: Throw exceptions instead?
     if (positionOffset == 0xFFFFFFFF) {
-        std::cerr << "No FLOAT3 position key found in vertexKeys!" << std::endl;
+        LOG_WARN("No FLOAT3 position key found in vertexKeys!");
         return vertices;
     }
     if (uvOffset == 0xFFFFFFFF) {
-        std::cerr << "No FLOAT2 UV key found in vertexKeys!" << std::endl;
+        LOG_WARN("No FLOAT2 UV key found in vertexKeys!");
         return vertices;
     }
 
@@ -157,6 +156,7 @@ std::optional<ModelData> Loader::LoadModel(const std::string &path, const essenc
     // Not sure how groups are being affected by this...
 
     models.insert({model.path, model});
+    LOG_INFO("Loaded model at path %s", path.c_str());
     return model;
 }
 
@@ -181,7 +181,7 @@ std::optional<MaterialData> Loader::LoadMaterial(const std::string &path, const 
                         // Load the DDS texture using gli
                         gli::texture texture = gli::load((*texturePath).c_str());
                         if (texture.empty()) {
-                            std::cerr << "Failed to load texture: " << *texturePath << std::endl;
+                            LOG_WARN("Failed to load texture: %s", (*texturePath).c_str());
                             return std::nullopt;
                         }
 
@@ -204,6 +204,7 @@ std::optional<MaterialData> Loader::LoadMaterial(const std::string &path, const 
     }
 
     materials.insert({material.path, material});
+    LOG_INFO("Loaded material at path %s", path.c_str());
     return material;
 }
 

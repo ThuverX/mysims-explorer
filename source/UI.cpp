@@ -11,8 +11,7 @@
 #include "imgui_internal.h"
 #include "ImGuiFileDialog.h"
 
-// testing
-#include <iostream>
+#include "Logger.hpp"
 
 void UI::DockSpace() {
     static bool opt_fullscreen = true;
@@ -212,9 +211,34 @@ void UI::Properties() {
 }
 
 void UI::Console() {
-    ImGui::Begin("Console");
+    ImGui::Begin("Console", nullptr, ImGuiWindowFlags_HorizontalScrollbar);
 
+    const auto &history = Logger::Get().GetHistory();
 
+    for (const auto& entry : history) {
+        ImVec4 color;
+
+        switch (entry.level) {
+            case LogLevel::ERROR:
+                color = ImVec4(1.0f, 0.2f, 0.2f, 1.0f); // red
+                break;
+            case LogLevel::WARN:
+                color = ImVec4(1.0f, 0.7f, 0.0f, 1.0f); // orange/yellow
+                break;
+            case LogLevel::INFO:
+                color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // white
+                break;
+            default:
+                color = ImVec4(0.5f, 0.5f, 0.5f, 1.0f); // gray
+                break;
+        }
+
+        ImGui::PushStyleColor(ImGuiCol_Text, color);
+        ImGui::TextUnformatted(entry.message.c_str());
+        ImGui::PopStyleColor();
+    }
+
+    ImGui::SetScrollHereY(1.0f);
     ImGui::End();
 }
 
