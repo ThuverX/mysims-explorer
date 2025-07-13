@@ -6,18 +6,22 @@
 #include <optional>
 
 #include "essencio/GameType.hpp"
+#include "essencio/model/WindowsModel.hpp"
 #include "essencio/model/WindowsMesh.hpp"
+#include "essencio/material/Material.hpp"
 
 #include "Renderer.hpp"
 
 struct ModelData {
     std::string path;
     std::vector<MeshHandle> meshes;
+    essencio::WindowsModel data;
 };
 
 struct MaterialData {
     std::string path;
     TextureHandle texture;
+    essencio::Material data;
 };
 
 class Loader {

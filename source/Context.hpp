@@ -15,6 +15,7 @@ namespace fs = std::filesystem;
 #include "essencio/GameType.hpp"
 
 enum class ViewportType {
+    NONE,
     MODEL,
     MATERIAL
 };
@@ -63,6 +64,10 @@ public:
 
     inline essencio::GameType GetGameType() const {
         return mGameType;
+    }
+
+    inline ViewportType GetViewportType() const {
+        return mViewportType;
     }
 
     inline Loader &GetLoader() {

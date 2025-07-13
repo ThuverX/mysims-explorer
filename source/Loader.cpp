@@ -119,15 +119,14 @@ std::optional<std::string> Loader::FindTexturePath(const std::string &fileName) 
 }
 
 std::optional<ModelData> Loader::LoadModel(const std::string &path, const essencio::GameType &gameType) {
-    ModelData data;
+    ModelData model;
 
     std::vector<uint8_t> file = File::ReadFile(path);
     essencio::BinReader reader(file.data(), file.size());
 
-    essencio::WindowsModel model;
-    essencio::WindowsModel::Read(model, reader);
+    essencio::WindowsModel::Read(model.data, reader);
 
-    for (const auto &mesh : model.meshes) {
+    for (const auto &mesh : model.data.meshes) {
         std::vector<float> vertices = GetMeshVertices(mesh);
         std::vector<uint32_t> indices = GetMeshIndices(mesh);
 
@@ -150,28 +149,27 @@ std::optional<ModelData> Loader::LoadModel(const std::string &path, const essenc
             }
         }
 
-        data.path = path;
-        data.meshes.emplace_back(meshHandle);
+        model.path = path;
+        model.meshes.emplace_back(meshHandle);
     }
 
     // TODO: Insert using base instance hash only?
     // Not sure how groups are being affected by this...
 
-    models.insert({data.path, data});
-    return data;
+    models.insert({model.path, model});
+    return model;
 }
 
 std::optional<MaterialData> Loader::LoadMaterial(const std::string &path, const essencio::GameType &gameType) {
-    MaterialData data;
+    MaterialData material;
 
     std::vector<uint8_t> file = File::ReadFile(path);
     essencio::BinReader reader(file.data(), file.size());
 
-    essencio::Material material;
-    essencio::Material::Read(material, reader, gameType);
+    essencio::Material::Read(material.data, reader, gameType);
 
     // Read material
-    for (const auto &param : material.data.params) {
+    for (const auto &param : material.data.data.params) {
         switch (param.valueType) {
             case essencio::MaterialParameterType::RESOURCE_KEY:
                 {
@@ -191,7 +189,7 @@ std::optional<MaterialData> Loader::LoadMaterial(const std::string &path, const 
                         gli::gl::format const format = GL.translate(texture.format(), texture.swizzles());
                         GLsizei const levels = static_cast<GLsizei>(texture.levels());
 
-                        data.texture = Renderer::CreateTexture({
+                        material.texture = Renderer::CreateTexture({
                             texture,
                             format,
                             levels,
@@ -205,8 +203,8 @@ std::optional<MaterialData> Loader::LoadMaterial(const std::string &path, const 
         }
     }
 
-    materials.insert({data.path, data});
-    return data;
+    materials.insert({material.path, material});
+    return material;
 }
 
 void Loader::UnloadAll() {

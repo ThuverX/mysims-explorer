@@ -1,18 +1,23 @@
 #pragma once
 
 #include "Renderer.hpp"
+#include "Loader.hpp"
 
 #include <filesystem>
 namespace fs = std::filesystem;
 
 namespace UI {
 
-void DrawDockSpace();
+void DockSpace();
 void DrawDirectory(const fs::path &directory);
-void DrawFileExplorer();
-void DrawProperties();
-void DrawConsole();
-void DrawViewport(FramebufferHandle &framebuffer);
-void DrawMainMenuBar();
+void Explorer();
+
+void DrawModelProperties(Loader &loader);
+void DrawMaterialProperties(Loader &loader);
+void Properties();
+
+void Console();
+void Viewport(FramebufferHandle &framebuffer);
+void MainMenuBar();
 
 } // namespace UI

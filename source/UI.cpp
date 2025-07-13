@@ -2,13 +2,19 @@
 
 #include "Context.hpp"
 #include <essencio/GameType.hpp>
+#include <essencio/model/VertexKey.hpp>
+#include <essencio/model/WindowsModel.hpp>
+#include <string>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "ImGuiFileDialog.h"
 
-void UI::DrawDockSpace() {
+// testing
+#include <iostream>
+
+void UI::DockSpace() {
     static bool opt_fullscreen = true;
     static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
 
@@ -46,7 +52,7 @@ void UI::DrawDockSpace() {
 
         // Step 1: Split horizontally
         ImGuiID dock_id_left   = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.2f, nullptr, &dock_main_id);
-        ImGuiID dock_id_right  = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.2f, nullptr, &dock_main_id);
+        ImGuiID dock_id_right  = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.25f, nullptr, &dock_main_id);
         ImGuiID dock_id_center = dock_main_id;
 
         // Step 2: Split center vertically for Viewport (top) and Console (bottom)
@@ -82,7 +88,7 @@ void UI::DrawDirectory(const fs::path &directory) {
     }
 }
 
-void UI::DrawFileExplorer() {
+void UI::Explorer() {
     ImGui::Begin("Explorer");
 
     auto gameRoot = Context::Get().GetGameRoot();
@@ -95,21 +101,124 @@ void UI::DrawFileExplorer() {
     ImGui::End();
 }
 
-void UI::DrawProperties() {
+void UI::DrawModelProperties(Loader &loader) {
+
+    for (const auto &pair : loader.GetModels()) {
+
+        const essencio::WindowsModel &model = pair.second.data;
+
+        ImGui::Text("Version: %d.%d", model.majorVersion, model.minorVersion);
+        ImGui::Text("Min. Bounds: %.3f,%.3f,%.3f",
+            model.boundsMin.x, model.boundsMin.y, model.boundsMin.z);
+        ImGui::Text("Max. Bounds: %.3f,%.3f,%.3f",
+            model.boundsMax.x, model.boundsMax.y, model.boundsMax.z);
+
+        // TODO: Add extra parameter info
+
+        for (uint32_t i = 0; i < model.rigs.size(); ++i) {
+            const auto &rig = model.rigs[i];
+            std::string rigLabel = "Rig #" + std::to_string(i + 1);
+
+            if (ImGui::CollapsingHeader(rigLabel.c_str())) {
+                ImGui::Indent();
+                ImGui::Text("# of Bones: %d", rig.numBones);
+                ImGui::Unindent();
+            }
+        }
+
+        for (uint32_t i = 0; i < model.meshes.size(); ++i) {
+            const auto &mesh = model.meshes[i];
+            std::string meshLabel = "Mesh #" + std::to_string(i + 1);
+
+            if (ImGui::CollapsingHeader(meshLabel.c_str())) {
+                ImGui::Indent();
+
+                std::string materialLabel = "Material##" + std::to_string(i);
+                if (ImGui::CollapsingHeader(materialLabel.c_str())) {
+                    ImGui::Indent();
+                    GLuint texture = pair.second.meshes[i].texture;
+
+                    if (texture != 0) {
+                        ImGui::Image((void*)(intptr_t)texture, ImVec2(128, 128));
+                    }
+
+                    // TODO: Add possibilty to directly open material
+
+                    ImGui::Unindent();
+                }
+
+                ImGui::Text("Min. Bounds: %.3f,%.3f,%.3f",
+                    mesh.boundsMin.x, mesh.boundsMin.y, mesh.boundsMin.z);
+                ImGui::Text("Max. Bounds: %.3f,%.3f,%.3f",
+                    mesh.boundsMax.x, mesh.boundsMax.y, mesh.boundsMax.z);
+
+                ImGui::Text("# of Vertices: %d", mesh.numVertices);
+                ImGui::Text("# of Faces: %d", mesh.numFaces);
+                ImGui::Text("# of Vertex Keys: %d", mesh.numVertexKeys);
+
+                for (uint32_t j = 0; j < mesh.vertexKeys.size(); ++j) {
+                    const auto &key = mesh.vertexKeys[j];
+                    std::string keyLabel = "Vertex Key #" + std::to_string(j + 1)
+                        + "##mesh" + std::to_string(i) + "_key" + std::to_string(j);
+
+                    if (ImGui::CollapsingHeader(keyLabel.c_str())) {
+                        ImGui::Indent();
+                        std::string type;
+
+                        switch (key.type) {
+                            case essencio::VertexKeyType::FLOAT2: type = "FLOAT2"; break;
+                            case essencio::VertexKeyType::FLOAT3: type = "FLOAT3"; break;
+                            case essencio::VertexKeyType::FLOAT: type = "FLOAT"; break;
+                            case essencio::VertexKeyType::UNKNOWN: type = "(Unknown)"; break;
+                        }
+
+                        ImGui::Text("Offset: %d", key.offset);
+                        ImGui::Text("Type: %s", type.c_str());
+                        ImGui::Text("Index: %d", key.index);
+                        ImGui::Text("Sub Index: %d", key.subIndex);
+
+                        ImGui::Unindent();
+                    }
+                }
+
+                ImGui::Unindent();
+            }
+        }
+    }
+}
+
+void UI::DrawMaterialProperties(Loader &loader) {
+
+}
+
+void UI::Properties() {
     ImGui::Begin("Properties");
 
+    auto &loader = Context::Get().GetLoader();
+
+    switch (Context::Get().GetViewportType()) {
+        case ViewportType::MODEL:
+            DrawModelProperties(loader);
+            break;
+        case ViewportType::MATERIAL:
+            DrawMaterialProperties(loader);
+            break;
+        default:
+            // TODO: Show default text here?
+            break;
+    }
 
     ImGui::End();
 }
 
-void UI::DrawConsole() {
+void UI::Console() {
     ImGui::Begin("Console");
 
 
     ImGui::End();
 }
 
-void UI::DrawViewport(FramebufferHandle &framebuffer) {
+void UI::Viewport(FramebufferHandle &framebuffer) {
     ImGui::Begin("Viewport");
 
     ImVec2 size = ImGui::GetContentRegionAvail();
@@ -150,7 +259,7 @@ void UI::DrawViewport(FramebufferHandle &framebuffer) {
     ImGui::End();
 }
 
-void UI::DrawMainMenuBar() {
+void UI::MainMenuBar() {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {
             if (ImGui::MenuItem("Open Game Root...", "Ctrl+O")) {

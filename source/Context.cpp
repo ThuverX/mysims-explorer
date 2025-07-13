@@ -153,11 +153,13 @@ void Context::Render() {
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
-    UI::DrawDockSpace();
-    UI::DrawFileExplorer();
-    //UI::DrawProperties();
+    UI::MainMenuBar();
+    UI::DockSpace();
+
+    UI::Explorer();
+    UI::Properties();
     //UI::DrawConsole();
-    UI::DrawMainMenuBar();
+    
 
     // ImGui::UpdatePlatformWindows();
     // ImGui::RenderPlatformWindowsDefault();
@@ -178,11 +180,14 @@ void Context::Render() {
         case ViewportType::MATERIAL:
             RenderLoadedMaterial();
             break;
+        default:
+            // Nothing to render to the viewport...
+            break;
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    UI::DrawViewport(mViewport);
+    UI::Viewport(mViewport);
 
     ImGui::Render();
 
