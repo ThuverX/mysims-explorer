@@ -78,7 +78,7 @@ std::optional<fs::path> Context::FindGameRoot(const fs::path &path) {
 
 bool Context::Initialize(const std::optional<fs::path> &gameRoot) {
 
-    mGameRoot = gameRoot;
+    ChangeGameRoot(gameRoot);
     
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         std::cerr << "Failed to initialize SDL: " << SDL_GetError() << std::endl;
