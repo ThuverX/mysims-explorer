@@ -16,10 +16,17 @@ private:
     void Update();
 
 public:
-    Camera(glm::vec3 target = glm::vec3(0.0f), float distance = 3.f, float yaw = 90.f, float pitch = 0.f)
-        : target(target), distance(distance), yaw(yaw), pitch(pitch) {
-            Update();
-        }
+    Camera() {
+        Reset();
+    }
+
+    void Reset() {
+        target = glm::vec3(0.f);
+        distance = 3.f;
+        yaw = 90.f;
+        pitch = 0.f;
+        Update();
+    }
 
     void Orbit(float deltaYaw, float deltaPitch);
     void Zoom(float deltaZoom);

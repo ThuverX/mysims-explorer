@@ -88,7 +88,7 @@ void UI::DrawDirectory(const fs::path &directory) {
 }
 
 void UI::Explorer() {
-    ImGui::Begin("Explorer");
+    ImGui::Begin("Explorer", nullptr, ImGuiWindowFlags_HorizontalScrollbar);
 
     auto gameRoot = Context::Get().GetGameRoot();
     if (gameRoot && fs::exists(*gameRoot)) {

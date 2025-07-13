@@ -283,6 +283,7 @@ void Context::ChangeGameType(const essencio::GameType &gameType) {
 
 void Context::LoadViewportFile(const fs::path &path) {
     mLoader.UnloadAll();
+    mCamera.Reset();
 
     if (path.extension() == ".0xb359c791") {
         mLoader.LoadModel(path.string(), mGameType);
