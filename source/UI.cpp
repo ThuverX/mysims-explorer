@@ -6,6 +6,7 @@
 #include <essencio/model/WindowsModel.hpp>
 #include <string>
 
+#include "Renderer.hpp"
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "ImGuiFileDialog.h"
@@ -282,6 +283,8 @@ void UI::DrawSceneViewport(FramebufferHandle &framebuffer, const ImVec2 &size) {
 
 void UI::Viewport(ViewportType type, FramebufferHandle &framebuffer) {
     ImGui::Begin("Viewport");
+
+    auto &loader = Context::Get().GetLoader();
     ImVec2 size = ImGui::GetContentRegionAvail();
 
     switch (type) {
@@ -290,9 +293,13 @@ void UI::Viewport(ViewportType type, FramebufferHandle &framebuffer) {
             break;
         case ViewportType::MATERIAL:
             {
-                auto &materials = Context::Get().GetLoader().GetMaterials();
-                ImGui::Image(materials.begin()->second.texture, ImVec2(256, 256));
-            }            
+                const auto &materials = loader.GetMaterials();
+
+                if (materials.size() > 0) {
+                    TextureHandle texture = materials.begin()->second.texture;
+                    ImGui::Image(texture, ImVec2(256, 256));
+                }
+            }
             break;
         default:
             // Nothing to do here

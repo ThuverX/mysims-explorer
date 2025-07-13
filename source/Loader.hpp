@@ -38,8 +38,8 @@ private:
     static std::optional<std::string> FindTexturePath(const std::string &fileName);
 
 public:
-    std::optional<ModelData> LoadModel(const std::string &path, const essencio::GameType &gameType);
-    std::optional<MaterialData> LoadMaterial(const std::string &path, const essencio::GameType &gameType);
+    ModelData *LoadModel(const std::string &path, const essencio::GameType &gameType);
+    MaterialData *LoadMaterial(const std::string &path, const essencio::GameType &gameType);
 
     void UnloadAll();
 

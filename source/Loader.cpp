@@ -117,7 +117,7 @@ std::optional<std::string> Loader::FindTexturePath(const std::string &fileName) 
     return std::nullopt;
 }
 
-std::optional<ModelData> Loader::LoadModel(const std::string &path, const essencio::GameType &gameType) {
+ModelData *Loader::LoadModel(const std::string &path, const essencio::GameType &gameType) {
     ModelData model;
 
     std::vector<uint8_t> file = File::ReadFile(path);
@@ -155,12 +155,12 @@ std::optional<ModelData> Loader::LoadModel(const std::string &path, const essenc
     // TODO: Insert using base instance hash only?
     // Not sure how groups are being affected by this...
 
-    models.insert({model.path, model});
+    auto result = models.insert({model.path, std::move(model)});
     LOG_INFO("Loaded model at path %s", path.c_str());
-    return model;
+    return &result.first->second;
 }
 
-std::optional<MaterialData> Loader::LoadMaterial(const std::string &path, const essencio::GameType &gameType) {
+MaterialData *Loader::LoadMaterial(const std::string &path, const essencio::GameType &gameType) {
     MaterialData material;
 
     std::vector<uint8_t> file = File::ReadFile(path);
@@ -182,7 +182,7 @@ std::optional<MaterialData> Loader::LoadMaterial(const std::string &path, const 
                         gli::texture texture = gli::load((*texturePath).c_str());
                         if (texture.empty()) {
                             LOG_WARN("Failed to load texture: %s", (*texturePath).c_str());
-                            return std::nullopt;
+                            return nullptr;
                         }
 
                         gli::gl GL(gli::gl::PROFILE_GL33);
@@ -203,9 +203,9 @@ std::optional<MaterialData> Loader::LoadMaterial(const std::string &path, const 
         }
     }
 
-    materials.insert({material.path, material});
+    auto result = materials.insert({material.path, std::move(material)});
     LOG_INFO("Loaded material at path %s", path.c_str());
-    return material;
+    return &result.first->second;
 }
 
 void Loader::UnloadAll() {

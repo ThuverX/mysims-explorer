@@ -49,6 +49,7 @@ public:
     bool mWireframeMode = false;
 
     static std::optional<fs::path> FindGameRoot(const fs::path &path);
+    static ViewportType GetExtensionViewportType(const std::string &extension);
 
     bool Initialize(const std::optional<fs::path> &gameRoot);
     void Update();

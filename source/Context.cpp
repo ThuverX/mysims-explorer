@@ -77,6 +77,15 @@ std::optional<fs::path> Context::FindGameRoot(const fs::path &path) {
     return std::nullopt;
 }
 
+ViewportType Context::GetExtensionViewportType(const std::string &extension) {
+    if (extension == ".0xb359c791") {
+        return ViewportType::MODEL;
+    } else if (extension == ".Material") {
+        return ViewportType::MATERIAL;
+    }
+    return ViewportType::NONE;
+}
+
 bool Context::Initialize(const std::optional<fs::path> &gameRoot) {
 
     mLastTime = SDL_GetPerformanceCounter();
@@ -282,11 +291,17 @@ void Context::LoadViewportFile(const fs::path &path) {
     mLoader.UnloadAll();
     mCamera.Reset();
 
-    if (path.extension() == ".0xb359c791") {
-        mLoader.LoadModel(path.string(), mGameType);
-        mViewportType = ViewportType::MODEL;
-    } else if (path.extension() == ".Material") {
-        mLoader.LoadMaterial(path.string(), mGameType);
-        mViewportType = ViewportType::MATERIAL;
+    mViewportType = GetExtensionViewportType(path.extension().string());
+
+    switch (mViewportType) {
+        case ViewportType::MODEL:
+            mLoader.LoadModel(path.string(), mGameType);
+            break;
+        case ViewportType::MATERIAL:
+            mLoader.LoadMaterial(path.string(), mGameType);
+            break;
+        default:
+            // Nothing to load here...
+            break;
     }
 }
