@@ -8,6 +8,7 @@ namespace fs = std::filesystem;
 #include "SDL3/SDL_video.h"
 #include "SDL3/SDL_events.h"
 
+#include "macros/singleton.hpp"
 #include "Renderer.hpp"
 #include "Loader.hpp"
 #include "Camera.hpp"
@@ -21,6 +22,7 @@ enum class ViewportType {
 };
 
 class Context {
+    MAKE_SINGLETON(Context)
 private:
     SDL_Window *mWindow;
     SDL_GLContext mGLContext;
@@ -33,12 +35,6 @@ private:
     ViewportType mViewportType;
     Loader mLoader;
     Camera mCamera;
-
-    Context() = default;
-    Context(const Context&) = delete;
-    Context(Context&&) = delete;
-    Context &operator=(const Context &) = delete;
-    Context &operator=(Context &&) = delete;
 
 public:
     // View options
@@ -83,10 +79,5 @@ public:
 
     inline Camera &GetCamera() {
         return mCamera;
-    }
-
-    static Context &Get() {
-        static Context instance;
-        return instance;
     }
 };
