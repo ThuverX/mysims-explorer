@@ -40,6 +40,9 @@ private:
     Uint64 mLastTime;
     double mDeltaTime;
 
+    std::optional<std::string> mCurrentFile;
+    std::optional<std::string> mNextFile;
+
 public:
     // View options
     bool mShowExplorer = true;
@@ -62,8 +65,12 @@ public:
     void ChangeGameRoot(const std::optional<fs::path> &gameRoot);
     void ChangeGameType(const essencio::GameType &gameType);
 
-    void LoadViewportFile(const fs::path &path);
+    void SetNextFile(const std::optional<std::string> &path);
 
+private:
+    void LoadFile(const fs::path &path);
+
+public:
     inline std::optional<fs::path> GetGameRoot() const {
         return mGameRoot;
     }
@@ -86,5 +93,9 @@ public:
 
     inline double GetDeltaTime() const {
         return mDeltaTime;
+    }
+
+    inline const std::optional<std::string> &GetCurrentFile() const {
+        return mCurrentFile;
     }
 };

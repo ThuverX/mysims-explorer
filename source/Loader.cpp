@@ -119,6 +119,7 @@ std::optional<std::string> Loader::FindTexturePath(const std::string &fileName) 
 
 ModelData *Loader::LoadModel(const std::string &path, const essencio::GameType &gameType) {
     ModelData model;
+    model.path = path;
 
     std::vector<uint8_t> file = File::ReadFile(path);
     essencio::BinReader reader(file.data(), file.size());
@@ -129,7 +130,8 @@ ModelData *Loader::LoadModel(const std::string &path, const essencio::GameType &
         std::vector<float> vertices = GetMeshVertices(mesh);
         std::vector<uint32_t> indices = GetMeshIndices(mesh);
 
-        MeshHandle meshHandle = Renderer::CreateMesh({
+        MeshData meshData;
+        meshData.handle = Renderer::CreateMesh({
             vertices,
             indices,
         });
@@ -143,13 +145,13 @@ ModelData *Loader::LoadModel(const std::string &path, const essencio::GameType &
             auto materialData = LoadMaterial(*materialPath, gameType);
 
             if (materialData) {
+                meshData.material = *materialData;
                 // Attach this material to the current mesh
-                meshHandle.texture = materialData->texture;
+                meshData.handle.texture = materialData->texture;
             }
         }
 
-        model.path = path;
-        model.meshes.emplace_back(meshHandle);
+        model.meshes.emplace_back(meshData);
     }
 
     // TODO: Insert using base instance hash only?
@@ -162,6 +164,7 @@ ModelData *Loader::LoadModel(const std::string &path, const essencio::GameType &
 
 MaterialData *Loader::LoadMaterial(const std::string &path, const essencio::GameType &gameType) {
     MaterialData material;
+    material.path = path;
 
     std::vector<uint8_t> file = File::ReadFile(path);
     essencio::BinReader reader(file.data(), file.size());
@@ -216,7 +219,7 @@ void Loader::UnloadAll() {
 
     for (auto &model : models) {
         for (auto &mesh : model.second.meshes) {
-            Renderer::DestroyMesh(mesh);
+            Renderer::DestroyMesh(mesh.handle);
         }
     }
     models.clear();

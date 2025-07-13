@@ -6,6 +6,7 @@
 #include <essencio/model/WindowsModel.hpp>
 #include <string>
 
+#include "macros/log.hpp"
 #include "Renderer.hpp"
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -88,7 +89,7 @@ void UI::DrawDirectory(const fs::path &directory) {
             }
 
             if (ImGui::Selectable(name.c_str())) {
-                Context::Get().LoadViewportFile(path);
+                Context::Get().SetNextFile(path.string());
             }
 
             if (type == ContextType::NONE) {
@@ -113,9 +114,7 @@ void UI::Explorer() {
 }
 
 void UI::DrawModelProperties(Loader &loader) {
-
     for (const auto &pair : loader.GetModels()) {
-
         const essencio::WindowsModel &model = pair.second.data;
 
         ImGui::Text("Version: %d.%d", model.majorVersion, model.minorVersion);
@@ -147,13 +146,15 @@ void UI::DrawModelProperties(Loader &loader) {
                 std::string materialLabel = "Material##" + std::to_string(i);
                 if (ImGui::CollapsingHeader(materialLabel.c_str())) {
                     ImGui::Indent();
-                    GLuint texture = pair.second.meshes[i].texture;
+
+                    auto meshData = pair.second.meshes[i];
+                    GLuint texture = meshData.handle.texture;
 
                     if (texture != 0) {
-                        ImGui::Image((void*)(intptr_t)texture, ImVec2(128, 128));
+                        if (ImGui::ImageButton("material", (void*)(intptr_t)texture, ImVec2(128, 128))) {
+                            Context::Get().SetNextFile(meshData.material.path.c_str());
+                        }
                     }
-
-                    // TODO: Add possibilty to directly open material
 
                     ImGui::Unindent();
                 }

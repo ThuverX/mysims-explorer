@@ -165,6 +165,12 @@ void Context::Update() {
 
     mDeltaTime = (double)(currentTime - mLastTime) / frequency;
     mLastTime = currentTime;
+
+    if (mNextFile) {
+        LoadFile(*mNextFile);
+        mCurrentFile = mNextFile;
+        mNextFile = std::nullopt;
+    }
 }
 
 void Context::ProcessEvent(SDL_Event *event) {
@@ -230,11 +236,11 @@ void Context::RenderScene() {
         for (const auto &mesh : model.second.meshes) {
             // Bind texture
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, mesh.texture);
+            glBindTexture(GL_TEXTURE_2D, mesh.handle.texture);
             glUniform1i(glGetUniformLocation(mShaderHandle, "uTexture"), 0);
 
-            glBindVertexArray(mesh.VAO);
-            glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
+            glBindVertexArray(mesh.handle.VAO);
+            glDrawElements(GL_TRIANGLES, mesh.handle.indexCount, GL_UNSIGNED_INT, 0);
         }
     }
 
@@ -287,7 +293,15 @@ void Context::ChangeGameType(const essencio::GameType &gameType) {
     LOG_INFO("Game type was changed to %d", static_cast<int>(mGameType));
 }
 
-void Context::LoadViewportFile(const fs::path &path) {
+void Context::SetNextFile(const std::optional<std::string> &path) {
+
+    if (mCurrentFile == path)
+        return;
+
+    mNextFile = path;
+}
+
+void Context::LoadFile(const fs::path &path) {
     mLoader.UnloadAll();
     mCamera.Reset();
 

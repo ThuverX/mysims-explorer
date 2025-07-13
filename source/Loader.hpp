@@ -12,16 +12,21 @@
 
 #include "Renderer.hpp"
 
-struct ModelData {
-    std::string path;
-    std::vector<MeshHandle> meshes;
-    essencio::WindowsModel data;
-};
-
 struct MaterialData {
     std::string path;
     TextureHandle texture;
     essencio::Material data;
+};
+
+struct MeshData {
+    MeshHandle handle;
+    MaterialData material;
+};
+
+struct ModelData {
+    std::string path;
+    std::vector<MeshData> meshes;
+    essencio::WindowsModel data;
 };
 
 class Loader {
