@@ -1,8 +1,14 @@
 cmake_minimum_required(VERSION 3.18)
-project(mysims-explorer VERSION 0.0.0 LANGUAGES CXX C)
+project(MYSIMSEXPLORER VERSION 0.0.0 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/version.h.in
+    ${CMAKE_CURRENT_BINARY_DIR}/version.h
+    @ONLY
+)
 
 set(SDL_STATIC ON CACHE BOOL "")
 set(SDL_SHARED OFF CACHE BOOL "")
@@ -43,8 +49,10 @@ target_include_directories(mysims-explorer SYSTEM PRIVATE
     lib/glm
     lib/gli
     lib/imgui
-    lib/imguifiledialog
-    lib/essencio/include)
+    lib/imguifiledialog)
+target_include_directories(mysims-explorer PRIVATE
+    lib/essencio/include
+    ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(mysims-explorer PRIVATE SDL3-static)
 
 # Enable all warnings

@@ -1,7 +1,5 @@
 #include "Context.hpp"
 
-#include <iostream>
-
 #include "Renderer.hpp"
 #include "SDL3/SDL_init.h"
 #include "SDL3/SDL_video.h"
@@ -10,7 +8,6 @@
 
 #include "Context.hpp"
 #include "macros/log.hpp"
-#include <iostream>
 #include <filesystem>
 
 namespace fs = std::filesystem;
@@ -28,6 +25,8 @@ namespace fs = std::filesystem;
 #include "imgui.h"
 #include "backends/imgui_impl_sdl3.h"
 #include "backends/imgui_impl_opengl3.h"
+
+#include "version.h"
 
 #define VERTEX_SHADER_SOURCE "#version 330 core\n" \
     "layout(location = 0) in vec3 aPos;\n" \
@@ -79,7 +78,7 @@ std::optional<fs::path> Context::FindGameRoot(const fs::path &path) {
 
 bool Context::Initialize(const std::optional<fs::path> &gameRoot) {
 
-    LOG_INFO("MySims Explorer is initializing...");
+    LOG_INFO("MySims Explorer v%s is initializing...", VERSION_STRING);
     ChangeGameRoot(gameRoot);
     
     if (!SDL_Init(SDL_INIT_VIDEO)) {
@@ -91,7 +90,8 @@ bool Context::Initialize(const std::optional<fs::path> &gameRoot) {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-    mWindow = SDL_CreateWindow("MySims Explorer", 1280, 720, 
+    std::string title = "MySims Explorer v" + std::string(VERSION_STRING);
+    mWindow = SDL_CreateWindow(title.c_str(), 1280, 720, 
         SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE);
     if (!mWindow) {
         LOG_ERROR("Failed to create SDL window: %s", SDL_GetError());
