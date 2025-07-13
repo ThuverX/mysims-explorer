@@ -132,10 +132,7 @@ void UI::DrawViewport(FramebufferHandle &framebuffer) {
 
     auto &camera = Context::Get().GetCamera();
 
-    bool hovered = ImGui::IsWindowHovered();
-    bool focused = ImGui::IsWindowFocused();
-
-    if (hovered && focused) {
+    if (ImGui::IsWindowHovered()) {
         ImGuiIO& io = ImGui::GetIO();
 
         if (ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {

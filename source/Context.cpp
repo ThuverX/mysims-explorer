@@ -175,6 +175,7 @@ void Context::Render() {
 
     // Build MVP using glm
     glm::mat4 model = glm::mat4(1.0f);
+    model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.f, 1.f, 0.f));
 
     glm::mat4 projection = mCamera.GetProjectionMatrix(glm::vec2(mViewport.width, mViewport.height));
     glm::mat4 view = mCamera.GetViewMatrix();
