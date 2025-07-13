@@ -271,7 +271,7 @@ void UI::MainMenuBar() {
                     config.path = (*gameRoot).string();
                 }
 
-                ImGuiFileDialog::Instance()->OpenDialog("ChooseGameRoot", "Choose Game Directory", nullptr, config);
+                ImGuiFileDialog::Instance()->OpenDialog("ChooseGameRoot", "Choose Game Root", nullptr, config);
             }
 
             if (ImGui::BeginMenu("Select Game Type")) {
@@ -296,7 +296,7 @@ void UI::MainMenuBar() {
         ImGui::EndMainMenuBar();
     }
 
-    if (ImGuiFileDialog::Instance()->Display("ChooseGameRoot")) {
+    if (ImGuiFileDialog::Instance()->Display("ChooseGameRoot", ImGuiWindowFlags_NoCollapse, ImVec2(500, 250))) {
         if (ImGuiFileDialog::Instance()->IsOk()) { // action if OK
             std::string directoryPath = ImGuiFileDialog::Instance()->GetCurrentPath();
 
