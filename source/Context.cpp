@@ -8,6 +8,7 @@
 
 #include "Context.hpp"
 #include "macros/log.hpp"
+#include <SDL3/SDL_timer.h>
 #include <filesystem>
 
 namespace fs = std::filesystem;
@@ -78,6 +79,9 @@ std::optional<fs::path> Context::FindGameRoot(const fs::path &path) {
 
 bool Context::Initialize(const std::optional<fs::path> &gameRoot) {
 
+    mLastTime = SDL_GetPerformanceCounter();
+    mDeltaTime = 0.0f;
+
     LOG_INFO("MySims Explorer v%s is initializing...", VERSION_STRING);
     ChangeGameRoot(gameRoot);
     
@@ -147,7 +151,11 @@ bool Context::Initialize(const std::optional<fs::path> &gameRoot) {
 }
 
 void Context::Update() {
-    // TODO
+    Uint64 currentTime = SDL_GetPerformanceCounter();
+    Uint64 frequency = SDL_GetPerformanceFrequency();
+
+    mDeltaTime = (double)(currentTime - mLastTime) / frequency;
+    mLastTime = currentTime;
 }
 
 void Context::ProcessEvent(SDL_Event *event) {

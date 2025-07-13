@@ -35,6 +35,10 @@ private:
     ViewportType mViewportType;
     Loader mLoader;
     Camera mCamera;
+    
+    // Delta time
+    Uint64 mLastTime;
+    double mDeltaTime;
 
 public:
     // View options
@@ -79,5 +83,9 @@ public:
 
     inline Camera &GetCamera() {
         return mCamera;
+    }
+
+    inline double GetDeltaTime() const {
+        return mDeltaTime;
     }
 };

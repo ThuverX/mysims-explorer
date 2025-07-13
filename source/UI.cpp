@@ -257,6 +257,7 @@ void UI::Viewport(FramebufferHandle &framebuffer) {
     ImGui::Image((ImTextureID)(intptr_t)framebuffer.texture, size, ImVec2(0, 1), ImVec2(1, 0));
 
     auto &camera = Context::Get().GetCamera();
+    double deltaTime = Context::Get().GetDeltaTime();
 
     if (ImGui::IsWindowHovered()) {
         ImGuiIO& io = ImGui::GetIO();
@@ -265,18 +266,18 @@ void UI::Viewport(FramebufferHandle &framebuffer) {
             float deltaX = io.MouseDelta.x;
             float deltaY = io.MouseDelta.y;
 
-            camera.Orbit(deltaX * 0.2f, deltaY * 0.2f);
+            camera.Orbit(deltaX * deltaTime * 10.f, deltaY * deltaTime * 10.f);
         }
 
         if (io.MouseWheel != 0.0f) {
-            camera.Zoom(io.MouseWheel * 0.5f);
+            camera.Zoom(io.MouseWheel * deltaTime * 6.f);
         }
 
         if (ImGui::IsMouseDragging(ImGuiMouseButton_Right)) {
             float deltaX = io.MouseDelta.x;
             float deltaY = io.MouseDelta.y;
 
-            camera.Pan(deltaX * 0.0075f, deltaY * 0.0075f);
+            camera.Pan(deltaX * deltaTime * 0.2f, deltaY * deltaTime * 0.2f);
         }
     }
 
