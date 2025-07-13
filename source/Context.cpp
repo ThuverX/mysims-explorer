@@ -171,13 +171,31 @@ void Context::Render() {
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe
 
+    switch (mViewportType) {
+        case ViewportType::MODEL:
+            RenderLoadedModel();
+            break;
+        case ViewportType::MATERIAL:
+            RenderLoadedMaterial();
+            break;
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    UI::DrawViewport(mViewport);
+
+    ImGui::Render();
+
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    SDL_GL_SwapWindow(mWindow);
+}
+
+void Context::RenderLoadedModel() {
     glUseProgram(mShaderHandle);
 
-    // Build MVP using glm
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.f, 1.f, 0.f));
-
-    glm::mat4 projection = mCamera.GetProjectionMatrix(glm::vec2(mViewport.width, mViewport.height));
+    glm::mat4 projection = mCamera.GetProjectionMatrix(
+        glm::vec2(mViewport.width, mViewport.height));
     glm::mat4 view = mCamera.GetViewMatrix();
 
     glm::mat4 mvp = projection * view * model;
@@ -197,15 +215,10 @@ void Context::Render() {
             glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
         }
     }
+}
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    UI::DrawViewport(mViewport);
-
-    ImGui::Render();
-
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    SDL_GL_SwapWindow(mWindow);
+void Context::RenderLoadedMaterial() {
+    // TODO: Render a quad showing the current material texture if available
 }
 
 void Context::Shutdown() {
@@ -246,4 +259,16 @@ void Context::ChangeGameType(const essencio::GameType &gameType) {
 
     mLoader.UnloadAll();
     mGameType = gameType;
+}
+
+void Context::LoadViewportFile(const fs::path &path) {
+    mLoader.UnloadAll();
+
+    if (path.extension() == ".0xb359c791") {
+        mLoader.LoadModel(path.string(), mGameType);
+        mViewportType = ViewportType::MODEL;
+    } else if (path.extension() == ".Material") {
+        mLoader.LoadMaterial(path.string(), mGameType);
+        mViewportType = ViewportType::MATERIAL;
+    }
 }

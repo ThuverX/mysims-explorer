@@ -75,15 +75,8 @@ void UI::DrawDirectory(const fs::path &directory) {
                 ImGui::TreePop();
             }
         } else {
-            // Only display models for now
-            if (path.extension() == ".0xb359c791") {
-                if (ImGui::Selectable(name.c_str())) {
-                    auto gameType = Context::Get().GetGameType();
-                    // Hacky way to quickly reload the model...
-                    // TODO: Add checks to detemine how to load the currently selected file
-                    Context::Get().GetLoader().UnloadAll();
-                    Context::Get().GetLoader().LoadModel(path.string(), gameType);
-                }
+            if (ImGui::Selectable(name.c_str())) {
+                Context::Get().LoadViewportFile(path);
             }
         }
     }

@@ -16,7 +16,7 @@ private:
     void Update();
 
 public:
-    Camera(glm::vec3 target = glm::vec3(0.0f), float distance = 3.f, float yaw = -90.f, float pitch = 0.f)
+    Camera(glm::vec3 target = glm::vec3(0.0f), float distance = 3.f, float yaw = 90.f, float pitch = 0.f)
         : target(target), distance(distance), yaw(yaw), pitch(pitch) {
             Update();
         }

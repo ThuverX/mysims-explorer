@@ -14,6 +14,11 @@ namespace fs = std::filesystem;
 
 #include "essencio/GameType.hpp"
 
+enum class ViewportType {
+    MODEL,
+    MATERIAL
+};
+
 class Context {
 private:
     SDL_Window *mWindow;
@@ -24,6 +29,7 @@ private:
 
     std::optional<fs::path> mGameRoot;
     essencio::GameType mGameType;
+    ViewportType mViewportType;
     Loader mLoader;
     Camera mCamera;
 
@@ -40,10 +46,16 @@ public:
     void Update();
     void ProcessEvent(SDL_Event *event);
     void Render();
+    
+    void RenderLoadedModel();
+    void RenderLoadedMaterial();
+
     void Shutdown();
 
     void ChangeGameRoot(const std::optional<fs::path> &gameRoot);
     void ChangeGameType(const essencio::GameType &gameType);
+
+    void LoadViewportFile(const fs::path &path);
 
     inline std::optional<fs::path> GetGameRoot() const {
         return mGameRoot;
