@@ -229,3 +229,30 @@ void Context::Shutdown() {
     SDL_DestroyWindow(mWindow);
     SDL_Quit();
 }
+
+void Context::ChangeGameRoot(const std::optional<fs::path> &gameRoot) {
+
+    if (mGameRoot == gameRoot)
+        return;
+
+    mLoader.UnloadAll();
+    mGameRoot = gameRoot;
+
+    if (mGameRoot) {
+        // Try to determine game type
+        if (fs::exists(*mGameRoot / "GameData" / "Vaults")) {
+            mGameType = essencio::GameType::KINGDOM;
+        } else {
+            mGameType = essencio::GameType::MYSIMS;
+        }
+    }
+}
+
+void Context::ChangeGameType(const essencio::GameType &gameType) {
+
+    if (mGameType == gameType)
+        return;
+
+    mLoader.UnloadAll();
+    mGameType = gameType;
+}

@@ -118,7 +118,7 @@ std::optional<std::string> Loader::FindTexturePath(const std::string &fileName) 
     return std::nullopt;
 }
 
-std::optional<ModelData> Loader::LoadModel(const std::string &path) {
+std::optional<ModelData> Loader::LoadModel(const std::string &path, const essencio::GameType &gameType) {
     ModelData data;
 
     std::vector<uint8_t> file = File::ReadFile(path);
@@ -142,7 +142,7 @@ std::optional<ModelData> Loader::LoadModel(const std::string &path) {
         );
 
         if (materialPath) {
-            auto materialData = LoadMaterial(*materialPath);
+            auto materialData = LoadMaterial(*materialPath, gameType);
 
             if (materialData) {
                 // Attach this material to the current mesh
@@ -161,14 +161,14 @@ std::optional<ModelData> Loader::LoadModel(const std::string &path) {
     return data;
 }
 
-std::optional<MaterialData> Loader::LoadMaterial(const std::string &path) {
+std::optional<MaterialData> Loader::LoadMaterial(const std::string &path, const essencio::GameType &gameType) {
     MaterialData data;
 
     std::vector<uint8_t> file = File::ReadFile(path);
     essencio::BinReader reader(file.data(), file.size());
 
     essencio::Material material;
-    essencio::Material::Read(material, reader, essencio::GameType::KINGDOM);
+    essencio::Material::Read(material, reader, gameType);
 
     // Read material
     for (const auto &param : material.data.params) {

@@ -11,6 +11,8 @@ namespace fs = std::filesystem;
 #include "Renderer.hpp"
 #include "Loader.hpp"
 
+#include "essencio/GameType.hpp"
+
 class Context {
 private:
     SDL_Window *mWindow;
@@ -20,6 +22,7 @@ private:
     FramebufferHandle mViewport;
 
     std::optional<fs::path> mGameRoot;
+    essencio::GameType mGameType;
     Loader mLoader;
 
     Context() = default;
@@ -37,13 +40,15 @@ public:
     void Render();
     void Shutdown();
 
+    void ChangeGameRoot(const std::optional<fs::path> &gameRoot);
+    void ChangeGameType(const essencio::GameType &gameType);
+
     inline std::optional<fs::path> GetGameRoot() const {
         return mGameRoot;
     }
 
-    inline void SetGameRoot(const std::optional<fs::path> value) {
-        // TODO: Actually reload the current viewer state
-        mGameRoot = value;
+    inline essencio::GameType GetGameType() const {
+        return mGameType;
     }
 
     inline Loader &GetLoader() {

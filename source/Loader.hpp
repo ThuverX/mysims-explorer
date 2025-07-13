@@ -5,6 +5,7 @@
 #include <vector>
 #include <optional>
 
+#include "essencio/GameType.hpp"
 #include "essencio/model/WindowsMesh.hpp"
 
 #include "Renderer.hpp"
@@ -33,8 +34,8 @@ private:
     static std::optional<std::string> FindTexturePath(const std::string &fileName);
 
 public:
-    std::optional<ModelData> LoadModel(const std::string &path);
-    std::optional<MaterialData> LoadMaterial(const std::string &path);
+    std::optional<ModelData> LoadModel(const std::string &path, const essencio::GameType &gameType);
+    std::optional<MaterialData> LoadMaterial(const std::string &path, const essencio::GameType &gameType);
 
     void UnloadAll();
 

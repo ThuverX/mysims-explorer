@@ -1,6 +1,7 @@
 #include "UI.hpp"
 
 #include "Context.hpp"
+#include <essencio/GameType.hpp>
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
@@ -77,10 +78,12 @@ void UI::DrawDirectory(const fs::path &directory) {
             // Only display models for now
             if (path.extension() == ".0xb359c791") {
                 if (ImGui::Selectable(name.c_str())) {
+
+                    auto gameType = Context::Get().GetGameType();
                     // Hacky way to quickly reload the model...
                     // TODO: Add checks to detemine how to load the currently selected file
                     Context::Get().GetLoader().UnloadAll();
-                    Context::Get().GetLoader().LoadModel(path.string());
+                    Context::Get().GetLoader().LoadModel(path.string(), gameType);
                 }
             }
         }
@@ -145,6 +148,23 @@ void UI::DrawMainMenuBar() {
 
                 ImGuiFileDialog::Instance()->OpenDialog("ChooseGameRoot", "Choose Game Directory", nullptr, config);
             }
+
+            if (ImGui::BeginMenu("Select Game Type")) {
+                auto gameType = Context::Get().GetGameType();
+
+                if (ImGui::MenuItem("MySims", nullptr, 
+                    gameType == essencio::GameType::MYSIMS)) {
+                        Context::Get().ChangeGameType(essencio::GameType::MYSIMS);
+                    }
+
+                if (ImGui::MenuItem("MySims Kingdom", nullptr,
+                    gameType == essencio::GameType::KINGDOM)) {
+                        Context::Get().ChangeGameType(essencio::GameType::KINGDOM);
+                    }
+
+                ImGui::EndMenu();
+            }
+
             ImGui::EndMenu();
         }
 
@@ -166,7 +186,7 @@ void UI::DrawMainMenuBar() {
                     // Just 
                 }
                 else {
-                    Context::Get().SetGameRoot(gameRoot);
+                    Context::Get().ChangeGameRoot(gameRoot);
                 }
             }
         }

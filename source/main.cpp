@@ -9,7 +9,6 @@ SDL_AppResult SDL_AppInit([[maybe_unused]] void **appstate, [[maybe_unused]] int
         return SDL_APP_FAILURE;
     }
 
-    Context::Get().GetLoader().LoadModel(argv[1]);
     return SDL_APP_CONTINUE;
 }
 
