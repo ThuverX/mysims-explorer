@@ -33,24 +33,29 @@ void UI::DrawDockSpace() {
     ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 
-    // 🧠 Initialize default layout ONCE
     static bool initialized = false;
     if (!initialized) {
         initialized = true;
 
-        ImGui::DockBuilderRemoveNode(dockspace_id); // clear any previous layout
+        ImGui::DockBuilderRemoveNode(dockspace_id); // clear previous
         ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace);
         ImGui::DockBuilderSetNodeSize(dockspace_id, ImGui::GetMainViewport()->Size);
 
-        // Split: Left 20% (File Explorer), Right 80%
         ImGuiID dock_main_id = dockspace_id;
-        ImGuiID dock_id_left = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.2f, nullptr, &dock_main_id);
-        ImGuiID dock_id_down = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, 0.25f, nullptr, &dock_main_id);
 
-        // Dock windows by name
-        ImGui::DockBuilderDockWindow("File Explorer", dock_id_left);
-        ImGui::DockBuilderDockWindow("Viewport", dock_main_id);
-        ImGui::DockBuilderDockWindow("Console", dock_id_down);
+        // Step 1: Split horizontally
+        ImGuiID dock_id_left   = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.2f, nullptr, &dock_main_id);
+        ImGuiID dock_id_right  = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.2f, nullptr, &dock_main_id);
+        ImGuiID dock_id_center = dock_main_id;
+
+        // Step 2: Split center vertically for Viewport (top) and Console (bottom)
+        ImGuiID dock_id_console = ImGui::DockBuilderSplitNode(dock_id_center, ImGuiDir_Down, 0.25f, nullptr, &dock_id_center);
+
+        // Step 3: Dock windows
+        ImGui::DockBuilderDockWindow("Explorer", dock_id_left);
+        ImGui::DockBuilderDockWindow("Properties", dock_id_right);
+        ImGui::DockBuilderDockWindow("Viewport", dock_id_center);
+        ImGui::DockBuilderDockWindow("Console", dock_id_console);
 
         ImGui::DockBuilderFinish(dockspace_id);
     }
@@ -83,7 +88,7 @@ void UI::DrawDirectory(const fs::path &directory) {
 }
 
 void UI::DrawFileExplorer() {
-    ImGui::Begin("File Explorer");
+    ImGui::Begin("Explorer");
 
     auto gameRoot = Context::Get().GetGameRoot();
     if (gameRoot && fs::exists(*gameRoot)) {
@@ -91,6 +96,20 @@ void UI::DrawFileExplorer() {
     } else {
         ImGui::TextUnformatted("No valid game root selected.");
     }
+
+    ImGui::End();
+}
+
+void UI::DrawProperties() {
+    ImGui::Begin("Properties");
+
+
+    ImGui::End();
+}
+
+void UI::DrawConsole() {
+    ImGui::Begin("Console");
+
 
     ImGui::End();
 }

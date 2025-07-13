@@ -1,20 +1,11 @@
-#include <iostream>
-
 #define SDL_MAIN_USE_CALLBACKS
 #include <SDL3/SDL_main.h>
 
 #include "Context.hpp"
 
-SDL_AppResult SDL_AppInit([[maybe_unused]] void **appstate, int argc, char **argv) {
-    // TODO: Just show empty UI when no model is specified through the command-line
-    if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " <file>" << std::endl;
-        return SDL_APP_SUCCESS;
-    }
+SDL_AppResult SDL_AppInit([[maybe_unused]] void **appstate, [[maybe_unused]] int argc, char **argv) {
 
-    auto gameRoot = Context::FindGameRoot(argv[1]);
-
-    if (!Context::Get().Initialize(gameRoot)) {
+    if (!Context::Get().Initialize(std::nullopt)) {
         return SDL_APP_FAILURE;
     }
 

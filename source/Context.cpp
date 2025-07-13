@@ -155,6 +155,8 @@ void Context::Render() {
 
     UI::DrawDockSpace();
     UI::DrawFileExplorer();
+    //UI::DrawProperties();
+    //UI::DrawConsole();
     UI::DrawMainMenuBar();
 
     // ImGui::UpdatePlatformWindows();
