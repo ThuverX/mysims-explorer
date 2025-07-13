@@ -294,9 +294,28 @@ void UI::MainMenuBar() {
         }
 
         if (ImGui::BeginMenu("View")) {
-            if (ImGui::MenuItem("Wireframe Mode", nullptr, Context::Get().mWireframeMode)) {
-                Context::Get().mWireframeMode = !Context::Get().mWireframeMode;
-            }
+
+            if (ImGui::MenuItem("Explorer", nullptr, 
+                Context::Get().mShowExplorer)) {
+                    Context::Get().mShowExplorer = !Context::Get().mShowExplorer;
+                }
+
+            if (ImGui::MenuItem("Properties", nullptr, 
+                Context::Get().mShowProperties)) {
+                    Context::Get().mShowProperties = !Context::Get().mShowProperties;
+                }
+
+            if (ImGui::MenuItem("Console", nullptr, 
+                Context::Get().mShowConsole)) {
+                    Context::Get().mShowConsole = !Context::Get().mShowConsole;
+                }
+
+            ImGui::Separator();
+
+            if (ImGui::MenuItem("Wireframe Mode", nullptr, 
+                Context::Get().mWireframeMode)) {
+                    Context::Get().mWireframeMode = !Context::Get().mWireframeMode;
+                }
 
             ImGui::EndMenu();
         }

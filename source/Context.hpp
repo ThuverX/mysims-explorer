@@ -41,6 +41,11 @@ private:
     Context &operator=(Context &&) = delete;
 
 public:
+    // View options
+    bool mShowExplorer = true;
+    bool mShowProperties = true;
+    bool mShowConsole = true;
+
     bool mWireframeMode = false;
 
     static std::optional<fs::path> FindGameRoot(const fs::path &path);

@@ -156,8 +156,8 @@ void Context::Render() {
     UI::MainMenuBar();
     UI::DockSpace();
 
-    UI::Explorer();
-    UI::Properties();
+    if (mShowExplorer) UI::Explorer();
+    if (mShowProperties) UI::Properties();
     //UI::DrawConsole();
     
 
