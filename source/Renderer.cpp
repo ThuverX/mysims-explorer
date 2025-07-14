@@ -1,6 +1,6 @@
 #include "Renderer.hpp"
 
-#include <iostream>
+#include "macros/log.hpp"
 
 GLuint Renderer::CreateShader(const ShaderCreateInfo &info) {
     // Compile the vertex shader
@@ -14,7 +14,8 @@ GLuint Renderer::CreateShader(const ShaderCreateInfo &info) {
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
     if (!success) {
         glGetShaderInfoLog(vertexShader, 512, nullptr, infoLog);
-        std::cerr << "ERROR: Vertex shader compilation failed\n" << infoLog << std::endl;
+        LOG_ERROR("Vertex shader compilation failed\n%s", infoLog);
+        return 0;
     }
 
     // Compile the fragment shader
@@ -26,7 +27,8 @@ GLuint Renderer::CreateShader(const ShaderCreateInfo &info) {
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
     if (!success) {
         glGetShaderInfoLog(fragmentShader, 512, nullptr, infoLog);
-        std::cerr << "ERROR: Fragment shader compilation failed\n" << infoLog << std::endl;
+        LOG_ERROR("Fragment shader compilation failed\n%s", infoLog);
+        return 0;
     }
 
     // Link shaders into a program
@@ -39,7 +41,8 @@ GLuint Renderer::CreateShader(const ShaderCreateInfo &info) {
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
     if (!success) {
         glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
-        std::cerr << "ERROR: Shader program linking failed\n" << infoLog << std::endl;
+        LOG_ERROR("Shader program linking failed\n%s", infoLog);
+        return 0;
     }
 
     // Cleanup shaders as they're now in the program
@@ -142,7 +145,7 @@ FramebufferHandle Renderer::CreateFramebuffer(int width, int height) {
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER,framebuffer.depth);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        std::cerr << "ERROR: Framebuffer is not complete!" << std::endl;
+        LOG_ERROR("Framebuffer is incomplete!");
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

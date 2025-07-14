@@ -1,17 +1,14 @@
 #include "File.hpp"
 
 #include <fstream>
-#include <iostream>
 #include <sstream>
 #include <iomanip>
 
-// TODO: Use better error handling system
-std::vector<uint8_t> File::ReadFile(const std::string &path) {
+std::optional<std::vector<uint8_t>> File::ReadFile(const std::string &path) {
 
     std::ifstream in_file(path, std::ios::binary | std::ios::ate);
     if (!in_file) {
-        std::cerr << "Failed to open file " << path << std::endl;
-        throw std::runtime_error("Failed to open file");
+        return std::nullopt;
     }
 
     std::streamsize in_size = in_file.tellg();
@@ -19,8 +16,7 @@ std::vector<uint8_t> File::ReadFile(const std::string &path) {
 
     std::vector<uint8_t> in_buffer(in_size);
     if (!in_file.read(reinterpret_cast<char*>(in_buffer.data()), in_size)) {
-        std::cerr << "Failed to read from file: " << path << std::endl;
-        throw std::runtime_error("Failed to read from file");
+        return std::nullopt;
     }
 
     return in_buffer;

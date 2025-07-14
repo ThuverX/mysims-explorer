@@ -121,9 +121,13 @@ ModelData *Loader::LoadModel(const std::string &path, const essencio::GameType &
     ModelData model;
     model.path = path;
 
-    std::vector<uint8_t> file = File::ReadFile(path);
-    essencio::BinReader reader(file.data(), file.size());
+    auto file = File::ReadFile(path);
+    if (!file) {
+        LOG_ERROR("Failed to open/read file: %s", path.c_str());
+        return nullptr;
+    }
 
+    essencio::BinReader reader(file.value().data(), file.value().size());
     essencio::WindowsModel::Read(model.data, reader);
 
     for (const auto &mesh : model.data.meshes) {
@@ -166,9 +170,13 @@ MaterialData *Loader::LoadMaterial(const std::string &path, const essencio::Game
     MaterialData material;
     material.path = path;
 
-    std::vector<uint8_t> file = File::ReadFile(path);
-    essencio::BinReader reader(file.data(), file.size());
+    auto file = File::ReadFile(path);
+    if (!file) {
+        LOG_ERROR("Failed to open/read file: %s", path.c_str());
+        return nullptr;
+    }
 
+    essencio::BinReader reader(file.value().data(), file.value().size());
     essencio::Material::Read(material.data, reader, gameType);
 
     // Read material
