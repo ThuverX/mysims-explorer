@@ -118,8 +118,14 @@ std::optional<std::string> Loader::FindTexturePath(const std::string &fileName) 
 }
 
 ModelData *Loader::LoadModel(const std::string &path, const essencio::GameType &gameType) {
-    ModelData model;
-    model.path = path;
+
+    auto loaded = models.find(path);
+    if (loaded != models.end()) {
+        return &loaded->second;
+    }
+    
+    ModelData modelData;
+    modelData.path = path;
 
     auto file = File::ReadFile(path);
     if (!file) {
@@ -128,9 +134,9 @@ ModelData *Loader::LoadModel(const std::string &path, const essencio::GameType &
     }
 
     essencio::BinReader reader(file.value().data(), file.value().size());
-    essencio::WindowsModel::Read(model.data, reader);
+    essencio::WindowsModel::Read(modelData.data, reader);
 
-    for (const auto &mesh : model.data.meshes) {
+    for (const auto &mesh : modelData.data.meshes) {
         std::vector<float> vertices = GetMeshVertices(mesh);
         std::vector<uint32_t> indices = GetMeshIndices(mesh);
 
@@ -155,20 +161,23 @@ ModelData *Loader::LoadModel(const std::string &path, const essencio::GameType &
             }
         }
 
-        model.meshes.emplace_back(meshData);
+        modelData.meshes.emplace_back(meshData);
     }
 
-    // TODO: Insert using base instance hash only?
-    // Not sure how groups are being affected by this...
-
-    auto result = models.insert({model.path, std::move(model)});
+    auto result = models.insert({modelData.path, std::move(modelData)});
     LOG_INFO("Loaded model at path %s", path.c_str());
     return &result.first->second;
 }
 
 MaterialData *Loader::LoadMaterial(const std::string &path, const essencio::GameType &gameType) {
-    MaterialData material;
-    material.path = path;
+
+    auto loaded = materials.find(path);
+    if (loaded != materials.end()) {
+        return &loaded->second;
+    }
+    
+    MaterialData materialData;
+    materialData.path = path;
 
     auto file = File::ReadFile(path);
     if (!file) {
@@ -177,10 +186,10 @@ MaterialData *Loader::LoadMaterial(const std::string &path, const essencio::Game
     }
 
     essencio::BinReader reader(file.value().data(), file.value().size());
-    essencio::Material::Read(material.data, reader, gameType);
+    essencio::Material::Read(materialData.data, reader, gameType);
 
     // Read material
-    for (const auto &param : material.data.data.params) {
+    for (const auto &param : materialData.data.data.params) {
         switch (param.valueType) {
             case essencio::MaterialParameterType::RESOURCE_KEY:
                 {
@@ -200,7 +209,7 @@ MaterialData *Loader::LoadMaterial(const std::string &path, const essencio::Game
                         gli::gl::format const format = GL.translate(texture.format(), texture.swizzles());
                         GLsizei const levels = static_cast<GLsizei>(texture.levels());
 
-                        material.texture = Renderer::CreateTexture({
+                        materialData.texture = Renderer::CreateTexture({
                             texture,
                             format,
                             levels,
@@ -214,7 +223,7 @@ MaterialData *Loader::LoadMaterial(const std::string &path, const essencio::Game
         }
     }
 
-    auto result = materials.insert({material.path, std::move(material)});
+    auto result = materials.insert({materialData.path, std::move(materialData)});
     LOG_INFO("Loaded material at path %s", path.c_str());
     return &result.first->second;
 }
