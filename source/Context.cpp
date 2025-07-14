@@ -235,6 +235,9 @@ void Context::RenderScene() {
 
     for (const auto &model : mLoader.GetModels()) {
         for (const auto &mesh : model.second.meshes) {
+            // Skip invisible meshes
+            if (!mesh.isVisible) continue;
+
             // Bind texture
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, mesh.handle.texture);

@@ -115,7 +115,7 @@ void UI::Explorer() {
 }
 
 void UI::DrawModelProperties(Loader &loader) {
-    for (const auto &pair : loader.GetModels()) {
+    for (auto &pair : loader.GetModels()) {
         const essencio::WindowsModel &model = pair.second.data;
 
         ImGui::Text("Version: %d.%d", model.majorVersion, model.minorVersion);
@@ -138,17 +138,22 @@ void UI::DrawModelProperties(Loader &loader) {
         }
 
         for (uint32_t i = 0; i < model.meshes.size(); ++i) {
+            // Native mesh data loaded through Essencio
             const auto &mesh = model.meshes[i];
-            std::string meshLabel = "Mesh #" + std::to_string(i + 1);
+            // Custom loaded data from Loader
+            auto &meshData = pair.second.meshes[i];
 
+            std::string meshLabel = "Mesh #" + std::to_string(i + 1);
             if (ImGui::CollapsingHeader(meshLabel.c_str())) {
                 ImGui::Indent();
+
+                std::string isVisibleLabel = "Is Visible##" + std::to_string(i);
+                ImGui::Checkbox(isVisibleLabel.c_str(), &meshData.isVisible);
 
                 std::string materialLabel = "Material##" + std::to_string(i);
                 if (ImGui::CollapsingHeader(materialLabel.c_str())) {
                     ImGui::Indent();
 
-                    auto meshData = pair.second.meshes[i];
                     GLuint texture = meshData.handle.texture;
 
                     if (texture != 0) {

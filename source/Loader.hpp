@@ -21,6 +21,7 @@ struct MaterialData {
 struct MeshData {
     MeshHandle handle;
     MaterialData material;
+    bool isVisible = true;
 };
 
 struct ModelData {
