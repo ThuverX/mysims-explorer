@@ -410,7 +410,7 @@ void UI::Viewport(ContextType type, FramebufferHandle &framebuffer) {
 void UI::MainMenuBar() {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {
-            if (ImGui::MenuItem("Open Data Root...", "Ctrl+O")) {
+            if (ImGui::MenuItem("Open Data Root...")) {
                 IGFD::FileDialogConfig config;
                 config.path = ".";
 
