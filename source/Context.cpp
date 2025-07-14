@@ -285,7 +285,7 @@ void Context::ChangeDataRoot(const std::optional<fs::path> &dataRoot) {
             mGameType = essencio::GameType::MYSIMS;
         }
 
-        LOG_DEBUG("Automatically detected game type %d", static_cast<int>(mGameType));
+        LOG_TRACE("Automatically detected game type %d", static_cast<int>(mGameType));
     }
 }
 

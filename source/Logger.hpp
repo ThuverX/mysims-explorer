@@ -5,7 +5,7 @@
 #include <string>
 
 enum class LogLevel {
-    DEBUG,
+    TRACE,
     INFO,
     WARN,
     ERROR
