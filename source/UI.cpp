@@ -152,7 +152,8 @@ void UI::DrawModelProperties(Loader &loader) {
                     GLuint texture = meshData.handle.texture;
 
                     if (texture != 0) {
-                        if (ImGui::ImageButton("material", (void*)(intptr_t)texture, ImVec2(128, 128))) {
+                        std::string materialButtonLabel = "MaterialButton##" + std::to_string(i);
+                        if (ImGui::ImageButton(materialButtonLabel.c_str(), (void*)(intptr_t)texture, ImVec2(128, 128))) {
                             Context::Get().SetNextFile(meshData.material.path.c_str());
                         }
                     }
