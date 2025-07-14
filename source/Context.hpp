@@ -59,9 +59,10 @@ public:
     void ProcessEvent(SDL_Event *event);
     void Render();
     void RenderScene();
-
     void Shutdown();
 
+    void Quit();
+    
     void ChangeDataRoot(const std::optional<fs::path> &dataRoot);
     void ChangeGameType(const essencio::GameType &gameType);
 

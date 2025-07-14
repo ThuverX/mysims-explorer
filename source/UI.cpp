@@ -438,6 +438,12 @@ void UI::MainMenuBar() {
                 ImGui::EndMenu();
             }
 
+            ImGui::Separator();
+
+            if (ImGui::MenuItem("Quit")) {
+                Context::Get().Quit();
+            }
+
             ImGui::EndMenu();
         }
 

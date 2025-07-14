@@ -8,6 +8,7 @@
 
 #include "Context.hpp"
 #include "macros/log.hpp"
+#include <SDL3/SDL_mutex.h>
 #include <SDL3/SDL_timer.h>
 #include <filesystem>
 
@@ -258,6 +259,12 @@ void Context::Shutdown() {
     SDL_GL_DestroyContext(mGLContext);
     SDL_DestroyWindow(mWindow);
     SDL_Quit();
+}
+
+void Context::Quit() {
+    SDL_Event event;
+    event.type = SDL_EVENT_QUIT;
+    SDL_PushEvent(&event);
 }
 
 void Context::ChangeDataRoot(const std::optional<fs::path> &dataRoot) {
