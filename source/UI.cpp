@@ -89,7 +89,8 @@ void UI::DrawDirectory(const fs::path &directory) {
                 ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
             }
 
-            if (ImGui::Selectable(name.c_str())) {
+            bool isCurrentFile = Context::Get().GetCurrentFile() == path;
+            if (ImGui::Selectable(name.c_str(), isCurrentFile)) {
                 Context::Get().SetNextFile(path.string());
             }
 
