@@ -6,6 +6,7 @@
 #include <essencio/model/WindowsModel.hpp>
 #include <string>
 
+#include "essencio/material/MaterialParameter.hpp"
 #include "macros/log.hpp"
 #include "Renderer.hpp"
 #include "imgui.h"
@@ -200,7 +201,90 @@ void UI::DrawModelProperties(Loader &loader) {
 }
 
 void UI::DrawMaterialProperties(Loader &loader) {
+    const auto &gameType = Context::Get().GetGameType();
 
+    for (const auto &material : loader.GetMaterials()) {
+        const auto &data = material.second.data;
+
+        if (gameType == essencio::GameType::MYSIMS) {
+            ImGui::Text("Header Size: %d", data.headerSize);
+            ImGui::Text("Total Size: %d", data.totalSize);
+            ImGui::Text("Version: %d", data.version);
+
+            ImGui::Text("Material Hash: 0x%X", data.materialHash);
+            ImGui::Text("Shader Hash: 0x%X", data.shaderHash);
+        }
+
+        ImGui::Text("Data Size: %d", data.dataSize);
+
+        ImGui::Text("Parameter Size: %d", data.data.paramSize);
+        ImGui::Text("# of Parameters: %d", data.data.paramCount);
+
+        for (uint32_t i = 0; i < data.data.params.size(); ++i) {
+            const auto &param = data.data.params[i];
+            const std::string paramLabel = "Parameter #" + std::to_string(i + 1);
+
+            if (ImGui::CollapsingHeader(paramLabel.c_str())) {
+                ImGui::Indent();
+                std::string valueType;
+
+                switch (param.valueType) {
+                    case essencio::MaterialParameterType::COLOR: valueType = "COLOR"; break;
+                    case essencio::MaterialParameterType::VALUE: valueType = "VALUE"; break;
+                    case essencio::MaterialParameterType::RESOURCE_KEY: valueType = "RESOURCE_KEY"; break;
+                }
+
+                ImGui::Text("Type: 0x%X", param.type);
+
+                ImGui::Text("Value Type: %s", valueType.c_str());
+                ImGui::Text("# of Value Fields: %d", param.valueFieldCount);
+                ImGui::Text("Offset: %d", param.offset);
+
+                switch (param.valueType) {
+                    case essencio::MaterialParameterType::COLOR:
+                        {
+                            std::string colorLabel = "Color##" + std::to_string(i);
+                            if (ImGui::CollapsingHeader(colorLabel.c_str())) {
+                                ImGui::Indent();
+
+                                for (const auto &channel : param.color) {
+                                    ImGui::Text("Channel: %.f", channel);
+                                }
+
+                                ImGui::Unindent();
+                            }
+                        }
+                        break;
+                    case essencio::MaterialParameterType::VALUE:
+                        {
+                            std::string valueLabel = "Value##" + std::to_string(i);
+                            if (ImGui::CollapsingHeader(valueLabel.c_str())) {
+                                ImGui::Indent();
+                                ImGui::Text("Value: %d", param.value);
+                                ImGui::Unindent();
+                            }
+                        }
+                        break;
+                    case essencio::MaterialParameterType::RESOURCE_KEY:
+                        {
+                            std::string resourceKeyLabel = "ResourceKey##" + std::to_string(i);
+                            if (ImGui::CollapsingHeader("ResourceKey")) {
+                                ImGui::Indent();
+
+                                ImGui::Text("Type: 0x%X", param.mapKey.type);
+                                ImGui::Text("Group: 0x%X", param.mapKey.group);
+                                ImGui::Text("Instance: 0x%llX", param.mapKey.instance);
+
+                                ImGui::Unindent();
+                            }
+                        }
+                        break;
+                }
+
+                ImGui::Unindent();
+            }
+        }
+    }
 }
 
 void UI::Properties() {
