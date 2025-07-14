@@ -52,7 +52,7 @@ namespace fs = std::filesystem;
     "    FragColor = texture(uTexture, TexCoord);\n" \
     "}\n"
 
-std::optional<fs::path> Context::FindGameRoot(const fs::path &path) {
+std::optional<fs::path> Context::FindDataRoot(const fs::path &path) {
     fs::path current = path;
 
     // If the input path is a file, go to its parent
@@ -86,13 +86,13 @@ ContextType Context::GetExtensionContextType(const std::string &extension) {
     return ContextType::NONE;
 }
 
-bool Context::Initialize(const std::optional<fs::path> &gameRoot) {
+bool Context::Initialize(const std::optional<fs::path> &dataRoot) {
 
     mLastTime = SDL_GetPerformanceCounter();
     mDeltaTime = 0.0f;
 
     LOG_INFO("MySims Explorer v%s is initializing...", VERSION_STRING);
-    ChangeGameRoot(gameRoot);
+    ChangeDataRoot(dataRoot);
     
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         LOG_ERROR("Failed to initialize SDL: %s", SDL_GetError());
@@ -260,19 +260,19 @@ void Context::Shutdown() {
     SDL_Quit();
 }
 
-void Context::ChangeGameRoot(const std::optional<fs::path> &gameRoot) {
+void Context::ChangeDataRoot(const std::optional<fs::path> &dataRoot) {
 
-    if (mGameRoot == gameRoot)
+    if (mDataRoot == dataRoot)
         return;
 
     mLoader.UnloadAll();
-    mGameRoot = gameRoot;
+    mDataRoot = dataRoot;
 
-    LOG_INFO("Data directory was changed to %s", (*gameRoot).string().c_str());
+    LOG_INFO("Data directory was changed to %s", (*dataRoot).string().c_str());
 
-    if (mGameRoot) {
+    if (mDataRoot) {
         // Try to determine game type
-        if (fs::exists(*mGameRoot / "GameData" / "Vaults")) {
+        if (fs::exists(*mDataRoot / "GameData" / "Vaults")) {
             mGameType = essencio::GameType::KINGDOM;
         } else {
             mGameType = essencio::GameType::MYSIMS;

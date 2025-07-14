@@ -8,14 +8,14 @@
 SDL_AppResult SDL_AppInit([[maybe_unused]] void **appstate, int argc, char **argv) {
 
     if (argc > 1) {
-        auto gameRoot = Context::FindGameRoot(argv[1]);
+        auto dataRoot = Context::FindDataRoot(argv[1]);
 
-        if (!gameRoot) {
+        if (!dataRoot) {
             LOG_ERROR("Failed to find game root at %s", argv[1]);
             return SDL_APP_FAILURE;
         }
 
-        if (!Context::Get().Initialize(gameRoot)) {
+        if (!Context::Get().Initialize(dataRoot)) {
             return SDL_APP_FAILURE;
         }
     } else {

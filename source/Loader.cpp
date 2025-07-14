@@ -101,13 +101,13 @@ std::optional<std::string> Loader::FindTexturePath(const std::string &fileName) 
     };
 
     for (const auto &path : searchPaths) {
-        const std::optional<fs::path> gameRoot = Context::Get().GetGameRoot();
+        const std::optional<fs::path> dataRoot = Context::Get().GetDataRoot();
 
-        if (!gameRoot) {
+        if (!dataRoot) {
             return std::nullopt;
         }
 
-        const fs::path texturePath = *gameRoot / path / fileName;
+        const fs::path texturePath = *dataRoot / path / fileName;
 
         if (fs::exists(texturePath) && !fs::is_directory(texturePath)) {
             return texturePath.string();

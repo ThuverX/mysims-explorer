@@ -104,9 +104,9 @@ void UI::DrawDirectory(const fs::path &directory) {
 void UI::Explorer() {
     ImGui::Begin("Explorer", nullptr, ImGuiWindowFlags_HorizontalScrollbar);
 
-    auto gameRoot = Context::Get().GetGameRoot();
-    if (gameRoot && fs::exists(*gameRoot)) {
-        DrawDirectory(*gameRoot);
+    auto dataRoot = Context::Get().GetDataRoot();
+    if (dataRoot && fs::exists(*dataRoot)) {
+        DrawDirectory(*dataRoot);
     } else {
         ImGui::TextUnformatted("No valid game root selected.");
     }
@@ -410,16 +410,16 @@ void UI::Viewport(ContextType type, FramebufferHandle &framebuffer) {
 void UI::MainMenuBar() {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {
-            if (ImGui::MenuItem("Open Game Root...", "Ctrl+O")) {
+            if (ImGui::MenuItem("Open Data Root...", "Ctrl+O")) {
                 IGFD::FileDialogConfig config;
                 config.path = ".";
 
-                auto gameRoot = Context::Get().GetGameRoot();
-                if (gameRoot) {
-                    config.path = (*gameRoot).string();
+                auto dataRoot = Context::Get().GetDataRoot();
+                if (dataRoot) {
+                    config.path = (*dataRoot).string();
                 }
 
-                ImGuiFileDialog::Instance()->OpenDialog("ChooseGameRoot", "Choose Game Root", nullptr, config);
+                ImGuiFileDialog::Instance()->OpenDialog("ChooseDataRoot", "Choose Data Root", nullptr, config);
             }
 
             if (ImGui::BeginMenu("Select Game Type")) {
@@ -471,22 +471,22 @@ void UI::MainMenuBar() {
         ImGui::EndMainMenuBar();
     }
 
-    if (ImGuiFileDialog::Instance()->Display("ChooseGameRoot", ImGuiWindowFlags_NoCollapse, ImVec2(500, 250))) {
+    if (ImGuiFileDialog::Instance()->Display("ChooseDataRoot", ImGuiWindowFlags_NoCollapse, ImVec2(500, 250))) {
         if (ImGuiFileDialog::Instance()->IsOk()) { // action if OK
             std::string directoryPath = ImGuiFileDialog::Instance()->GetCurrentPath();
 
-            auto gameRoot = Context::FindGameRoot(directoryPath);
+            auto dataRoot = Context::FindDataRoot(directoryPath);
 
-            if (!gameRoot) {
+            if (!dataRoot) {
                 // TODO: Warn the user; this is not a game directory
             }
             else {
-                if (*gameRoot != directoryPath) {
+                if (*dataRoot != directoryPath) {
                     // TODO: Ask the user to fix the game path automatically
                     // Just 
                 }
                 else {
-                    Context::Get().ChangeGameRoot(gameRoot);
+                    Context::Get().ChangeDataRoot(dataRoot);
                 }
             }
         }

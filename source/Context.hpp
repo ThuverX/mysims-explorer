@@ -30,7 +30,7 @@ private:
     GLuint mShaderHandle;
     FramebufferHandle mViewport;
 
-    std::optional<fs::path> mGameRoot;
+    std::optional<fs::path> mDataRoot;
     essencio::GameType mGameType;
     ContextType mContextType;
     Loader mLoader;
@@ -51,10 +51,10 @@ public:
 
     bool mWireframeMode = false;
 
-    static std::optional<fs::path> FindGameRoot(const fs::path &path);
+    static std::optional<fs::path> FindDataRoot(const fs::path &path);
     static ContextType GetExtensionContextType(const std::string &extension);
 
-    bool Initialize(const std::optional<fs::path> &gameRoot);
+    bool Initialize(const std::optional<fs::path> &dataRoot);
     void Update();
     void ProcessEvent(SDL_Event *event);
     void Render();
@@ -62,7 +62,7 @@ public:
 
     void Shutdown();
 
-    void ChangeGameRoot(const std::optional<fs::path> &gameRoot);
+    void ChangeDataRoot(const std::optional<fs::path> &dataRoot);
     void ChangeGameType(const essencio::GameType &gameType);
 
     void SetNextFile(const std::optional<std::string> &path);
@@ -71,8 +71,8 @@ private:
     void LoadFile(const fs::path &path);
 
 public:
-    inline std::optional<fs::path> GetGameRoot() const {
-        return mGameRoot;
+    inline std::optional<fs::path> GetDataRoot() const {
+        return mDataRoot;
     }
 
     inline essencio::GameType GetGameType() const {
