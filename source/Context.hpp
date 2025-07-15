@@ -1,9 +1,6 @@
 #pragma once
 
 #include <optional>
-#include <filesystem>
-
-namespace fs = std::filesystem;
 
 #include "SDL3/SDL_video.h"
 #include "SDL3/SDL_events.h"
@@ -13,6 +10,7 @@ namespace fs = std::filesystem;
 #include "Renderer.hpp"
 #include "Loader.hpp"
 #include "Camera.hpp"
+#include "File.hpp"
 
 #include "essencio/GameType.hpp"
 
@@ -35,6 +33,7 @@ private:
     essencio::GameType mGameType;
     ContextType mContextType;
     std::optional<AssetMap> mAssetMap;
+    DirectoryEntry mRootDirectory;
     Loader mLoader;
     Camera mCamera;
     
@@ -89,6 +88,10 @@ public:
 
     inline const std::optional<AssetMap> &GetAssetMap() const {
         return mAssetMap;
+    }
+
+    inline const DirectoryEntry &GetRootDirectory() const {
+        return mRootDirectory;
     }
 
     inline Loader &GetLoader() {

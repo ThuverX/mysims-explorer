@@ -290,6 +290,8 @@ void Context::ChangeDataRoot(const std::optional<fs::path> &dataRoot) {
         }
 
         LOG_TRACE("Automatically detected game type %d", static_cast<int>(mGameType));
+        // Build and cache directory tree
+        mRootDirectory = File::BuildDirectoryTree(*mDataRoot);
     }
 
     ReloadAssetMap();

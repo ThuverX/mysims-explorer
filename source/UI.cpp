@@ -71,43 +71,41 @@ void UI::DockSpace() {
     ImGui::End();
 }
 
-void UI::DrawDirectory(const fs::path &directory) {
-    const auto &assetMap = Context::Get().GetAssetMap();
-
-    for (const auto& entry : fs::directory_iterator(directory)) {
-        const auto& path = entry.path();
-        std::string name = path.filename().string();
-
-        if (entry.is_directory()) {
-            if (ImGui::TreeNodeEx(name.c_str(), ImGuiTreeNodeFlags_OpenOnArrow)) {
-                DrawDirectory(path);
-                ImGui::TreePop();
+void UI::DrawDirectoryEntry(const DirectoryEntry &entry) {
+    if (entry.isDirectory) {
+        if (ImGui::TreeNodeEx(entry.name.c_str(), ImGuiTreeNodeFlags_OpenOnArrow)) {
+            for (const auto& child : entry.children) {
+                DrawDirectoryEntry(child);
             }
-        } else {
-            const ContextType type = Context::GetExtensionContextType(path.extension().string());
+            ImGui::TreePop();
+        }
+    } else {
+        const auto& path = entry.path;
+        const auto& assetMap = Context::Get().GetAssetMap();
 
-            if (type == ContextType::NONE) {
-                ImGui::BeginDisabled(true);
-                ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
-            }
+        const ContextType type = Context::GetExtensionContextType(path.extension().string());
 
-            std::string displayName = name;
-            if (assetMap) {
-                auto mapping = assetMap->Get(path.stem().string());
-                if (mapping) {
-                    displayName = *mapping + path.extension().string();
-                }
-            }
+        if (type == ContextType::NONE) {
+            ImGui::BeginDisabled(true);
+            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+        }
 
-            bool isCurrentFile = Context::Get().GetCurrentFile() == path;
-            if (ImGui::Selectable(displayName.c_str(), isCurrentFile)) {
-                Context::Get().SetNextFile(path.string());
+        std::string displayName = entry.name;
+        if (assetMap) {
+            auto mapping = assetMap->Get(path.stem().string());
+            if (mapping) {
+                displayName = *mapping + path.extension().string();
             }
+        }
 
-            if (type == ContextType::NONE) {
-                ImGui::PopStyleColor();
-                ImGui::EndDisabled();
-            }
+        bool isCurrentFile = Context::Get().GetCurrentFile() == path;
+        if (ImGui::Selectable(displayName.c_str(), isCurrentFile)) {
+            Context::Get().SetNextFile(path.string());
+        }
+
+        if (type == ContextType::NONE) {
+            ImGui::PopStyleColor();
+            ImGui::EndDisabled();
         }
     }
 }
@@ -115,9 +113,13 @@ void UI::DrawDirectory(const fs::path &directory) {
 void UI::Explorer() {
     ImGui::Begin("Explorer", nullptr, ImGuiWindowFlags_HorizontalScrollbar);
 
-    auto dataRoot = Context::Get().GetDataRoot();
-    if (dataRoot && fs::exists(*dataRoot)) {
-        DrawDirectory(*dataRoot);
+    const auto& context = Context::Get();
+    const auto& root = context.GetRootDirectory();
+
+    if (!root.path.empty()) {
+        for (const auto& child : root.children) {
+            DrawDirectoryEntry(child);
+        }
     } else {
         ImGui::TextUnformatted("No valid game root selected.");
     }

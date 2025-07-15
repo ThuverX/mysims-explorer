@@ -3,9 +3,7 @@
 #include "Context.hpp"
 #include "Renderer.hpp"
 #include "Loader.hpp"
-
-#include <filesystem>
-namespace fs = std::filesystem;
+#include "File.hpp"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
@@ -13,7 +11,7 @@ namespace fs = std::filesystem;
 namespace UI {
 
 void DockSpace();
-void DrawDirectory(const fs::path &directory);
+void DrawDirectoryEntry(const DirectoryEntry &entry);
 void Explorer();
 
 void DrawModelProperties(Loader &loader);

@@ -1,5 +1,6 @@
 #include "File.hpp"
 
+#include <filesystem>
 #include <fstream>
 #include <sstream>
 #include <iomanip>
@@ -34,4 +35,19 @@ std::string File::GetResourceKeyPath(const essencio::ResourceKey &key, const std
     }
 
     return stream.str();
+}
+
+DirectoryEntry File::BuildDirectoryTree(const fs::path &directory) {
+    DirectoryEntry node;
+    node.path = directory;
+    node.name = directory.filename().string();
+    node.isDirectory = fs::is_directory(directory);
+
+    if (node.isDirectory) {
+        for (const auto& entry : fs::directory_iterator(directory)) {
+            node.children.push_back(BuildDirectoryTree(entry.path()));
+        }
+    }
+
+    return node;
 }
