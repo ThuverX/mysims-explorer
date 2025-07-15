@@ -91,7 +91,9 @@ void UI::DrawDirectoryEntry(const DirectoryEntry &entry) {
         }
 
         std::string displayName = entry.name;
-        if (assetMap) {
+        // Currently, we're only translating asset map names for Kingdom
+        // MySims seems to have some weirdness going on in terms of uniqueness
+        if (assetMap && Context::Get().GetGameType() == essencio::GameType::KINGDOM) {
             auto mapping = assetMap->Get(path.stem().string());
             if (mapping) {
                 displayName = *mapping + path.extension().string();
