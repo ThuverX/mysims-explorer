@@ -2,6 +2,8 @@
 
 A tool to easily browse, inspect and view game assets from MySims and MySims Kingdom (Cozy Bundle edition).
 
+![Screenshot of MySims Explorer](https://raw.githubusercontent.com/bottledlactose/mysims-explorer/refs/heads/trunk/images/screenshot.png)
+
 This was mostly tested on Kingdom, so things are more likely to break on the original MySims.
 
 ## Features
