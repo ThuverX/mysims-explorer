@@ -7,6 +7,7 @@
 #include "glad/gl.h"
 
 #include "Context.hpp"
+#include "AssetMap.hpp"
 #include "macros/log.hpp"
 #include <SDL3/SDL_mutex.h>
 #include <SDL3/SDL_timer.h>
@@ -290,6 +291,8 @@ void Context::ChangeDataRoot(const std::optional<fs::path> &dataRoot) {
 
         LOG_TRACE("Automatically detected game type %d", static_cast<int>(mGameType));
     }
+
+    ReloadAssetMap();
 }
 
 void Context::ChangeGameType(const essencio::GameType &gameType) {
@@ -300,6 +303,8 @@ void Context::ChangeGameType(const essencio::GameType &gameType) {
     mLoader.UnloadAll();
     mGameType = gameType;
 
+    ReloadAssetMap();
+
     LOG_INFO("Game type was changed to %d", static_cast<int>(mGameType));
 }
 
@@ -309,6 +314,15 @@ void Context::SetNextFile(const std::optional<std::string> &path) {
         return;
 
     mNextFile = path;
+}
+
+void Context::ReloadAssetMap() {
+
+    auto dataRoot = GetDataRoot();
+    if (!dataRoot) return;
+
+    fs::path assetMapPath = fs::path(*dataRoot) / "BuildData" / "AssetGenerator" / "AssetMap.xml";
+    mAssetMap = AssetMap::Read(assetMapPath.string());
 }
 
 void Context::LoadFile(const fs::path &path) {

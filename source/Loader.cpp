@@ -31,7 +31,6 @@ std::vector<float> Loader::GetMeshVertices(const essencio::WindowsMesh &mesh) {
         }
     }
 
-    // TODO: Throw exceptions instead?
     if (positionOffset == 0xFFFFFFFF) {
         LOG_WARN("No FLOAT3 position key found in vertexKeys!");
         return vertices;

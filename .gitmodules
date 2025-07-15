@@ -17,3 +17,6 @@
 [submodule "lib/imguifiledialog"]
 	path = lib/imguifiledialog
 	url = https://github.com/aiekick/ImGuiFileDialog.git
+[submodule "lib/tinyxml"]
+	path = lib/tinyxml
+	url = https://github.com/leethomason/tinyxml2.git

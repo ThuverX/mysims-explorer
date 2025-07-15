@@ -9,6 +9,7 @@ namespace fs = std::filesystem;
 #include "SDL3/SDL_events.h"
 
 #include "macros/singleton.hpp"
+#include "AssetMap.hpp"
 #include "Renderer.hpp"
 #include "Loader.hpp"
 #include "Camera.hpp"
@@ -33,6 +34,7 @@ private:
     std::optional<fs::path> mDataRoot;
     essencio::GameType mGameType;
     ContextType mContextType;
+    std::optional<AssetMap> mAssetMap;
     Loader mLoader;
     Camera mCamera;
     
@@ -65,6 +67,7 @@ public:
     
     void ChangeDataRoot(const std::optional<fs::path> &dataRoot);
     void ChangeGameType(const essencio::GameType &gameType);
+    void ReloadAssetMap();
 
     void SetNextFile(const std::optional<std::string> &path);
 
@@ -82,6 +85,10 @@ public:
 
     inline ContextType GetContextType() const {
         return mContextType;
+    }
+
+    inline const std::optional<AssetMap> &GetAssetMap() const {
+        return mAssetMap;
     }
 
     inline Loader &GetLoader() {

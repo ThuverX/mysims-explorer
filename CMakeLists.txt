@@ -14,8 +14,11 @@ set(SDL_STATIC ON CACHE BOOL "")
 set(SDL_SHARED OFF CACHE BOOL "")
 
 add_subdirectory(lib/sdl)
+add_subdirectory(lib/tinyxml)
 
 add_executable(mysims-explorer source/main.cpp
+    source/AssetMap.hpp
+    source/AssetMap.cpp
     source/Camera.hpp
     source/Camera.cpp
     source/Context.hpp
@@ -49,11 +52,12 @@ target_include_directories(mysims-explorer SYSTEM PRIVATE
     lib/glm
     lib/gli
     lib/imgui
-    lib/imguifiledialog)
+    lib/imguifiledialog
+    lib/tinyxml)
 target_include_directories(mysims-explorer PRIVATE
     lib/essencio/include
     ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(mysims-explorer PRIVATE SDL3-static)
+target_link_libraries(mysims-explorer PRIVATE SDL3-static tinyxml2)
 
 # Enable all warnings
 if(MSVC)

@@ -72,6 +72,8 @@ void UI::DockSpace() {
 }
 
 void UI::DrawDirectory(const fs::path &directory) {
+    const auto &assetMap = Context::Get().GetAssetMap();
+
     for (const auto& entry : fs::directory_iterator(directory)) {
         const auto& path = entry.path();
         std::string name = path.filename().string();
@@ -89,8 +91,16 @@ void UI::DrawDirectory(const fs::path &directory) {
                 ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
             }
 
+            std::string displayName = name;
+            if (assetMap) {
+                auto mapping = assetMap->Get(path.stem().string());
+                if (mapping) {
+                    displayName = *mapping + path.extension().string();
+                }
+            }
+
             bool isCurrentFile = Context::Get().GetCurrentFile() == path;
-            if (ImGui::Selectable(name.c_str(), isCurrentFile)) {
+            if (ImGui::Selectable(displayName.c_str(), isCurrentFile)) {
                 Context::Get().SetNextFile(path.string());
             }
 
@@ -307,7 +317,6 @@ void UI::Properties() {
             DrawMaterialProperties(loader);
             break;
         default:
-            // TODO: Show default text here?
             break;
     }
 
