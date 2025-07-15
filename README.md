@@ -16,7 +16,7 @@ This was mostly tested on Kingdom, so things are more likely to break on the ori
 
 ## Usage
 
-1. Download the latest version on the Releases page
+1. Download the latest version on the [Releases](https://github.com/bottledlactose/mysims-explorer/releases) page
 2. Launch the tool
 3. Navigate to `File` -> `Open Data Root...`
 4. Select your MySims or MySims Kingdom data directory
