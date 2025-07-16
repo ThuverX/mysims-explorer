@@ -94,10 +94,6 @@ ContextType Context::GetExtensionContextType(const std::string &extension) {
 }
 
 bool Context::Initialize(const std::optional<fs::path> &dataRoot) {
-
-    mLastTime = SDL_GetPerformanceCounter();
-    mDeltaTime = 0.0f;
-
     LOG_INFO("MySims Explorer v%s is initializing...", VERSION_STRING);
     ChangeDataRoot(dataRoot);
     
@@ -167,12 +163,6 @@ bool Context::Initialize(const std::optional<fs::path> &dataRoot) {
 }
 
 void Context::Update() {
-    Uint64 currentTime = SDL_GetPerformanceCounter();
-    Uint64 frequency = SDL_GetPerformanceFrequency();
-
-    mDeltaTime = (double)(currentTime - mLastTime) / frequency;
-    mLastTime = currentTime;
-
     if (mNextFile) {
         LoadFile(*mNextFile);
         mCurrentFile = mNextFile;

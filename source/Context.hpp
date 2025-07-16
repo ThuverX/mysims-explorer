@@ -37,10 +37,6 @@ private:
     DirectoryEntry mRootDirectory;
     Loader mLoader;
     Camera mCamera;
-    
-    // Delta time
-    Uint64 mLastTime;
-    double mDeltaTime;
 
     std::optional<std::string> mCurrentFile;
     std::optional<std::string> mNextFile;
@@ -101,10 +97,6 @@ public:
 
     inline Camera &GetCamera() {
         return mCamera;
-    }
-
-    inline double GetDeltaTime() const {
-        return mDeltaTime;
     }
 
     inline const std::optional<std::string> &GetCurrentFile() const {

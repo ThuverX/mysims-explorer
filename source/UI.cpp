@@ -372,6 +372,7 @@ void UI::Console() {
 }
 
 void UI::DrawSceneViewport(FramebufferHandle &framebuffer, const ImVec2 &size) {
+    auto &camera = Context::Get().GetCamera();
 
     int width = static_cast<int>(size.x);
     int height = static_cast<int>(size.y);
@@ -384,28 +385,22 @@ void UI::DrawSceneViewport(FramebufferHandle &framebuffer, const ImVec2 &size) {
 
     ImGui::Image((ImTextureID)(intptr_t)framebuffer.texture, size, ImVec2(0, 1), ImVec2(1, 0));
 
-    auto &camera = Context::Get().GetCamera();
-    double deltaTime = Context::Get().GetDeltaTime();
-
     if (ImGui::IsWindowHovered()) {
         ImGuiIO& io = ImGui::GetIO();
 
-        if (ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
-            float deltaX = io.MouseDelta.x;
-            float deltaY = io.MouseDelta.y;
+        float deltaX = io.MouseDelta.x;
+        float deltaY = io.MouseDelta.y;
 
-            camera.Orbit(deltaX * deltaTime * 10.f, deltaY * deltaTime * 10.f);
+        if (ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
+            camera.Orbit(deltaX * 0.3f,  deltaY * 0.3f);
         }
 
         if (io.MouseWheel != 0.0f) {
-            camera.Zoom(io.MouseWheel * deltaTime * 6.f);
+            camera.Zoom(io.MouseWheel * 0.6f);
         }
 
         if (ImGui::IsMouseDragging(ImGuiMouseButton_Right)) {
-            float deltaX = io.MouseDelta.x;
-            float deltaY = io.MouseDelta.y;
-
-            camera.Pan(deltaX * deltaTime * 0.2f, deltaY * deltaTime * 0.2f);
+            camera.Pan(deltaX * 0.005f, deltaY * 0.005f);
         }
     }
 }
