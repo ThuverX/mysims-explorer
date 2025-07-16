@@ -399,15 +399,16 @@ void UI::DrawSceneViewport(FramebufferHandle &framebuffer, const ImVec2 &size) {
     }
 }
 
-void UI::DrawXmlElement(const XmlNode &node) {
-    if (ImGui::TreeNode(node.name.c_str())) {
+void UI::DrawXmlElement(const XmlNode &node, int &nodeIndex) {
+    std::string nodeLabel = node.name + "##" + std::to_string(nodeIndex);
+    if (ImGui::TreeNode(nodeLabel.c_str())) {
 
         for (const auto &attr : node.attributes) {
             ImGui::Text("%s = %s", attr.first.c_str(), attr.second.c_str());
         }
 
         for (const auto &child : node.children) {
-            DrawXmlElement(child);
+            DrawXmlElement(child, ++nodeIndex);
         }
 
         ImGui::TreePop();
@@ -440,7 +441,8 @@ void UI::Viewport(ContextType type, FramebufferHandle &framebuffer) {
 
                 if (xml.size() > 0) {
                     const auto &root = xml.begin()->second.root;
-                    DrawXmlElement(root);
+                    int nodeIndex = 0;
+                    DrawXmlElement(root, nodeIndex);
                 }
             }
             break;

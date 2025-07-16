@@ -20,7 +20,7 @@ void Properties();
 
 void Console();
 
-void DrawXmlElement(const XmlNode &node);
+void DrawXmlElement(const XmlNode &node, int &nodeIndex);
 
 void DrawSceneViewport(FramebufferHandle &framebuffer, const ImVec2 &size);
 void Viewport(ContextType type, FramebufferHandle &framebuffer);
