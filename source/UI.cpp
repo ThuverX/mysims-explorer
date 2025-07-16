@@ -403,7 +403,12 @@ void UI::DrawSceneViewport(FramebufferHandle &framebuffer, const ImVec2 &size) {
 }
 
 void UI::DrawXmlElement(const XmlNode &node, int &nodeIndex) {
-    std::string nodeLabel = node.name + "##" + std::to_string(nodeIndex);
+    std::string nodeLabel = node.name;
+    if (!node.text.empty()) {
+        nodeLabel += " = " + node.text;
+    }
+    nodeLabel += "##" + std::to_string(nodeIndex);
+
     if (ImGui::TreeNode(nodeLabel.c_str())) {
 
         for (const auto &attr : node.attributes) {
