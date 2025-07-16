@@ -23,7 +23,7 @@ This was mostly tested on Kingdom, so things are more likely to break on the ori
     - On Steam, these are usually the following directories:
         - MySims Kingdom: `C:\Program Files (x86)\Steam\steamapps\common\MySims Kingdom\data`
         - MySims: `C:\Program Files (x86)\Steam\steamapps\common\MySims\data`
-5. Browse through the models loaded in the Explorer
+5. Browse through the files loaded in the Explorer
 
 ## Known Issues
 

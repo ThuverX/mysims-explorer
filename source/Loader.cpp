@@ -97,7 +97,11 @@ std::optional<std::string> Loader::FindMaterialPath(const std::string &fileName,
 std::optional<std::string> Loader::FindTexturePath(const std::string &fileName) {
 
     static std::vector<fs::path> searchPaths = {
+        fs::path("GameData_Win64") / "Textures" / "Characters",
+        fs::path("GameData_Win64") / "Textures" / "Levels",
         fs::path("GameData_Win64") / "Textures" / "Objects",
+        fs::path("GameData_Win64") / "Textures" / "Textures",
+        fs::path("GameData_Win64") / "Textures" / "UI",
     };
 
     for (const auto &path : searchPaths) {
@@ -177,7 +181,11 @@ ModelData *Loader::LoadModel(const std::string &path, const essencio::GameType &
                 meshData.material = *materialData;
                 // Attach this material to the current mesh
                 meshData.handle.texture = materialData->texture;
+            } else {
+                LOG_WARN("Material data could not be loaded");
             }
+        } else {
+            LOG_WARN("Material path not found");
         }
 
         modelData.meshes.emplace_back(meshData);
@@ -233,6 +241,8 @@ MaterialData *Loader::LoadMaterial(const std::string &path, const essencio::Game
                             format,
                             levels,
                         });
+                    } else {
+                        LOG_WARN("Texture path not found");
                     }
                 }
                 break;
