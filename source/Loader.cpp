@@ -210,7 +210,6 @@ ModelData *Loader::LoadModel(const std::string &path, const essencio::GameType &
     }
 
     auto result = models.insert({modelData.path, std::move(modelData)});
-    LOG_INFO("Loaded model at path %s", path.c_str());
     return &result.first->second;
 }
 
@@ -270,7 +269,6 @@ MaterialData *Loader::LoadMaterial(const std::string &path, const essencio::Game
     }
 
     auto result = materials.insert({materialData.path, std::move(materialData)});
-    LOG_INFO("Loaded material at path %s", path.c_str());
     return &result.first->second;
 }
 
@@ -288,7 +286,6 @@ XmlData *Loader::LoadXml(const std::string &path) {
     xmlData.root = BuildXmlNodeTree(doc.RootElement());
 
     auto result = xml.insert({xmlData.path, std::move(xmlData)});
-    LOG_INFO("Loaded XML file at path %s", path.c_str());
     return &result.first->second;
 }
 

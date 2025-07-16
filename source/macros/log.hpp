@@ -6,3 +6,4 @@
 #define LOG_INFO(message, ...)  Logger::Get().Log(LogLevel::INFO,  message, ##__VA_ARGS__)
 #define LOG_WARN(message, ...)  Logger::Get().Log(LogLevel::WARN,  message, ##__VA_ARGS__)
 #define LOG_ERROR(message, ...) Logger::Get().Log(LogLevel::ERROR, message, ##__VA_ARGS__)
+#define LOG_SUCCESS(message, ...) Logger::Get().Log(LogLevel::SUCCESS, message, ##__VA_ARGS__)

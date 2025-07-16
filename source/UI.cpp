@@ -340,6 +340,9 @@ void UI::Console() {
             case LogLevel::ERROR:
                 color = ImVec4(1.0f, 0.2f, 0.2f, 1.0f); // red
                 break;
+            case LogLevel::SUCCESS:
+                color = ImVec4(0.2f, 1.0f, 0.2f, 1.0f); // green
+                break;
             case LogLevel::WARN:
                 color = ImVec4(1.0f, 0.7f, 0.0f, 1.0f); // orange/yellow
                 break;

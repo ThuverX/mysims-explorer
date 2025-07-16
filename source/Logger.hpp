@@ -8,7 +8,8 @@ enum class LogLevel {
     TRACE,
     INFO,
     WARN,
-    ERROR
+    ERROR,
+    SUCCESS,
 };
 
 struct LogEntry {

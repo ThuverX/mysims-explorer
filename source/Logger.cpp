@@ -9,10 +9,11 @@
 
 std::string Logger::LevelToString(const LogLevel level) {
     switch (level) {
-        case LogLevel::TRACE: return "TRACE";
-        case LogLevel::INFO:  return "INFO ";
-        case LogLevel::WARN:  return "WARN ";
-        case LogLevel::ERROR: return "ERROR";
+        case LogLevel::TRACE: return "TRACE  ";
+        case LogLevel::INFO:  return "INFO   ";
+        case LogLevel::WARN:  return "WARN   ";
+        case LogLevel::ERROR: return "ERROR  ";
+        case LogLevel::SUCCESS: return "SUCCESS";
     }
     return "UNKNOWN";
 }

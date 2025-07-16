@@ -159,7 +159,7 @@ bool Context::Initialize(const std::optional<fs::path> &dataRoot) {
 
     SDL_ShowWindow(mWindow);
 
-    LOG_INFO("MySims Explorer was successfully initialized!");
+    LOG_SUCCESS("MySims Explorer was successfully initialized!");
     return true;
 }
 
@@ -281,7 +281,7 @@ void Context::ChangeDataRoot(const std::optional<fs::path> &dataRoot) {
     mLoader.UnloadAll();
     mDataRoot = dataRoot;
 
-    LOG_INFO("Data directory was changed to %s", (*dataRoot).string().c_str());
+    LOG_TRACE("Data root was changed to %s", (*dataRoot).string().c_str());
 
     if (mDataRoot) {
         // Try to determine game type
