@@ -332,6 +332,7 @@ void UI::Console() {
     ImGui::Begin("Console", nullptr, ImGuiWindowFlags_HorizontalScrollbar);
 
     const auto &history = Logger::Get().GetHistory();
+    static uint64_t lastEntryId = 0;
 
     for (const auto& entry : history) {
         ImVec4 color;
@@ -359,7 +360,14 @@ void UI::Console() {
         ImGui::PopStyleColor();
     }
 
-    ImGui::SetScrollHereY(1.0f);
+    if (!history.empty()) {
+        uint64_t latestId = history.back().id;
+        if (latestId != lastEntryId) {
+            ImGui::SetScrollHereY(1.0f);
+            lastEntryId = latestId;
+        }
+    }
+
     ImGui::End();
 }
 

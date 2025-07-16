@@ -44,11 +44,13 @@ void Logger::Log(const LogLevel level, const char *format, ...) {
     
     std::string message(buffer, n);
 
-
     LogEntry entry = {
         level,
-        "[" + timestamp + "][" + levelStr + "] " + message
+        "[" + timestamp + "][" + levelStr + "] " + message,
+        messageCount,
     };
+
+    messageCount++;
 
     switch (level) {
         case LogLevel::WARN:
