@@ -543,20 +543,15 @@ void UI::MainMenuBar() {
     if (ImGuiFileDialog::Instance()->Display("ChooseDataRoot", ImGuiWindowFlags_NoCollapse, ImVec2(500, 250))) {
         if (ImGuiFileDialog::Instance()->IsOk()) { // action if OK
             std::string directoryPath = ImGuiFileDialog::Instance()->GetCurrentPath();
-
             auto dataRoot = Context::FindDataRoot(directoryPath);
 
             if (!dataRoot) {
-                // TODO: Warn the user; this is not a game directory
-            }
-            else {
+                LOG_WARN("The selected directory is not a MySims data directory!");
+            } else {
                 if (*dataRoot != directoryPath) {
-                    // TODO: Ask the user to fix the game path automatically
-                    // Just 
+                    LOG_INFO("Automatically detected data root at %s", dataRoot->string().c_str());
                 }
-                else {
-                    Context::Get().ChangeDataRoot(dataRoot);
-                }
+                Context::Get().ChangeDataRoot(dataRoot);
             }
         }
 

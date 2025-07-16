@@ -73,6 +73,9 @@ std::optional<fs::path> Context::FindDataRoot(const fs::path &path) {
             return current;
         }
 
+        if (current == current.parent_path())
+            return std::nullopt;
+
         current = current.parent_path();
     }
 
