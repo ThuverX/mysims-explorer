@@ -89,7 +89,27 @@ std::optional<std::string> Loader::FindMaterialPath(const std::string &fileName,
         }
     }
 
-    // TODO: Add multiple possible material search paths here
+    static std::vector<fs::path> searchPaths = {
+        fs::path("GameData") / "Characters",
+        fs::path("GameData") / "Levels",
+        fs::path("GameData") / "Objects",
+        fs::path("GameData") / "Textures",
+        fs::path("GameData") / "UI",
+    };
+
+    for (const auto &path : searchPaths) {
+        const std::optional<fs::path> dataRoot = Context::Get().GetDataRoot();
+
+        if (!dataRoot) {
+            return std::nullopt;
+        }
+
+        const fs::path materialPath = *dataRoot / path / fileName;
+
+        if (fs::exists(materialPath) && !fs::is_directory(materialPath)) {
+            return materialPath.string();
+        }
+    }
 
     return std::nullopt;
 }
@@ -169,10 +189,8 @@ ModelData *Loader::LoadModel(const std::string &path, const essencio::GameType &
             indices,
         });
 
-        auto materialPath = FindMaterialPath(
-            File::GetResourceKeyPath(mesh.material, "Material"),
-            path
-        );
+        const auto &resourcePath = File::GetResourceKeyPath(mesh.material, "Material");
+        auto materialPath = FindMaterialPath(resourcePath, path);
 
         if (materialPath) {
             auto materialData = LoadMaterial(*materialPath, gameType);
@@ -185,7 +203,7 @@ ModelData *Loader::LoadModel(const std::string &path, const essencio::GameType &
                 LOG_WARN("Material data could not be loaded");
             }
         } else {
-            LOG_WARN("Material path not found");
+            LOG_WARN("Material path not found for resource %s", resourcePath.c_str());
         }
 
         modelData.meshes.emplace_back(meshData);
@@ -220,9 +238,8 @@ MaterialData *Loader::LoadMaterial(const std::string &path, const essencio::Game
         switch (param.valueType) {
             case essencio::MaterialParameterType::RESOURCE_KEY:
                 {
-                    auto texturePath = FindTexturePath(
-                        File::GetResourceKeyPath(param.mapKey, "dds")
-                    );
+                    const auto &resourcePath = File::GetResourceKeyPath(param.mapKey, "dds");
+                    auto texturePath = FindTexturePath(resourcePath);
 
                     if (texturePath) {
                         // Load the DDS texture using gli
@@ -242,7 +259,7 @@ MaterialData *Loader::LoadMaterial(const std::string &path, const essencio::Game
                             levels,
                         });
                     } else {
-                        LOG_WARN("Texture path not found");
+                        LOG_WARN("Texture path not found for resource %s", resourcePath.c_str());
                     }
                 }
                 break;
