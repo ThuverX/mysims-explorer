@@ -29,7 +29,6 @@ This was mostly tested on Kingdom, so things are more likely to break on the ori
 
 - Characters can't load materials on MySims
 - Asset map translations are currently disabled for MySims
-- Scrolling up doesn't work in the console window
 
 ## License
 
