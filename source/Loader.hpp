@@ -12,6 +12,8 @@
 
 #include "Renderer.hpp"
 
+#include "tinyxml2.h"
+
 struct MaterialData {
     std::string path;
     TextureHandle texture;
@@ -30,10 +32,23 @@ struct ModelData {
     essencio::WindowsModel data;
 };
 
+struct XmlNode {
+    std::string name;
+    std::unordered_map<std::string, std::string> attributes;
+    std::vector<XmlNode> children;
+    std::string text;
+};
+
+struct XmlData {
+    std::string path;
+    XmlNode root;
+};
+
 class Loader {
 private:
     std::unordered_map<std::string, ModelData> models;
     std::unordered_map<std::string, MaterialData> materials;
+    std::unordered_map<std::string, XmlData> xml;
 
     // Mesh data helpers
     static std::vector<float> GetMeshVertices(const essencio::WindowsMesh &mesh);
@@ -43,9 +58,13 @@ private:
     static std::optional<std::string> FindMaterialPath(const std::string &fileName, const std::string &modelPath = "");
     static std::optional<std::string> FindTexturePath(const std::string &fileName);
 
+    // XML loading helper
+    static XmlNode BuildXmlNodeTree(const tinyxml2::XMLElement *element);
+
 public:
     ModelData *LoadModel(const std::string &path, const essencio::GameType &gameType);
     MaterialData *LoadMaterial(const std::string &path, const essencio::GameType &gameType);
+    XmlData *LoadXml(const std::string &path);
 
     void UnloadAll();
 
@@ -55,5 +74,9 @@ public:
 
     inline std::unordered_map<std::string, MaterialData> &GetMaterials() {
         return materials;
+    }
+
+    inline std::unordered_map<std::string, XmlData> &GetXml() {
+        return xml;
     }
 };

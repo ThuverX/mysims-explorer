@@ -5,6 +5,7 @@
 #include <essencio/model/VertexKey.hpp>
 #include <essencio/model/WindowsModel.hpp>
 #include <string>
+#include <tinyxml2.h>
 
 #include "essencio/material/MaterialParameter.hpp"
 #include "macros/log.hpp"
@@ -398,6 +399,21 @@ void UI::DrawSceneViewport(FramebufferHandle &framebuffer, const ImVec2 &size) {
     }
 }
 
+void UI::DrawXmlElement(const XmlNode &node) {
+    if (ImGui::TreeNode(node.name.c_str())) {
+
+        for (const auto &attr : node.attributes) {
+            ImGui::Text("%s = %s", attr.first.c_str(), attr.second.c_str());
+        }
+
+        for (const auto &child : node.children) {
+            DrawXmlElement(child);
+        }
+
+        ImGui::TreePop();
+    }
+}
+
 void UI::Viewport(ContextType type, FramebufferHandle &framebuffer) {
     ImGui::Begin("Viewport");
 
@@ -415,6 +431,16 @@ void UI::Viewport(ContextType type, FramebufferHandle &framebuffer) {
                 if (materials.size() > 0) {
                     TextureHandle texture = materials.begin()->second.texture;
                     ImGui::Image(texture, ImVec2(256, 256));
+                }
+            }
+            break;
+        case ContextType::XML:
+            {
+                const auto &xml = loader.GetXml();
+
+                if (xml.size() > 0) {
+                    const auto &root = xml.begin()->second.root;
+                    DrawXmlElement(root);
                 }
             }
             break;

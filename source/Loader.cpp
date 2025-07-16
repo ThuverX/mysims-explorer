@@ -11,6 +11,7 @@
 #include "File.hpp"
 
 #include <gli/load.hpp>
+#include <tinyxml2.h>
 
 #include "macros/log.hpp"
 
@@ -114,6 +115,25 @@ std::optional<std::string> Loader::FindTexturePath(const std::string &fileName) 
     }
 
     return std::nullopt;
+}
+
+XmlNode Loader::BuildXmlNodeTree(const tinyxml2::XMLElement *element) {
+    XmlNode node;
+    node.name = element->Name();
+
+    for (const tinyxml2::XMLAttribute* attr = element->FirstAttribute(); attr; attr = attr->Next()) {
+        node.attributes[attr->Name()] = attr->Value();
+    }
+
+    for (const tinyxml2::XMLElement* child = element->FirstChildElement(); child; child = child->NextSiblingElement()) {
+        node.children.push_back(BuildXmlNodeTree(child));
+    }
+
+    if (element->GetText()) {
+        node.text = element->GetText();
+    }
+
+    return node;
 }
 
 ModelData *Loader::LoadModel(const std::string &path, const essencio::GameType &gameType) {
@@ -227,7 +247,27 @@ MaterialData *Loader::LoadMaterial(const std::string &path, const essencio::Game
     return &result.first->second;
 }
 
+XmlData *Loader::LoadXml(const std::string &path) {
+
+    tinyxml2::XMLDocument doc;
+    
+    if (doc.LoadFile(path.c_str()) != tinyxml2::XML_SUCCESS) {
+        LOG_ERROR("Failed to load XML file");
+        return nullptr;
+    }
+
+    XmlData xmlData;
+    xmlData.path = path;
+    xmlData.root = BuildXmlNodeTree(doc.RootElement());
+
+    auto result = xml.insert({xmlData.path, std::move(xmlData)});
+    LOG_INFO("Loaded XML file at path %s", path.c_str());
+    return &result.first->second;
+}
+
 void Loader::UnloadAll() {
+    xml.clear();
+
     for (auto &material : materials) {
         Renderer::DestroyTexture(material.second.texture);
     }

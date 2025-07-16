@@ -17,7 +17,8 @@
 enum class ContextType {
     NONE,
     MODEL,
-    MATERIAL
+    MATERIAL,
+    XML,
 };
 
 class Context {
