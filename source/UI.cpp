@@ -446,6 +446,16 @@ void UI::Viewport(ContextType type, FramebufferHandle &framebuffer) {
                 }
             }
             break;
+        case ContextType::MATERIALSET:
+            {
+                const auto &materials = loader.GetMaterials();
+
+                for (const auto &material : materials) {
+                    TextureHandle texture = material.second.texture;
+                    ImGui::Image(texture, ImVec2(256, 256));
+                }
+            }
+            break;
         case ContextType::XML:
             {
                 const auto &xml = loader.GetXml();

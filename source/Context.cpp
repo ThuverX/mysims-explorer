@@ -87,6 +87,8 @@ ContextType Context::GetExtensionContextType(const std::string &extension) {
         return ContextType::MODEL;
     } else if (extension == ".Material") {
         return ContextType::MATERIAL;
+    } else if (extension == ".MaterialSet") {
+        return ContextType::MATERIALSET;
     } else if (extension == ".xml") {
         return ContextType::XML;
     }
@@ -334,6 +336,9 @@ void Context::LoadFile(const fs::path &path) {
             break;
         case ContextType::MATERIAL:
             mLoader.LoadMaterial(path.string(), mGameType);
+            break;
+        case ContextType::MATERIALSET:
+            mLoader.LoadMaterialSet(path.string(), mGameType);
             break;
         case ContextType::XML:
             mLoader.LoadXml(path.string());

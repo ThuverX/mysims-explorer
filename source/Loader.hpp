@@ -64,6 +64,7 @@ private:
 public:
     ModelData *LoadModel(const std::string &path, const essencio::GameType &gameType);
     MaterialData *LoadMaterial(const std::string &path, const essencio::GameType &gameType);
+    void LoadMaterialSet(const std::string &path, const essencio::GameType &gameType);
     XmlData *LoadXml(const std::string &path);
 
     void UnloadAll();

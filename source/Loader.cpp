@@ -6,6 +6,7 @@
 #include "essencio/BinReader.hpp"
 #include "essencio/model/WindowsModel.hpp"
 #include "essencio/material/Material.hpp"
+#include "essencio/material/MaterialSet.hpp"
 
 #include "Context.hpp"
 #include "File.hpp"
@@ -270,6 +271,33 @@ MaterialData *Loader::LoadMaterial(const std::string &path, const essencio::Game
 
     auto result = materials.insert({materialData.path, std::move(materialData)});
     return &result.first->second;
+}
+
+void Loader::LoadMaterialSet(const std::string &path, const essencio::GameType &gameType) {
+    essencio::MaterialSet materialSet;
+    
+    auto file = File::ReadFile(path);
+    if (!file) {
+        LOG_ERROR("Failed to open/read file: %s", path.c_str());
+        return;
+    }
+
+    essencio::BinReader reader(file.value().data(), file.value().size());
+    essencio::MaterialSet::Read(materialSet, reader, gameType);
+
+    for (const auto &material : materialSet.materials) {
+
+        auto resourceKey = File::GetResourceKeyPath(material, "Material");
+        auto materialPath = FindMaterialPath(resourceKey);
+
+        if (!materialPath) {
+            LOG_WARN("Could not find mateial path %s in material set", resourceKey.c_str());
+            continue;
+        }
+
+        LOG_TRACE("material path: %s", materialPath->c_str());
+        LoadMaterial(*materialPath, gameType);
+    }
 }
 
 XmlData *Loader::LoadXml(const std::string &path) {
