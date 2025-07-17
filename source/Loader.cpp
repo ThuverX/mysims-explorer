@@ -233,7 +233,7 @@ MaterialData *Loader::LoadMaterial(const std::string &path, const essencio::Game
     essencio::Material::Read(materialData.data, reader, gameType);
 
     // Read material
-    for (const auto &param : materialData.data.data.params) {
+    for (const auto &param : materialData.data.params) {
         switch (param.valueType) {
             case essencio::MaterialParameterType::RESOURCE_KEY:
                 {

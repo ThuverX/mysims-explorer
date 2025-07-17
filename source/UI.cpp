@@ -239,11 +239,11 @@ void UI::DrawMaterialProperties(Loader &loader) {
 
         ImGui::Text("Data Size: %d", data.dataSize);
 
-        ImGui::Text("Parameter Size: %d", data.data.paramSize);
-        ImGui::Text("# of Parameters: %d", data.data.paramCount);
+        ImGui::Text("Parameter Size: %d", data.paramSize);
+        ImGui::Text("# of Parameters: %d", data.paramCount);
 
-        for (uint32_t i = 0; i < data.data.params.size(); ++i) {
-            const auto &param = data.data.params[i];
+        for (uint32_t i = 0; i < data.params.size(); ++i) {
+            const auto &param = data.params[i];
             const std::string paramLabel = "Parameter #" + std::to_string(i + 1);
 
             if (ImGui::CollapsingHeader(paramLabel.c_str())) {
