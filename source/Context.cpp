@@ -89,7 +89,7 @@ ContextType Context::GetExtensionContextType(const std::string &extension) {
         return ContextType::MATERIAL;
     } else if (extension == ".MaterialSet") {
         return ContextType::MATERIALSET;
-    } else if (extension == ".xml") {
+    } else if (extension == ".xml" || extension == ".CABXml") {
         return ContextType::XML;
     }
     return ContextType::NONE;
