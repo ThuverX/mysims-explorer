@@ -449,10 +449,14 @@ void UI::Viewport(ContextType type, FramebufferHandle &framebuffer) {
         case ContextType::MATERIALSET:
             {
                 const auto &materials = loader.GetMaterials();
+                size_t count = 0;
 
                 for (const auto &material : materials) {
+                    std::string materialLabel = "Material##" + std::to_string(count++);
                     TextureHandle texture = material.second.texture;
-                    ImGui::Image(texture, ImVec2(256, 256));
+                    if (ImGui::ImageButton(materialLabel.c_str(), texture, ImVec2(256, 256))) {
+                        Context::Get().SetNextFile(material.second.path);
+                    }
                 }
             }
             break;
