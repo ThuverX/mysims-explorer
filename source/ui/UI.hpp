@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Context.hpp"
-#include "Renderer.hpp"
-#include "Loader.hpp"
-#include "File.hpp"
+#include "gfx/Renderer.hpp"
+#include "io/Loader.hpp"
+#include "io/File.hpp"
 
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"

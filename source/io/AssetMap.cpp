@@ -1,6 +1,6 @@
 #include "AssetMap.hpp"
 
-#include "macros/log.hpp"
+#include "util/log.hpp"
 #include "tinyxml2.h"
 #include <optional>
 #include <sstream>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Logger.hpp"
+#include "io/Logger.hpp"
 
 #define LOG_TRACE(message, ...) Logger::Get().Log(LogLevel::TRACE, message, ##__VA_ARGS__)
 #define LOG_INFO(message, ...)  Logger::Get().Log(LogLevel::INFO,  message, ##__VA_ARGS__)

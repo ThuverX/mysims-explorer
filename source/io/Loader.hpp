@@ -10,7 +10,7 @@
 #include "essencio/model/WindowsMesh.hpp"
 #include "essencio/material/Material.hpp"
 
-#include "Renderer.hpp"
+#include "gfx/Renderer.hpp"
 
 #include "tinyxml2.h"
 

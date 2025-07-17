@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.18)
-project(MYSIMSEXPLORER VERSION 0.0.3 LANGUAGES CXX C)
+project(MSE VERSION 0.0.3 LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -16,23 +16,7 @@ set(SDL_SHARED OFF CACHE BOOL "")
 add_subdirectory(lib/sdl)
 add_subdirectory(lib/tinyxml)
 
-add_executable(mysims-explorer source/main.cpp
-    source/AssetMap.hpp
-    source/AssetMap.cpp
-    source/Camera.hpp
-    source/Camera.cpp
-    source/Context.hpp
-    source/Context.cpp
-    source/File.hpp
-    source/File.cpp
-    source/Loader.hpp
-    source/Loader.cpp
-    source/Logger.hpp
-    source/Logger.cpp
-    source/Renderer.hpp
-    source/Renderer.cpp
-    source/UI.hpp
-    source/UI.cpp
+set(IMGUI_SOURCES
     # ImGui
     lib/imgui/imgui.cpp
     lib/imgui/imgui_draw.cpp
@@ -43,6 +27,24 @@ add_executable(mysims-explorer source/main.cpp
     lib/imgui/backends/imgui_impl_opengl3.cpp
     # ImGui File Dialog
     lib/imguifiledialog/ImGuiFileDialog.cpp
+)
+
+file(GLOB MSE_SOURCES
+    source/*.hpp
+    source/*.cpp
+    source/gfx/*.hpp
+    source/gfx/*.cpp
+    source/io/*.cpp
+    source/io/*.hpp
+    source/util/*.cpp
+    source/util/*.hpp
+    source/ui/*.cpp
+    source/ui/*.hpp
+)
+
+add_executable(mysims-explorer
+    ${MSE_SOURCES}
+    ${IMGUI_SOURCES}
     # GLAD
     lib/glad/src/gl.c)
 
@@ -55,6 +57,7 @@ target_include_directories(mysims-explorer SYSTEM PRIVATE
     lib/imguifiledialog
     lib/tinyxml)
 target_include_directories(mysims-explorer PRIVATE
+    source
     lib/essencio/include
     ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(mysims-explorer PRIVATE SDL3-static tinyxml2)

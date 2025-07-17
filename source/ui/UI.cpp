@@ -8,13 +8,13 @@
 #include <tinyxml2.h>
 
 #include "essencio/material/MaterialParameter.hpp"
-#include "macros/log.hpp"
-#include "Renderer.hpp"
+#include "util/log.hpp"
+#include "gfx/Renderer.hpp"
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "ImGuiFileDialog.h"
 
-#include "Logger.hpp"
+#include "io/Logger.hpp"
 
 void UI::DockSpace() {
     static bool opt_fullscreen = true;

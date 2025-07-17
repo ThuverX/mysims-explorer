@@ -1,6 +1,6 @@
 #include "Renderer.hpp"
 
-#include "macros/log.hpp"
+#include "util/log.hpp"
 
 GLuint Renderer::CreateShader(const ShaderCreateInfo &info) {
     // Compile the vertex shader

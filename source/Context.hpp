@@ -5,12 +5,12 @@
 #include "SDL3/SDL_video.h"
 #include "SDL3/SDL_events.h"
 
-#include "macros/singleton.hpp"
-#include "AssetMap.hpp"
-#include "Renderer.hpp"
-#include "Loader.hpp"
+#include "util/singleton.hpp"
+#include "io/AssetMap.hpp"
+#include "gfx/Renderer.hpp"
+#include "io/Loader.hpp"
 #include "Camera.hpp"
-#include "File.hpp"
+#include "io/File.hpp"
 
 #include "essencio/GameType.hpp"
 

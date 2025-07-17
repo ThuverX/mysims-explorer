@@ -1,6 +1,6 @@
 #pragma once
 
-#include "macros/singleton.hpp"
+#include "util/singleton.hpp"
 #include <deque>
 #include <string>
 

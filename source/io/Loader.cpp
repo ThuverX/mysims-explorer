@@ -2,7 +2,7 @@
 
 #include <filesystem>
 
-#include "Renderer.hpp"
+#include "gfx/Renderer.hpp"
 #include "essencio/BinReader.hpp"
 #include "essencio/model/WindowsModel.hpp"
 #include "essencio/material/Material.hpp"
@@ -14,7 +14,7 @@
 #include <gli/load.hpp>
 #include <tinyxml2.h>
 
-#include "macros/log.hpp"
+#include "util/log.hpp"
 
 namespace fs = std::filesystem;
 

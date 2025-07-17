@@ -1,14 +1,14 @@
 #include "Context.hpp"
 
-#include "Renderer.hpp"
+#include "gfx/Renderer.hpp"
 #include "SDL3/SDL_init.h"
 #include "SDL3/SDL_video.h"
-#include "UI.hpp"
+#include "ui/UI.hpp"
 #include "glad/gl.h"
 
 #include "Context.hpp"
-#include "AssetMap.hpp"
-#include "macros/log.hpp"
+#include "io/AssetMap.hpp"
+#include "util/log.hpp"
 #include <SDL3/SDL_mutex.h>
 #include <SDL3/SDL_timer.h>
 #include <filesystem>
