@@ -37,7 +37,7 @@ private:
     essencio::GameType mGameType;
     ContextType mContextType;
     std::optional<AssetMap> mAssetMap;
-    DirectoryEntry mRootDirectory;
+    FileEntry mRootDirectory;
     Loader mLoader;
     Camera mCamera;
 
@@ -92,7 +92,7 @@ public:
         return mAssetMap;
     }
 
-    [[nodiscard]] inline const DirectoryEntry &GetRootDirectory() const {
+    [[nodiscard]] inline const FileEntry &GetRootDirectory() const {
         return mRootDirectory;
     }
 

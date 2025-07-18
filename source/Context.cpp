@@ -3,6 +3,7 @@
 #include "gfx/Renderer.hpp"
 #include "SDL3/SDL_init.h"
 #include "SDL3/SDL_video.h"
+#include "io/File.hpp"
 #include "ui/UI.hpp"
 #include "glad/gl.h"
 
@@ -323,7 +324,7 @@ void Context::ChangeDataRoot(const std::optional<fs::path> &dataRoot) {
 
         LOG_TRACE("Automatically detected game type %d", static_cast<int>(mGameType));
         // Build and cache directory tree
-        mRootDirectory = File::BuildDirectoryTree(*mDataRoot);
+        mRootDirectory = File::BuildFileTree(*mDataRoot);
     }
 
     ReloadAssetMap();

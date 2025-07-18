@@ -4,7 +4,7 @@
 
 namespace UI::Explorer {
 
-void DrawEntry(const DirectoryEntry &entry);
+void DrawEntry(const FileEntry &entry);
 void Draw();
 
 } // namespace UI::Properties

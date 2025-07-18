@@ -37,15 +37,15 @@ std::string File::GetResourceKeyPath(const essencio::ResourceKey &key, const std
     return stream.str();
 }
 
-DirectoryEntry File::BuildDirectoryTree(const fs::path &directory) {
-    DirectoryEntry node;
+FileEntry File::BuildFileTree(const fs::path &directory) {
+    FileEntry node;
     node.path = directory;
     node.name = directory.filename().string();
     node.isDirectory = fs::is_directory(directory);
 
     if (node.isDirectory) {
         for (const auto& entry : fs::directory_iterator(directory)) {
-            node.children.push_back(BuildDirectoryTree(entry.path()));
+            node.children.push_back(BuildFileTree(entry.path()));
         }
     }
 

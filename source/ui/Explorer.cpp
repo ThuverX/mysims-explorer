@@ -2,7 +2,7 @@
 
 #include "imgui.h"
 
-void UI::Explorer::DrawEntry(const DirectoryEntry &entry) {
+void UI::Explorer::DrawEntry(const FileEntry &entry) {
     if (entry.isDirectory) {
         if (ImGui::TreeNodeEx(entry.name.c_str(), ImGuiTreeNodeFlags_OpenOnArrow)) {
             for (const auto& child : entry.children) {
