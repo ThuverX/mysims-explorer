@@ -28,6 +28,11 @@ struct MeshData {
     bool isVisible = true;
     // Determines which material should be displayed in the scene viewport
     uint32_t materialIndex = 0;
+    // Information used to render bounds
+    glm::vec3 boundsMin;
+    glm::vec3 boundsMax;
+    glm::vec3 boundsCenter;
+    glm::vec3 boundsSize;
 };
 
 struct ModelData {

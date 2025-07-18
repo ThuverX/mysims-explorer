@@ -1,6 +1,7 @@
 #include "Renderer.hpp"
 
 #include "util/log.hpp"
+#include <glm/gtc/type_ptr.hpp>
 
 GLuint Renderer::CreateShader(const ShaderCreateInfo &info) {
     // Compile the vertex shader
@@ -134,6 +135,20 @@ MeshHandle Renderer::CreateMesh(const MeshCreateInfo &info) {
     glEnableVertexAttribArray(1);
 
     return mesh;
+}
+
+void Renderer::DrawMesh(const MeshHandle &mesh, const ShaderHandle &shader, const glm::mat4 mvp, const TextureHandle &texture, bool drawLines) {
+    GLint mvpLoc = glGetUniformLocation(shader, "uMVP");
+    glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
+
+    if (texture != 0) {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glUniform1i(glGetUniformLocation(shader, "uTexture"), 0);
+    }
+
+    glBindVertexArray(mesh.VAO);
+    glDrawElements(drawLines ? GL_LINES : GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
 }
 
 void Renderer::DestroyMesh(MeshHandle &mesh) {

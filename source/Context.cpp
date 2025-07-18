@@ -251,12 +251,11 @@ void Context::RenderScene() {
 
     glUseProgram(mShaderHandle);
 
-    glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 projection = Camera::GetProjectionMatrix(
         glm::vec2(mViewport.width, mViewport.height));
     glm::mat4 view = mCamera.GetViewMatrix();
 
-    glm::mat4 mvp = projection * view * model;
+    glm::mat4 mvp = projection * view * glm::mat4(1.0f);
 
     for (const auto &model : mLoader.GetModels()) {
         for (const auto &mesh : model.second.meshes) {
@@ -265,46 +264,18 @@ void Context::RenderScene() {
                 continue;
             }
 
-            GLint mvpLoc = glGetUniformLocation(mShaderHandle, "uMVP");
-            glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
-
-            if (mesh.handle.textures.size() > 0) {
+            if (mesh.handle.textures.size() > 0 && mesh.materialIndex < mesh.handle.textures.size()) {
                 TextureHandle texture = mesh.handle.textures[mesh.materialIndex];
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, texture);
-                glUniform1i(glGetUniformLocation(mShaderHandle, "uTexture"), 0);
+                Renderer::DrawMesh(mesh.handle, mShaderHandle, mvp, texture);
+            } else {
+                Renderer::DrawMesh(mesh.handle, mShaderHandle, mvp);
             }
 
-            glBindVertexArray(mesh.handle.VAO);
-            glDrawElements(GL_TRIANGLES, mesh.handle.indexCount, GL_UNSIGNED_INT, 0);
-
             if (mShowBounds) {
-
-                glm::vec3 boundsMin = glm::vec3(
-                    mesh.data.boundsMin.x,
-                    mesh.data.boundsMin.y,
-                    mesh.data.boundsMin.z
-                );
-                glm::vec3 boundsMax = glm::vec3(
-                    mesh.data.boundsMax.x,
-                    mesh.data.boundsMax.y,
-                    mesh.data.boundsMax.z
-                );
-                glm::vec3 center = (boundsMin + boundsMax) * 0.5f;
-                glm::vec3 size = (boundsMax - boundsMin);
-
-                glm::mat4 boundsModel = glm::translate(glm::mat4(1.0f), center);
-                boundsModel = glm::scale(boundsModel, size);
-                glm::mat4 boundsMvp = projection * view * boundsModel;
-
-                glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(boundsMvp));
-
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, mCubeTexture);
-                glUniform1i(glGetUniformLocation(mShaderHandle, "uTexture"), 0);
-
-                glBindVertexArray(mCubeMesh.VAO);
-                glDrawElements(GL_LINES, mCubeMesh.indexCount, GL_UNSIGNED_INT, 0);
+                auto boundsModel = glm::mat4(1.0f);
+                boundsModel = glm::translate(boundsModel, mesh.boundsCenter);
+                boundsModel = glm::scale(boundsModel, mesh.boundsSize);
+                Renderer::DrawMesh(mCubeMesh, mShaderHandle, projection * view * boundsModel, mCubeTexture, true);
             }
         }
     }

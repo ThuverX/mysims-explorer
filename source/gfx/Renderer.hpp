@@ -56,6 +56,7 @@ TextureHandle CreateColorTexture(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 void DestroyTexture(TextureHandle &texture);
 
 MeshHandle CreateMesh(const MeshCreateInfo &info);
+void DrawMesh(const MeshHandle &mesh, const ShaderHandle &shader, const glm::mat4 mvp, const TextureHandle &texture = 0, bool drawLines = false);
 void DestroyMesh(MeshHandle &mesh);
 
 FramebufferHandle CreateFramebuffer(int width, int height);

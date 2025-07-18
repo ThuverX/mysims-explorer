@@ -189,6 +189,24 @@ ModelData *Loader::LoadModel(const std::string &path, const essencio::GameType &
 
         MeshData meshData;
         meshData.data = mesh;
+
+        // Pre-calculating mesh bounds
+        {
+            meshData.boundsMin = glm::vec3(
+                mesh.boundsMin.x,
+                mesh.boundsMin.y,
+                mesh.boundsMin.z
+            );
+            meshData.boundsMax = glm::vec3(
+                mesh.boundsMax.x,
+                mesh.boundsMax.y,
+                mesh.boundsMax.z
+            );
+
+            meshData.boundsCenter = (meshData.boundsMin + meshData.boundsMax) * 0.5f;
+            meshData.boundsSize = (meshData.boundsMax - meshData.boundsMin);
+        }
+
         meshData.handle = Renderer::CreateMesh({
             vertices,
             indices,
