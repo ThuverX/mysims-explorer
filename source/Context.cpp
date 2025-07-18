@@ -57,6 +57,23 @@ namespace fs = std::filesystem;
     "    FragColor = texture(uTexture, TexCoord);\n" \
     "}\n"
 
+static std::vector<float> cubeVertices = {
+    -0.5f, -0.5f, -0.5f,   0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,   1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,   1.0f, 1.0f,
+    -0.5f,  0.5f, -0.5f,   0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,   0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,   1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,   1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,   0.0f, 1.0f,
+};
+
+static std::vector<uint32_t> cubeIndices = {
+    0, 1, 1, 2, 2, 3, 3, 0,
+    4, 5, 5, 6, 6, 7, 7, 4,
+    0, 4, 1, 5, 2, 6, 3, 7
+};
+
 std::optional<fs::path> Context::FindDataRoot(const fs::path &path) {
     fs::path current = path;
 
@@ -142,6 +159,14 @@ bool Context::Initialize(const std::optional<fs::path> &dataRoot) {
         FRAGMENT_SHADER_SOURCE
     });
     // TODO: Add error checking
+
+    // Create a cube mesh which can be used to display bounds in 3D space
+    mCubeMesh = Renderer::CreateMesh({
+        cubeVertices,
+        cubeIndices
+    });
+    // TODO: Add error checking
+    mCubeTexture = Renderer::CreateColorTexture(255, 255, 255, 255);
 
     // Create main viewport framebuffer (maybe allow multiple later on?)
     mViewport = Renderer::CreateFramebuffer(1280, 720);
@@ -233,16 +258,15 @@ void Context::RenderScene() {
 
     glm::mat4 mvp = projection * view * model;
 
-    // Upload to shader
-    GLint mvpLoc = glGetUniformLocation(mShaderHandle, "uMVP");
-    glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
-
     for (const auto &model : mLoader.GetModels()) {
         for (const auto &mesh : model.second.meshes) {
             // Skip invisible meshes
             if (!mesh.isVisible) {
                 continue;
             }
+
+            GLint mvpLoc = glGetUniformLocation(mShaderHandle, "uMVP");
+            glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
 
             if (mesh.handle.textures.size() > 0) {
                 TextureHandle texture = mesh.handle.textures[mesh.materialIndex];
@@ -253,6 +277,35 @@ void Context::RenderScene() {
 
             glBindVertexArray(mesh.handle.VAO);
             glDrawElements(GL_TRIANGLES, mesh.handle.indexCount, GL_UNSIGNED_INT, 0);
+
+            if (mShowBounds) {
+
+                glm::vec3 boundsMin = glm::vec3(
+                    mesh.data.boundsMin.x,
+                    mesh.data.boundsMin.y,
+                    mesh.data.boundsMin.z
+                );
+                glm::vec3 boundsMax = glm::vec3(
+                    mesh.data.boundsMax.x,
+                    mesh.data.boundsMax.y,
+                    mesh.data.boundsMax.z
+                );
+                glm::vec3 center = (boundsMin + boundsMax) * 0.5f;
+                glm::vec3 size = (boundsMax - boundsMin);
+
+                glm::mat4 boundsModel = glm::translate(glm::mat4(1.0f), center);
+                boundsModel = glm::scale(boundsModel, size);
+                glm::mat4 boundsMvp = projection * view * boundsModel;
+
+                glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(boundsMvp));
+
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, mCubeTexture);
+                glUniform1i(glGetUniformLocation(mShaderHandle, "uTexture"), 0);
+
+                glBindVertexArray(mCubeMesh.VAO);
+                glDrawElements(GL_LINES, mCubeMesh.indexCount, GL_UNSIGNED_INT, 0);
+            }
         }
     }
 
@@ -341,6 +394,7 @@ void Context::LoadFile(const fs::path &path) {
     mLoader.UnloadAll();
     mCamera.Reset();
 
+    // TODO: Pre-calculate extension when building directory tree
     mContextType = GetExtensionContextType(path.extension().string());
 
     switch (mContextType) {

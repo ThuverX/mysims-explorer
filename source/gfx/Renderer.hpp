@@ -51,6 +51,8 @@ ShaderHandle CreateShader(const ShaderCreateInfo &info);
 void DestroyShader(ShaderHandle &shader);
 
 TextureHandle CreateTexture(const TextureCreateInfo &info);
+// Creates a single pixel texture of the specified color to use as a placeholder
+TextureHandle CreateColorTexture(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 void DestroyTexture(TextureHandle &texture);
 
 MeshHandle CreateMesh(const MeshCreateInfo &info);

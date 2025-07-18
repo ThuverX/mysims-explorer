@@ -81,6 +81,23 @@ GLuint Renderer::CreateTexture(const TextureCreateInfo &info) {
     return textureID;
 }
 
+TextureHandle Renderer::CreateColorTexture(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    TextureHandle texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    unsigned char pixel[] = { r, g, b, a };
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0,
+        GL_RGBA, GL_UNSIGNED_BYTE, pixel);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // no mipmaps
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    return texture;
+}
+
 void Renderer::DestroyTexture(TextureHandle &texture) {
     if (texture != 0) {
         glDeleteTextures(1, &texture);

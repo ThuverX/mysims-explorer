@@ -29,6 +29,8 @@ private:
     SDL_GLContext mGLContext;
 
     GLuint mShaderHandle;
+    MeshHandle mCubeMesh;
+    TextureHandle mCubeTexture;
     FramebufferHandle mViewport;
 
     std::optional<fs::path> mDataRoot;
@@ -48,7 +50,9 @@ public:
     bool mShowProperties = true;
     bool mShowConsole = true;
 
+    // Rendering options
     bool mWireframeMode = false;
+    bool mShowBounds = true;
 
     static std::optional<fs::path> FindDataRoot(const fs::path &path);
     static ContextType GetExtensionContextType(const std::string &extension);

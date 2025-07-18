@@ -23,6 +23,7 @@ struct MaterialData {
 struct MeshData {
     MeshHandle handle;
     std::vector<MaterialData *> materials;
+    essencio::WindowsMesh data;
     // Determines whether the item should be drawn in the viewport
     bool isVisible = true;
     // Determines which material should be displayed in the scene viewport

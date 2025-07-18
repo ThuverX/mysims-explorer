@@ -188,6 +188,7 @@ ModelData *Loader::LoadModel(const std::string &path, const essencio::GameType &
         std::vector<uint32_t> indices = GetMeshIndices(mesh);
 
         MeshData meshData;
+        meshData.data = mesh;
         meshData.handle = Renderer::CreateMesh({
             vertices,
             indices,
