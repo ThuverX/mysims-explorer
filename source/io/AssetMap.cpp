@@ -17,30 +17,28 @@ std::optional<AssetMap> AssetMap::Read(const std::string &path) {
     AssetMap assetMap;
 
     XMLElement *root = doc.FirstChildElement("mappings");
-    if (root) {
+    if (root != nullptr) {
         XMLElement *type = root->FirstChildElement();
-        while (type) {
+        while (type != nullptr) {
             XMLElement *mapping = type->FirstChildElement("mapping");
-            while (mapping) {
+            while (mapping != nullptr) {
                 const char *key = mapping->Attribute("key");
                 const char *name = mapping->Attribute("name");
 
-                // XMLElement *info = mapping->FirstChildElement("info");
-                // if (info) {
-                //     const char *sourcePath = info->Attribute("sourcePath");
-                //     LOG_TRACE("%s", sourcePath);
-                // }
-
-                std::stringstream ss(key);
+                std::stringstream input(key);
                 std::string type, group, instance;
 
-                std::getline(ss, type, ':');
-                std::getline(ss, group, ':');
-                std::getline(ss, instance, ':');
+                std::getline(input, type, ':');
+                std::getline(input, group, ':');
+                std::getline(input, instance, ':');
 
-                std::string mappingKey = "0x" + group + "!0x" + instance;
+                std::stringstream output;
+                output << "0x";
+                output << group;
+                output << "!0x";
+                output << instance;
 
-                assetMap.mappings.insert({mappingKey, name});
+                assetMap.mappings.insert({output.str(), name});
                 mapping = mapping->NextSiblingElement("mapping");
             }
 
@@ -52,10 +50,10 @@ std::optional<AssetMap> AssetMap::Read(const std::string &path) {
 }
 
 std::optional<std::string> AssetMap::Get(const std::string &key) const {
-    auto it = mappings.find(key);
+    auto iterator = mappings.find(key);
 
-    if (it != mappings.end()) {
-        return std::make_optional(it->second);
+    if (iterator != mappings.end()) {
+        return std::make_optional(iterator->second);
     }
 
     return std::nullopt;

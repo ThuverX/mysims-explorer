@@ -1,0 +1,17 @@
+Checks: >
+  clang-analyzer-*,
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  modernize-*,
+  -modernize-use-trailing-return-type,
+  -modernize-avoid-c-arrays,
+  performance-*,
+  readability-*,
+  -readability-redundant-inline-specifier,
+  -readability-else-after-return,
+  -readability-uppercase-literal-suffix,
+  -readability-magic-numbers,
+  -readability-isolate-declaration
+WarningsAsErrors: ''
+HeaderFilterRegex: '.*'
+FormatStyle: file

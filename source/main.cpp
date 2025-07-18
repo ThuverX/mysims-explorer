@@ -34,12 +34,11 @@ SDL_AppResult SDL_AppIterate([[maybe_unused]] void *appstate) {
 }
 
 SDL_AppResult SDL_AppEvent([[maybe_unused]] void *appstate, SDL_Event *event) {
-    switch (event->type) {
-        case SDL_EVENT_QUIT:
-            return SDL_APP_FAILURE;
+    if (event->type == SDL_EVENT_QUIT) {
+        return SDL_APP_FAILURE;
     }
 
-    Context::Get().ProcessEvent(event);
+    Context::ProcessEvent(event);
     return SDL_APP_CONTINUE;
 }
 

@@ -1,5 +1,6 @@
 #include "Camera.hpp"
 
+#include <algorithm>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -19,18 +20,13 @@ void Camera::Update() {
 void Camera::Orbit(float deltaYaw, float deltaPitch) {
     yaw += deltaYaw;
     pitch += deltaPitch;
-
-    if (pitch > 89.0f) pitch = 89.0f;
-    if (pitch < -89.0f) pitch = -89.0f;
-
+    pitch = std::clamp(pitch, -89.9f, 89.8f);
     Update();
 }
 
 void Camera::Zoom(float deltaZoom) {
     distance -= deltaZoom;
-    if (distance < 0.1f) distance = 0.1f;
-    if (distance > 1000.0f) distance = 1000.0f;
-
+    distance = std::clamp(distance, 0.1f, 1000.0f);
     Update();
 }
 
@@ -46,6 +42,6 @@ glm::mat4 Camera::GetViewMatrix() const {
     return glm::lookAt(position, target, up);
 }
 
-glm::mat4 Camera::GetProjectionMatrix(const glm::vec2 viewport) const {
+glm::mat4 Camera::GetProjectionMatrix(const glm::vec2 &viewport) {
     return glm::perspective(glm::radians(45.0f), viewport.x / viewport.y, 0.1f, 100.0f);
 }

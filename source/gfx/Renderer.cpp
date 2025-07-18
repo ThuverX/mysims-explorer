@@ -10,10 +10,10 @@ GLuint Renderer::CreateShader(const ShaderCreateInfo &info) {
 
     // Check vertex shader compile status
     int success;
-    char infoLog[512];
+    char infoLog[LOG_INFO_SIZE];
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(vertexShader, 512, nullptr, infoLog);
+    if (success == 0) {
+        glGetShaderInfoLog(vertexShader, LOG_INFO_SIZE, nullptr, infoLog);
         LOG_ERROR("Vertex shader compilation failed\n%s", infoLog);
         return 0;
     }
@@ -25,8 +25,8 @@ GLuint Renderer::CreateShader(const ShaderCreateInfo &info) {
 
     // Check fragment shader compile status
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(fragmentShader, 512, nullptr, infoLog);
+    if (success == 0) {
+        glGetShaderInfoLog(fragmentShader, LOG_INFO_SIZE, nullptr, infoLog);
         LOG_ERROR("Fragment shader compilation failed\n%s", infoLog);
         return 0;
     }
@@ -39,8 +39,8 @@ GLuint Renderer::CreateShader(const ShaderCreateInfo &info) {
 
     // Check linking status
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
+    if (success == 0) {
+        glGetProgramInfoLog(shaderProgram, LOG_INFO_SIZE, nullptr, infoLog);
         LOG_ERROR("Shader program linking failed\n%s", infoLog);
         return 0;
     }
@@ -100,9 +100,11 @@ MeshHandle Renderer::CreateMesh(const MeshCreateInfo &info) {
     glBindVertexArray(mesh.VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
+    // NOLINTNEXTLINE(bugprone-narrowing-conversions)
     glBufferData(GL_ARRAY_BUFFER, info.vertices.size() * sizeof(float), info.vertices.data(), GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
+    // NOLINTNEXTLINE(bugprone-narrowing-conversions)
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, info.indices.size() * sizeof(uint32_t), info.indices.data(), GL_STATIC_DRAW);
 
     // position attribute (location = 0)
@@ -110,6 +112,7 @@ MeshHandle Renderer::CreateMesh(const MeshCreateInfo &info) {
     glEnableVertexAttribArray(0);
 
     // texcoord attribute (location = 1)
+    // NOLINTNEXTLINE(performance-no-int-to-ptr)
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 

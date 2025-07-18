@@ -26,7 +26,7 @@ struct MeshHandle {
     GLuint VAO;
     GLuint VBO;
     GLuint EBO;
-    GLsizei indexCount;
+    size_t indexCount;
     TextureHandle texture;
 };
 
@@ -45,11 +45,13 @@ struct FramebufferHandle {
 
 namespace Renderer {
 
+static constexpr uint32_t LOG_INFO_SIZE = 512;
+
 ShaderHandle CreateShader(const ShaderCreateInfo &info);
 void DestroyShader(ShaderHandle &shader);
 
 TextureHandle CreateTexture(const TextureCreateInfo &info);
-void DestroyTexture(TextureHandle &handle);
+void DestroyTexture(TextureHandle &texture);
 
 MeshHandle CreateMesh(const MeshCreateInfo &info);
 void DestroyMesh(MeshHandle &mesh);

@@ -7,7 +7,7 @@
 #include <sstream>
 #include <iomanip>
 
-std::string Logger::LevelToString(const LogLevel level) {
+std::string Logger::LevelToString(const LogLevel &level) {
     switch (level) {
         case LogLevel::TRACE: return "TRACE  ";
         case LogLevel::INFO:  return "INFO   ";
@@ -22,27 +22,31 @@ std::string Logger::GetTimestamp() {
     using namespace std::chrono;
 
     auto now = system_clock::now();
-    auto timeT = system_clock::to_time_t(now);
-    auto tm = *std::localtime(&timeT);
+    std::time_t timeT = system_clock::to_time_t(now);
+    
+    std::tm tm{}; // NOLINT(readability-identifier-length)
+    if (localtime_s(&tm, &timeT) != 0) {
+        return {};
+    }
 
     std::ostringstream oss;
     oss << std::put_time(&tm, "%Y-%m-%d %H:%M:%S");
     return oss.str();
 }
 
-void Logger::Log(const LogLevel level, const char *format, ...) {
+void Logger::Log(const LogLevel &level, const char *format, ...) {
     constexpr size_t BUFFER_SIZE = 1024;
     char buffer[BUFFER_SIZE];
 
     va_list args;
     va_start(args, format);
-    int n = vsnprintf(buffer, BUFFER_SIZE, format, args);
+    int size = vsnprintf(buffer, BUFFER_SIZE, format, args);
     va_end(args);
 
     std::string timestamp = GetTimestamp();
     std::string levelStr = LevelToString(level);
     
-    std::string message(buffer, n);
+    std::string message(buffer, size);
 
     LogEntry entry = {
         level,
@@ -55,10 +59,10 @@ void Logger::Log(const LogLevel level, const char *format, ...) {
     switch (level) {
         case LogLevel::WARN:
         case LogLevel::ERROR:
-            std::cerr << entry.message << std::endl;
+            std::cerr << entry.message << "\n";
             break;
         default:
-            std::cout << entry.message << std::endl;
+            std::cout << entry.message << "\n";
             break;
     }
 

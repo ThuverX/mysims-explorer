@@ -32,14 +32,14 @@ public:
     void Zoom(float deltaZoom);
     void Pan(float deltaX, float deltaY);
 
-    glm::mat4 GetViewMatrix() const;
-    glm::mat4 GetProjectionMatrix(const glm::vec2 viewport) const;
+    [[nodiscard]] glm::mat4 GetViewMatrix() const;
+    static glm::mat4 GetProjectionMatrix(const glm::vec2 &viewport);
 
-    inline glm::vec3 GetPosition() const {
+    [[nodiscard]] inline glm::vec3 GetPosition() const {
         return position;
     }
 
-    inline glm::vec3 GetTarget() const {
+    [[nodiscard]] inline glm::vec3 GetTarget() const {
         return target;
     }
 };

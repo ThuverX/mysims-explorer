@@ -6,7 +6,6 @@
 #include "ui/UI.hpp"
 #include "glad/gl.h"
 
-#include "Context.hpp"
 #include "io/AssetMap.hpp"
 #include "util/log.hpp"
 #include <SDL3/SDL_mutex.h>
@@ -73,8 +72,9 @@ std::optional<fs::path> Context::FindDataRoot(const fs::path &path) {
             return current;
         }
 
-        if (current == current.parent_path())
+        if (current == current.parent_path()) {
             return std::nullopt;
+        }
 
         current = current.parent_path();
     }
@@ -111,13 +111,13 @@ bool Context::Initialize(const std::optional<fs::path> &dataRoot) {
     std::string title = "MySims Explorer v" + std::string(VERSION_STRING);
     mWindow = SDL_CreateWindow(title.c_str(), 1280, 720, 
         SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE);
-    if (!mWindow) {
+    if (mWindow == nullptr) {
         LOG_ERROR("Failed to create SDL window: %s", SDL_GetError());
         return false;
     }
 
     mGLContext = SDL_GL_CreateContext(mWindow);
-    if (!mGLContext) {
+    if (mGLContext == nullptr) {
         LOG_ERROR("Failed to create GL context: %s", SDL_GetError());
         return false;
     }
@@ -146,7 +146,7 @@ bool Context::Initialize(const std::optional<fs::path> &dataRoot) {
     // Setup ImGui
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGuiIO& io = ImGui::GetIO(); (void)io; // NOLINT(readability-identifier-length)
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     //io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
@@ -184,9 +184,11 @@ void Context::Render() {
     UI::MainMenuBar();
     UI::DockSpace();
 
+    // NOLINTBEGIN(readability-braces-around-statements)
     if (mShowExplorer) UI::Explorer();
     if (mShowProperties) UI::Properties();
     if (mShowConsole) UI::Console();
+    // NOLINTEND(readability-braces-around-statements)
 
     // ImGui::UpdatePlatformWindows();
     // ImGui::RenderPlatformWindowsDefault();
@@ -221,7 +223,7 @@ void Context::RenderScene() {
     glUseProgram(mShaderHandle);
 
     glm::mat4 model = glm::mat4(1.0f);
-    glm::mat4 projection = mCamera.GetProjectionMatrix(
+    glm::mat4 projection = Camera::GetProjectionMatrix(
         glm::vec2(mViewport.width, mViewport.height));
     glm::mat4 view = mCamera.GetViewMatrix();
 
@@ -234,7 +236,9 @@ void Context::RenderScene() {
     for (const auto &model : mLoader.GetModels()) {
         for (const auto &mesh : model.second.meshes) {
             // Skip invisible meshes
-            if (!mesh.isVisible) continue;
+            if (!mesh.isVisible) {
+                continue;
+            }
 
             // Bind texture
             glActiveTexture(GL_TEXTURE0);
@@ -270,8 +274,9 @@ void Context::Quit() {
 
 void Context::ChangeDataRoot(const std::optional<fs::path> &dataRoot) {
 
-    if (mDataRoot == dataRoot)
+    if (mDataRoot == dataRoot) {
         return;
+    }
 
     mLoader.UnloadAll();
     mDataRoot = dataRoot;
@@ -295,9 +300,9 @@ void Context::ChangeDataRoot(const std::optional<fs::path> &dataRoot) {
 }
 
 void Context::ChangeGameType(const essencio::GameType &gameType) {
-
-    if (mGameType == gameType)
+    if (mGameType == gameType) {
         return;
+    }
 
     mLoader.UnloadAll();
     mGameType = gameType;
@@ -308,9 +313,9 @@ void Context::ChangeGameType(const essencio::GameType &gameType) {
 }
 
 void Context::SetNextFile(const std::optional<std::string> &path) {
-
-    if (mCurrentFile == path)
+    if (mCurrentFile == path) {
         return;
+    }
 
     mNextFile = path;
 }
@@ -318,7 +323,9 @@ void Context::SetNextFile(const std::optional<std::string> &path) {
 void Context::ReloadAssetMap() {
 
     auto dataRoot = GetDataRoot();
-    if (!dataRoot) return;
+    if (!dataRoot) {
+        return;
+    }
 
     fs::path assetMapPath = fs::path(*dataRoot) / "BuildData" / "AssetGenerator" / "AssetMap.xml";
     mAssetMap = AssetMap::Read(assetMapPath.string());

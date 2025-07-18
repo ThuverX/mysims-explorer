@@ -10,5 +10,5 @@ private:
 
 public:
     static std::optional<AssetMap> Read(const std::string &path);
-    std::optional<std::string> Get(const std::string &key) const;
+    [[nodiscard]] std::optional<std::string> Get(const std::string &key) const;
 };

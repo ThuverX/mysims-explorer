@@ -14,7 +14,7 @@
 
 #include "essencio/GameType.hpp"
 
-enum class ContextType {
+enum class ContextType : uint8_t {
     NONE,
     MODEL,
     MATERIAL,
@@ -55,12 +55,12 @@ public:
 
     bool Initialize(const std::optional<fs::path> &dataRoot);
     void Update();
-    void ProcessEvent(SDL_Event *event);
+    static void ProcessEvent(SDL_Event *event);
     void Render();
     void RenderScene();
     void Shutdown();
 
-    void Quit();
+    static void Quit();
     
     void ChangeDataRoot(const std::optional<fs::path> &dataRoot);
     void ChangeGameType(const essencio::GameType &gameType);
@@ -72,23 +72,23 @@ private:
     void LoadFile(const fs::path &path);
 
 public:
-    inline std::optional<fs::path> GetDataRoot() const {
+    [[nodiscard]] inline std::optional<fs::path> GetDataRoot() const {
         return mDataRoot;
     }
 
-    inline essencio::GameType GetGameType() const {
+    [[nodiscard]] inline essencio::GameType GetGameType() const {
         return mGameType;
     }
 
-    inline ContextType GetContextType() const {
+    [[nodiscard]] inline ContextType GetContextType() const {
         return mContextType;
     }
 
-    inline const std::optional<AssetMap> &GetAssetMap() const {
+    [[nodiscard]] inline const std::optional<AssetMap> &GetAssetMap() const {
         return mAssetMap;
     }
 
-    inline const DirectoryEntry &GetRootDirectory() const {
+    [[nodiscard]] inline const DirectoryEntry &GetRootDirectory() const {
         return mRootDirectory;
     }
 
@@ -100,7 +100,7 @@ public:
         return mCamera;
     }
 
-    inline const std::optional<std::string> &GetCurrentFile() const {
+    [[nodiscard]] inline const std::optional<std::string> &GetCurrentFile() const {
         return mCurrentFile;
     }
 };

@@ -21,39 +21,41 @@ namespace fs = std::filesystem;
 std::vector<float> Loader::GetMeshVertices(const essencio::WindowsMesh &mesh) {
     std::vector<float> vertices;
 
-    uint32_t positionOffset = 0xFFFFFFFF;
-    uint32_t uvOffset = 0xFFFFFFFF;
+    uint32_t positionOffset = UINT32_MAX;
+    uint32_t uvOffset = UINT32_MAX;
 
     for (const auto& key : mesh.vertexKeys) {
         //if (key.index == 0 && key.type == essencio::VertexKeyType::FLOAT3) {
-        if (key.type == essencio::VertexKeyType::FLOAT3 && positionOffset == 0xFFFFFFFF) {
+        if (key.type == essencio::VertexKeyType::FLOAT3 && positionOffset == UINT32_MAX) {
             positionOffset = key.offset;
-        } else if (key.type == essencio::VertexKeyType::FLOAT2 && uvOffset == 0xFFFFFFFF) {
+        } else if (key.type == essencio::VertexKeyType::FLOAT2 && uvOffset == UINT32_MAX) {
             uvOffset = key.offset;
         }
     }
 
-    if (positionOffset == 0xFFFFFFFF) {
+    if (positionOffset == UINT32_MAX) {
         LOG_WARN("No FLOAT3 position key found in vertexKeys!");
         return vertices;
     }
-    if (uvOffset == 0xFFFFFFFF) {
+    if (uvOffset == UINT32_MAX) {
         LOG_WARN("No FLOAT2 UV key found in vertexKeys!");
         return vertices;
     }
 
     size_t stride = mesh.vertexArraySize / mesh.numVertices;
-    vertices.reserve(mesh.numVertices * 5); // 3 for pos + 2 for UV
+    vertices.reserve(static_cast<size_t>(mesh.numVertices) * 5); // 3 for pos + 2 for UV
 
     for (size_t i = 0; i < mesh.numVertices; ++i) {
         size_t base = i * stride;
 
+        // NOLINTBEGIN(readability-identifier-length)
         float x = *reinterpret_cast<const float*>(&mesh.vertices[base + positionOffset + 0]);
         float y = *reinterpret_cast<const float*>(&mesh.vertices[base + positionOffset + 4]);
         float z = *reinterpret_cast<const float*>(&mesh.vertices[base + positionOffset + 8]);
 
         float u = *reinterpret_cast<const float*>(&mesh.vertices[base + uvOffset + 0]);
         float v = *reinterpret_cast<const float*>(&mesh.vertices[base + uvOffset + 4]);
+        // NOLINTEND(readability-identifier-length)
 
         vertices.push_back(x);
         vertices.push_back(y);
@@ -67,7 +69,7 @@ std::vector<float> Loader::GetMeshVertices(const essencio::WindowsMesh &mesh) {
 
 std::vector<uint32_t> Loader::GetMeshIndices(const essencio::WindowsMesh &mesh) {
     std::vector<uint32_t> indices;
-    indices.reserve(mesh.numFaces * 3);
+    indices.reserve(static_cast<size_t>(mesh.numFaces) * 3);
 
     for (const auto& face : mesh.faces) {
         indices.push_back(face.a);
@@ -146,15 +148,15 @@ XmlNode Loader::BuildXmlNodeTree(const tinyxml2::XMLElement *element) {
     XmlNode node;
     node.name = element->Name();
 
-    for (const tinyxml2::XMLAttribute* attr = element->FirstAttribute(); attr; attr = attr->Next()) {
+    for (const tinyxml2::XMLAttribute* attr = element->FirstAttribute(); attr != nullptr; attr = attr->Next()) {
         node.attributes[attr->Name()] = attr->Value();
     }
 
-    for (const tinyxml2::XMLElement* child = element->FirstChildElement(); child; child = child->NextSiblingElement()) {
+    for (const tinyxml2::XMLElement* child = element->FirstChildElement(); child != nullptr; child = child->NextSiblingElement()) {
         node.children.push_back(BuildXmlNodeTree(child));
     }
 
-    if (element->GetText()) {
+    if (element->GetText() != nullptr) {
         node.text = element->GetText();
     }
 
@@ -194,9 +196,9 @@ ModelData *Loader::LoadModel(const std::string &path, const essencio::GameType &
         auto materialPath = FindMaterialPath(resourcePath, path);
 
         if (materialPath) {
-            auto materialData = LoadMaterial(*materialPath, gameType);
+            auto *materialData = LoadMaterial(*materialPath, gameType);
 
-            if (materialData) {
+            if (materialData != nullptr) {
                 meshData.material = *materialData;
                 // Attach this material to the current mesh
                 meshData.handle.texture = materialData->texture;
@@ -249,9 +251,9 @@ MaterialData *Loader::LoadMaterial(const std::string &path, const essencio::Game
                             return nullptr;
                         }
 
-                        gli::gl GL(gli::gl::PROFILE_GL33);
+                        gli::gl GL(gli::gl::PROFILE_GL33); // NOLINT(readability-identifier-length)
                         gli::gl::format const format = GL.translate(texture.format(), texture.swizzles());
-                        GLsizei const levels = static_cast<GLsizei>(texture.levels());
+                        auto const levels = static_cast<GLsizei>(texture.levels());
 
                         materialData.texture = Renderer::CreateTexture({
                             texture,
