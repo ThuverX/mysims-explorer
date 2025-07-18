@@ -27,7 +27,7 @@ struct MeshHandle {
     GLuint VBO;
     GLuint EBO;
     size_t indexCount;
-    TextureHandle texture;
+    std::vector<TextureHandle> textures;
 };
 
 struct MeshCreateInfo {

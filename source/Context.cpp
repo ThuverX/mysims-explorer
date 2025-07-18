@@ -244,10 +244,13 @@ void Context::RenderScene() {
                 continue;
             }
 
-            // Bind texture
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, mesh.handle.texture);
-            glUniform1i(glGetUniformLocation(mShaderHandle, "uTexture"), 0);
+            if (mesh.handle.textures.size() > 0) {
+                // TODO: Attach all textures instead
+                // Bind texture
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, mesh.handle.textures[0]);
+                glUniform1i(glGetUniformLocation(mShaderHandle, "uTexture"), 0);
+            }
 
             glBindVertexArray(mesh.handle.VAO);
             glDrawElements(GL_TRIANGLES, mesh.handle.indexCount, GL_UNSIGNED_INT, 0);

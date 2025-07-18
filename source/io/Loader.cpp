@@ -200,13 +200,15 @@ ModelData *Loader::LoadModel(const std::string &path, const essencio::GameType &
 
             if (materialData != nullptr) {
                 meshData.material = *materialData;
+                meshData.handle.textures.reserve(1);
                 // Attach this material to the current mesh
-                meshData.handle.texture = materialData->texture;
+                meshData.handle.textures.push_back(materialData->texture);
             } else {
                 LOG_WARN("Material data could not be loaded");
             }
         } else {
             LOG_WARN("Material path not found for resource %s", resourcePath.c_str());
+            // TODO: Attempt to load material set instead
         }
 
         modelData.meshes.emplace_back(meshData);

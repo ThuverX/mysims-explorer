@@ -44,12 +44,15 @@ void UI::Properties::DrawModel(Loader &loader) {
                 if (ImGui::CollapsingHeader(materialLabel.c_str())) {
                     ImGui::Indent();
 
-                    GLuint texture = meshData.handle.texture;
+                    if (meshData.handle.textures.size() > 0) {
+                        // TODO: Show all attached textures
+                        GLuint texture = meshData.handle.textures[0];
 
-                    if (texture != 0) {
-                        std::string materialButtonLabel = "MaterialButton##" + std::to_string(i);
-                        if (ImGui::ImageButton(materialButtonLabel.c_str(), texture, ImVec2(128, 128))) {
-                            Context::Get().SetNextFile(meshData.material.path.c_str());
+                        if (texture != 0) {
+                            std::string materialButtonLabel = "MaterialButton##" + std::to_string(i);
+                            if (ImGui::ImageButton(materialButtonLabel.c_str(), texture, ImVec2(128, 128))) {
+                                Context::Get().SetNextFile(meshData.material.path.c_str());
+                            }
                         }
                     }
 
