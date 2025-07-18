@@ -52,7 +52,7 @@ public:
 
     // Rendering options
     bool mWireframeMode = false;
-    bool mShowBounds = true;
+    bool mShowBounds = false;
 
     static std::optional<fs::path> FindDataRoot(const fs::path &path);
     static ContextType GetExtensionContextType(const std::string &extension);

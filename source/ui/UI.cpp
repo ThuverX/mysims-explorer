@@ -133,6 +133,11 @@ void UI::MainMenuBar() {
                     Context::Get().mWireframeMode = !Context::Get().mWireframeMode;
                 }
 
+            if (ImGui::MenuItem("Show Bounds", nullptr, 
+                Context::Get().mShowBounds)) {
+                    Context::Get().mShowBounds = !Context::Get().mShowBounds;
+                }
+
             ImGui::EndMenu();
         }
 
