@@ -7,6 +7,10 @@
 #include "glad/gl.h"
 
 #include "io/AssetMap.hpp"
+#include "ui/Properties.hpp"
+#include "ui/Explorer.hpp"
+#include "ui/Viewport.hpp"
+#include "ui/Console.hpp"
 #include "util/log.hpp"
 #include <SDL3/SDL_mutex.h>
 #include <SDL3/SDL_timer.h>
@@ -185,9 +189,9 @@ void Context::Render() {
     UI::DockSpace();
 
     // NOLINTBEGIN(readability-braces-around-statements)
-    if (mShowExplorer) UI::Explorer();
-    if (mShowProperties) UI::Properties();
-    if (mShowConsole) UI::Console();
+    if (mShowExplorer) UI::Explorer::Draw();
+    if (mShowProperties) UI::Properties::Draw();
+    if (mShowConsole) UI::Console::Draw();
     // NOLINTEND(readability-braces-around-statements)
 
     // ImGui::UpdatePlatformWindows();
@@ -198,7 +202,7 @@ void Context::Render() {
         RenderScene();
     }
 
-    UI::Viewport(mContextType, mViewport);
+    UI::Viewport::Draw(mContextType, mViewport);
     ImGui::Render();
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
