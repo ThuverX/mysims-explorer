@@ -9,6 +9,7 @@
 #include "essencio/model/WindowsModel.hpp"
 #include "essencio/model/WindowsMesh.hpp"
 #include "essencio/material/Material.hpp"
+#include "essencio/material/MaterialSet.hpp"
 
 #include "gfx/Renderer.hpp"
 
@@ -22,7 +23,7 @@ struct MaterialData {
 
 struct MeshData {
     MeshHandle handle;
-    MaterialData material;
+    std::vector<MaterialData *> materials;
     bool isVisible = true;
 };
 
@@ -64,7 +65,7 @@ private:
 public:
     ModelData *LoadModel(const std::string &path, const essencio::GameType &gameType);
     MaterialData *LoadMaterial(const std::string &path, const essencio::GameType &gameType);
-    void LoadMaterialSet(const std::string &path, const essencio::GameType &gameType);
+    std::vector<MaterialData *> LoadMaterialSet(const std::string &path, const essencio::GameType &gameType);
     XmlData *LoadXml(const std::string &path);
 
     void UnloadAll();

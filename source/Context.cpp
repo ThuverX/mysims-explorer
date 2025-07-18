@@ -244,11 +244,12 @@ void Context::RenderScene() {
                 continue;
             }
 
-            if (mesh.handle.textures.size() > 0) {
-                // TODO: Attach all textures instead
+            for (uint32_t i = 0; i < mesh.handle.textures.size(); ++i) {
+                TextureHandle handle = mesh.handle.textures[i];
                 // Bind texture
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, mesh.handle.textures[0]);
+                glActiveTexture(GL_TEXTURE0 + i);
+                glBindTexture(GL_TEXTURE_2D, handle);
+                // TODO: Modify shader to allow multiple textures
                 glUniform1i(glGetUniformLocation(mShaderHandle, "uTexture"), 0);
             }
 

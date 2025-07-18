@@ -6,6 +6,7 @@ Checks: >
   -modernize-use-trailing-return-type,
   -modernize-avoid-c-arrays,
   performance-*,
+  -performance-avoid-endl,
   readability-*,
   -readability-redundant-inline-specifier,
   -readability-else-after-return,

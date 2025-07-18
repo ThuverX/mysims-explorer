@@ -14,6 +14,7 @@
 #include <gli/load.hpp>
 #include <tinyxml2.h>
 
+#include "io/File.hpp"
 #include "util/log.hpp"
 
 namespace fs = std::filesystem;
@@ -137,6 +138,7 @@ std::optional<std::string> Loader::FindTexturePath(const std::string &fileName) 
         const fs::path texturePath = *dataRoot / path / fileName;
 
         if (fs::exists(texturePath) && !fs::is_directory(texturePath)) {
+            LOG_TRACE("texture path: %s", texturePath.string().c_str());
             return texturePath.string();
         }
     }
@@ -199,7 +201,7 @@ ModelData *Loader::LoadModel(const std::string &path, const essencio::GameType &
             auto *materialData = LoadMaterial(*materialPath, gameType);
 
             if (materialData != nullptr) {
-                meshData.material = *materialData;
+                meshData.materials.push_back(materialData);
                 meshData.handle.textures.reserve(1);
                 // Attach this material to the current mesh
                 meshData.handle.textures.push_back(materialData->texture);
@@ -207,8 +209,19 @@ ModelData *Loader::LoadModel(const std::string &path, const essencio::GameType &
                 LOG_WARN("Material data could not be loaded");
             }
         } else {
-            LOG_WARN("Material path not found for resource %s", resourcePath.c_str());
-            // TODO: Attempt to load material set instead
+            const auto &resourcePathSet = File::GetResourceKeyPath(mesh.material, "MaterialSet");
+            auto materialSetPath = FindMaterialPath(resourcePathSet);
+
+            if (materialSetPath) {
+                std::vector<MaterialData *> materialSet = LoadMaterialSet(*materialSetPath, gameType);
+
+                for (const auto &material : materialSet) {
+                    meshData.materials.push_back(material);
+                    meshData.handle.textures.push_back(material->texture);
+                }
+            } else {
+                LOG_WARN("Material path not found for resource %s", resourcePath.c_str());
+            }
         }
 
         modelData.meshes.emplace_back(meshData);
@@ -277,14 +290,18 @@ MaterialData *Loader::LoadMaterial(const std::string &path, const essencio::Game
     return &result.first->second;
 }
 
-void Loader::LoadMaterialSet(const std::string &path, const essencio::GameType &gameType) {
-    essencio::MaterialSet materialSet;
-    
+std::vector<MaterialData *> Loader::LoadMaterialSet(const std::string &path, const essencio::GameType &gameType) {
+
+    std::vector<MaterialData *> materialSetData;
+    materialSetData.clear();
+
     auto file = File::ReadFile(path);
     if (!file) {
         LOG_ERROR("Failed to open/read file: %s", path.c_str());
-        return;
+        return materialSetData;
     }
+
+    essencio::MaterialSet materialSet;
 
     essencio::BinReader reader(file.value().data(), file.value().size());
     essencio::MaterialSet::Read(materialSet, reader, gameType);
@@ -299,9 +316,11 @@ void Loader::LoadMaterialSet(const std::string &path, const essencio::GameType &
             continue;
         }
 
-        LOG_TRACE("material path: %s", materialPath->c_str());
-        LoadMaterial(*materialPath, gameType);
+        MaterialData *data = LoadMaterial(*materialPath, gameType);
+        materialSetData.push_back(data);
     }
+
+    return materialSetData;
 }
 
 XmlData *Loader::LoadXml(const std::string &path) {

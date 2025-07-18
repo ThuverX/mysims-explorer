@@ -3,6 +3,8 @@
 #include "imgui.h"
 #include "Context.hpp"
 
+#include "util/log.hpp"
+
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void UI::Properties::DrawModel(Loader &loader) {
     for (auto &pair : loader.GetModels()) {
@@ -40,23 +42,23 @@ void UI::Properties::DrawModel(Loader &loader) {
                 std::string isVisibleLabel = "Is Visible##" + std::to_string(i);
                 ImGui::Checkbox(isVisibleLabel.c_str(), &meshData.isVisible);
 
-                std::string materialLabel = "Material##" + std::to_string(i);
-                if (ImGui::CollapsingHeader(materialLabel.c_str())) {
-                    ImGui::Indent();
+                for (uint32_t j = 0; j < meshData.materials.size(); ++j) {
+                    TextureHandle texture = meshData.handle.textures[j];
 
-                    if (meshData.handle.textures.size() > 0) {
-                        // TODO: Show all attached textures
-                        GLuint texture = meshData.handle.textures[0];
+                    std::string materialLabel = "Material #" + std::to_string(j + 1) + "##" + std::to_string(i);
+                    if (ImGui::CollapsingHeader(materialLabel.c_str())) {
+                        ImGui::Indent();
 
                         if (texture != 0) {
-                            std::string materialButtonLabel = "MaterialButton##" + std::to_string(i);
+                            std::string materialButtonLabel = "MaterialButton##" + std::to_string(i) + "_" + std::to_string(j);
                             if (ImGui::ImageButton(materialButtonLabel.c_str(), texture, ImVec2(128, 128))) {
-                                Context::Get().SetNextFile(meshData.material.path.c_str());
+                                Context::Get().SetNextFile(meshData.materials[0]->path.c_str());
                             }
                         }
+
+                        ImGui::Unindent();
                     }
 
-                    ImGui::Unindent();
                 }
 
                 ImGui::Text("Min. Bounds: %.3f,%.3f,%.3f",

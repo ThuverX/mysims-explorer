@@ -59,10 +59,10 @@ void Logger::Log(const LogLevel &level, const char *format, ...) {
     switch (level) {
         case LogLevel::WARN:
         case LogLevel::ERROR:
-            std::cerr << entry.message << "\n";
+            std::cerr << entry.message << std::endl;
             break;
         default:
-            std::cout << entry.message << "\n";
+            std::cout << entry.message << std::endl;
             break;
     }
 
