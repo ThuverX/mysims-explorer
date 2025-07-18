@@ -49,6 +49,14 @@ void UI::Properties::DrawModel(Loader &loader) {
                     if (ImGui::CollapsingHeader(materialLabel.c_str())) {
                         ImGui::Indent();
 
+                        bool isCurrent = (meshData.materialIndex == j);
+                        std::string isCurrentLabel = "Is Current##" + std::to_string(i) + "_" + std::to_string(j);
+                        if (ImGui::Checkbox(isCurrentLabel.c_str(), &isCurrent)) {
+                            if (isCurrent) {
+                                meshData.materialIndex = j;
+                            }
+                        }
+
                         if (texture != 0) {
                             std::string materialButtonLabel = "MaterialButton##" + std::to_string(i) + "_" + std::to_string(j);
                             if (ImGui::ImageButton(materialButtonLabel.c_str(), texture, ImVec2(128, 128))) {

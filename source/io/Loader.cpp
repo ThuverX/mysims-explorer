@@ -138,7 +138,6 @@ std::optional<std::string> Loader::FindTexturePath(const std::string &fileName) 
         const fs::path texturePath = *dataRoot / path / fileName;
 
         if (fs::exists(texturePath) && !fs::is_directory(texturePath)) {
-            LOG_TRACE("texture path: %s", texturePath.string().c_str());
             return texturePath.string();
         }
     }
@@ -250,8 +249,10 @@ MaterialData *Loader::LoadMaterial(const std::string &path, const essencio::Game
     essencio::BinReader reader(file.value().data(), file.value().size());
     essencio::Material::Read(materialData.data, reader, gameType);
 
-    // Read material
-    for (const auto &param : materialData.data.params) {
+    // Read material parameters in reverse, since this somehow gives us the right texture
+    // instead of a weird purple-to-white gradient it sometimes returned
+    for (auto it = materialData.data.params.rbegin(); it != materialData.data.params.rend(); ++it) {
+        const auto& param = *it;
         switch (param.valueType) {
             case essencio::MaterialParameterType::RESOURCE_KEY:
                 {

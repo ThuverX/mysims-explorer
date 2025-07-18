@@ -9,7 +9,6 @@
 #include "essencio/model/WindowsModel.hpp"
 #include "essencio/model/WindowsMesh.hpp"
 #include "essencio/material/Material.hpp"
-#include "essencio/material/MaterialSet.hpp"
 
 #include "gfx/Renderer.hpp"
 
@@ -24,7 +23,10 @@ struct MaterialData {
 struct MeshData {
     MeshHandle handle;
     std::vector<MaterialData *> materials;
+    // Determines whether the item should be drawn in the viewport
     bool isVisible = true;
+    // Determines which material should be displayed in the scene viewport
+    uint32_t materialIndex = 0;
 };
 
 struct ModelData {
