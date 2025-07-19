@@ -153,6 +153,8 @@ bool Context::Initialize(const std::optional<fs::path> &dataRoot) {
     }
     
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Load a simple default shader
     mShaderHandle = Renderer::CreateShader({
@@ -242,7 +244,7 @@ void Context::RenderScene() {
     glViewport(0, 0, mViewport.width, mViewport.height);
     glEnable(GL_DEPTH_TEST);
 
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (mWireframeMode) {
