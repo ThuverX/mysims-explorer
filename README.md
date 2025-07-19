@@ -25,10 +25,10 @@ This was mostly tested on Kingdom, so things are more likely to break on the ori
         - MySims: `C:\Program Files (x86)\Steam\steamapps\common\MySims\data`
 5. Browse through the files loaded in the Explorer
 
-## Known Issues
+## Gallery
 
-- Characters can't load materials on MySims
-- Asset map translations are currently disabled for MySims
+<img width="425" alt="image" src="https://raw.githubusercontent.com/bottledlactose/mysims-explorer/refs/heads/trunk/images/screenshot1.png" />
+<img width="425" alt="image" src="https://raw.githubusercontent.com/bottledlactose/mysims-explorer/refs/heads/trunk/images/screenshot2.png" />
 
 ## License
 
