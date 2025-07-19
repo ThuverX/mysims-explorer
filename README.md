@@ -14,6 +14,20 @@ This was mostly tested on Kingdom, so things are more likely to break on the ori
 - Asset map parsing to unhash some file names where possible
 - Built-in logging and debug console
 
+## Roadmap
+
+- Add Explorer filtering and search
+- Add icons to the Explorer and main menu bar
+- Add option to find references to the specified asset (see which asset is using which)
+- Port to Linux
+
+### Technical
+
+- Migrate from ImGuiFileDialog to Native File Dialog
+- Upgrade to magic_enum for enum-to-string conversions
+- Disable exceptions and RTTI for increased performance
+- Remove GLAD from source tree and allow contributors to supply their own package
+
 ## Usage
 
 1. Download the latest version on the [Releases](https://github.com/bottledlactose/mysims-explorer/releases) page
