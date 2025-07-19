@@ -1,6 +1,7 @@
 #include "UI.hpp"
 
 #include "Context.hpp"
+#include <SDL3/SDL_misc.h>
 #include <essencio/GameType.hpp>
 #include <essencio/model/VertexKey.hpp>
 #include <essencio/model/WindowsModel.hpp>
@@ -11,6 +12,7 @@
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "ImGuiFileDialog.h"
+#include "version.h"
 
 void UI::DockSpace() {
     static bool opt_fullscreen = true;
@@ -143,6 +145,24 @@ void UI::MainMenuBar() {
             bool isDarkTheme = Context::Get().GetIsDarkTheme();
             if (ImGui::MenuItem("Dark Theme", nullptr, isDarkTheme)) {
                 Context::Get().SetIsDarkTheme(!isDarkTheme);
+            }
+
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Help")) {
+            if (ImGui::BeginMenu("About")) {
+
+                std::string titleLabel = std::string("MySims Explorer v") + VERSION_STRING;
+                ImGui::Text("%s", titleLabel.c_str());
+                ImGui::TextWrapped("A tool to easily browse, inspect and view game assets from MySims and MySims Kingdom (Cozy Bundle edition).");
+                ImGui::Text("Created by bottledlactose");
+                
+                ImGui::EndMenu();
+            }
+
+            if (ImGui::MenuItem("GitHub")) {
+                SDL_OpenURL("https://github.com/bottledlactose/mysims-explorer");
             }
 
             ImGui::EndMenu();
