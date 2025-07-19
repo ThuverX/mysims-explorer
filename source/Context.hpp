@@ -43,6 +43,9 @@ private:
 
     std::optional<std::string> mCurrentFile;
     std::optional<std::string> mNextFile;
+    
+    // Theme options
+    bool mIsDarkTheme = true;
 
 public:
     // View options
@@ -71,6 +74,7 @@ public:
     void ReloadAssetMap();
 
     void SetNextFile(const std::optional<std::string> &path);
+    void SetIsDarkTheme(bool isDarkTheme);
 
 private:
     void LoadFile(const fs::path &path);
@@ -103,6 +107,8 @@ public:
     inline Camera &GetCamera() {
         return mCamera;
     }
+
+    [[nodiscard]] inline bool GetIsDarkTheme() const { return mIsDarkTheme; }
 
     [[nodiscard]] inline const std::optional<std::string> &GetCurrentFile() const {
         return mCurrentFile;

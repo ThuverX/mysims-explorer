@@ -183,7 +183,8 @@ bool Context::Initialize(const std::optional<fs::path> &dataRoot) {
     io.IniFilename = nullptr;
 
     // Setup style
-    ImGui::StyleColorsDark();
+    SetIsDarkTheme(SDL_GetSystemTheme() != SDL_SYSTEM_THEME_LIGHT);
+
     // Initialize backends
     ImGui_ImplSDL3_InitForOpenGL(mWindow, mGLContext);
     ImGui_ImplOpenGL3_Init("#version 330");
@@ -349,6 +350,15 @@ void Context::SetNextFile(const std::optional<std::string> &path) {
     }
 
     mNextFile = path;
+}
+
+void Context::SetIsDarkTheme(bool isDarkTheme) {
+    mIsDarkTheme = isDarkTheme;
+    if (mIsDarkTheme) {
+        ImGui::StyleColorsDark();
+    } else {
+        ImGui::StyleColorsLight();
+    }
 }
 
 void Context::ReloadAssetMap() {

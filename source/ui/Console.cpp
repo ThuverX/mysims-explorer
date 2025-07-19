@@ -1,6 +1,7 @@
 #include "Console.hpp"
 
 #include "imgui.h"
+#include "Context.hpp"
 #include "io/Logger.hpp"
 
 void UI::Console::Draw() {
@@ -9,21 +10,35 @@ void UI::Console::Draw() {
     const auto &history = Logger::Get().GetHistory();
     static uint64_t lastEntryId = 0;
 
+    const bool isDarkTheme = Context::Get().GetIsDarkTheme();
+
     for (const auto& entry : history) {
         ImVec4 color;
 
         switch (entry.level) {
             case LogLevel::ERROR:
-                color = ImVec4(1.0f, 0.2f, 0.2f, 1.0f); // red
+                if (isDarkTheme) {
+                    color = ImVec4(1.0f, 0.25f, 0.25f, 1.0f); // red
+                } else {
+                    color = ImVec4(0.75f, 0.125f, 0.125f, 1.0f); // red
+                }
                 break;
             case LogLevel::SUCCESS:
-                color = ImVec4(0.2f, 1.0f, 0.2f, 1.0f); // green
+                if (isDarkTheme) {
+                    color = ImVec4(0.25f, 1.0f, 0.25f, 1.0f); // green
+                } else {
+                    color = ImVec4(0.125f, 0.75f, 0.125f, 1.0f); // green
+                }
                 break;
             case LogLevel::WARN:
                 color = ImVec4(1.0f, 0.7f, 0.0f, 1.0f); // orange/yellow
                 break;
             case LogLevel::INFO:
-                color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // white
+                if (isDarkTheme) {
+                    color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // white
+                } else {
+                    color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f); // black
+                }
                 break;
             default:
                 color = ImVec4(0.5f, 0.5f, 0.5f, 1.0f); // gray

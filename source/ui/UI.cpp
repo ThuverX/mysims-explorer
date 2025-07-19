@@ -138,6 +138,13 @@ void UI::MainMenuBar() {
                     Context::Get().mShowBounds = !Context::Get().mShowBounds;
                 }
 
+            ImGui::Separator();
+
+            bool isDarkTheme = Context::Get().GetIsDarkTheme();
+            if (ImGui::MenuItem("Dark Theme", nullptr, isDarkTheme)) {
+                Context::Get().SetIsDarkTheme(!isDarkTheme);
+            }
+
             ImGui::EndMenu();
         }
 
