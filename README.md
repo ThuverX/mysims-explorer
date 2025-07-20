@@ -21,13 +21,6 @@ This was mostly tested on Kingdom, so things are more likely to break on the ori
 - Add option to find references to the specified asset (see which asset is using which)
 - Port to Linux
 
-### Technical
-
-- Migrate from ImGuiFileDialog to Native File Dialog
-- Upgrade to magic_enum for enum-to-string conversions
-- Disable exceptions and RTTI for increased performance
-- Remove GLAD from source tree and allow contributors to supply their own package
-
 ## Usage
 
 1. Download the latest version on the [Releases](https://github.com/bottledlactose/mysims-explorer/releases) page
