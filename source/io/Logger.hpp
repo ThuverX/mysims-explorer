@@ -3,6 +3,7 @@
 #include "util/singleton.hpp"
 #include <deque>
 #include <string>
+#include <cstdint>
 
 enum class LogLevel : uint8_t {
     TRACE,

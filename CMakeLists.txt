@@ -27,10 +27,20 @@ set(IMGUI_SOURCES
     lib/imgui/backends/imgui_impl_opengl3.cpp
 )
 
-set(NFD_SOURCES
-    lib/nfd/src/nfd_common.c
-    lib/nfd/src/nfd_win.cpp
-)
+if(WIN32)
+    set(NFD_SOURCES
+        lib/nfd/src/nfd_common.c
+        lib/nfd/src/nfd_win.cpp
+    )
+elseif(UNIX)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
+
+    set(NFD_SOURCES
+        lib/nfd/src/nfd_common.c
+        lib/nfd/src/nfd_gtk.c
+    )
+endif()
 
 file(GLOB MSE_SOURCES
     source/*.hpp
@@ -65,6 +75,13 @@ target_include_directories(mysims-explorer PRIVATE
     lib/essencio/include
     ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(mysims-explorer PRIVATE SDL3-static tinyxml2)
+
+if (UNIX)
+    include_directories(${GTK3_INCLUDE_DIRS})
+    link_directories(${GTK3_LIBRARY_DIRS})
+    add_definitions(${GTK3_CFLAGS_OTHER})
+    target_link_libraries(mysims-explorer PRIVATE ${GTK3_LIBRARIES})
+endif()
 
 if(MSVC)
     # Enable all warnings

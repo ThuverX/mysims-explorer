@@ -25,9 +25,15 @@ std::string Logger::GetTimestamp() {
     std::time_t timeT = system_clock::to_time_t(now);
     
     std::tm tm{}; // NOLINT(readability-identifier-length)
+#if defined(_WIN32) || defined(_WIN64)
     if (localtime_s(&tm, &timeT) != 0) {
         return {};
     }
+#else
+    if (localtime_r(&timeT, &tm) == nullptr) {
+        return {};
+    }
+#endif
 
     std::ostringstream oss;
     oss << std::put_time(&tm, "%Y-%m-%d %H:%M:%S");
