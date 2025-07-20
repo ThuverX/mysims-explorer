@@ -4,35 +4,51 @@ A tool to easily browse, inspect and view game assets from MySims and MySims Kin
 
 ![Screenshot of MySims Explorer](https://raw.githubusercontent.com/bottledlactose/mysims-explorer/refs/heads/trunk/images/screenshot.png)
 
-This was mostly tested on Kingdom, so things are more likely to break on the original MySims.
-
 ## Features
 
-- View and browse asset files from MySims and MySims Kingdom
-- Explore 3D models and materials in a real-time viewport with camera controls
-- Inspect meta data for model and material resources
-- Asset map parsing to unhash some file names where possible
-- Built-in logging and debug console
+- **Explore Game Assets**  
+   Easily browse and inspect raw asset files from MySims and MySims Kingdom.
+
+- **Real-Time 3D Model Viewer**  
+   Visualize 3D models with live material previews in a responsive viewport.
+
+- **Material Preview Support**  
+  Toggle between different material variants for models (e.g., facial expressions, textures).
+
+- **Detailed Property Inspector**  
+  Inspect metadata such as meshes, materials, bounding boxes, and additional asset details.
+
+- **Integrated Console Panel**
+  View live log messages and asset loading traces in a built-in console.
+
+- **Asset Map & Filename Unhashing**  
+   Automatically reveals known asset names and types via partial unhashing when available.
+
+- **Lightweight, Classic Desktop UI**  
+   Features panels for Explorer, Viewport, Properties, and Console, optimized for efficient, smooth inspection.
+
+- **Cross-Platform**
+  Compatible with both Windows and Linux.
 
 ## Usage
 
 1. Download the latest version on the [Releases](https://github.com/bottledlactose/mysims-explorer/releases) page
-2. Launch the tool
+2. Launch **MySims Explorer**
 3. Navigate to `File` -> `Open Data Root...`
-4. Select your MySims or MySims Kingdom data directory
+4. Select the data directory for your game:
     - On Steam, these are usually the following directories:
         - MySims Kingdom: `C:\Program Files (x86)\Steam\steamapps\common\MySims Kingdom\data`
         - MySims: `C:\Program Files (x86)\Steam\steamapps\common\MySims\data`
-5. Browse through the files loaded in the Explorer
+5. Browse and explore the game assets
 
-## Compiling
+## Building from Source
 
 ### Windows
 
 1. Clone the repository:
     - `git clone --recurse-submodules https://github.com/bottledlactose/mysims-explorer.git`
-2. Open the cloned folder in your editor of choice
-3. Build and run the code with your compiler of choice. MSVC or Clang-cl are recommended.
+2. Open the cloned folder in your preferred IDE
+3. Build and run using MSVC or Clang-cl (recommended).
 
 ### Linux
 
@@ -50,9 +66,11 @@ This was mostly tested on Kingdom, so things are more likely to break on the ori
 
 ## Gallery
 
-<img width="425" alt="image" src="https://raw.githubusercontent.com/bottledlactose/mysims-explorer/refs/heads/trunk/images/screenshot1.png" />
-<img width="425" alt="image" src="https://raw.githubusercontent.com/bottledlactose/mysims-explorer/refs/heads/trunk/images/screenshot2.png" />
+![Screenshot 1](https://raw.githubusercontent.com/bottledlactose/mysims-explorer/refs/heads/trunk/images/screenshot1.png)
+![Screenshot 2](https://raw.githubusercontent.com/bottledlactose/mysims-explorer/refs/heads/trunk/images/screenshot2.png)
+![Screenshot 3](https://raw.githubusercontent.com/bottledlactose/mysims-explorer/refs/heads/trunk/images/screenshot3.png)
+![Screenshot 4](https://raw.githubusercontent.com/bottledlactose/mysims-explorer/refs/heads/trunk/images/screenshot4.png)
 
 ## License
 
-This project is licensed under the MIT license. See [LICENSE](https://github.com/bottledlactose/mysims-explorer/blob/trunk/LICENSE) for details.
+This project is licensed under the [MIT License](https://github.com/bottledlactose/mysims-explorer/blob/trunk/LICENSE).
