@@ -14,13 +14,6 @@ This was mostly tested on Kingdom, so things are more likely to break on the ori
 - Asset map parsing to unhash some file names where possible
 - Built-in logging and debug console
 
-## Roadmap
-
-- Add Explorer filtering and search
-- Add icons to the Explorer and main menu bar
-- Add option to find references to the specified asset (see which asset is using which)
-- Port to Linux
-
 ## Usage
 
 1. Download the latest version on the [Releases](https://github.com/bottledlactose/mysims-explorer/releases) page
