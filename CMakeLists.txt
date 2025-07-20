@@ -66,9 +66,14 @@ target_include_directories(mysims-explorer PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(mysims-explorer PRIVATE SDL3-static tinyxml2)
 
-# Enable all warnings
 if(MSVC)
+    # Enable all warnings
     target_compile_options(mysims-explorer PRIVATE /W4 /permissive- /Zc:__cplusplus)
+    # Disable RTTI and exceptions
+    target_compile_options(mysims-explorer PRIVATE /GR- /EHs-c-)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    # Enable all warnings
     target_compile_options(mysims-explorer PRIVATE -Wall -Wextra -Wpedantic)
+    # Disable RTTI and exceptions
+    target_compile_options(mysims-explorer PRIVATE -fno-rtti -fno-exceptions)
 endif()
