@@ -1,5 +1,6 @@
 #include "Context.hpp"
 
+#include "essencio/GameType.hpp"
 #include "gfx/Renderer.hpp"
 #include "SDL3/SDL_init.h"
 #include "SDL3/SDL_video.h"
@@ -325,7 +326,13 @@ void Context::ChangeDataRoot(const std::optional<fs::path> &dataRoot) {
             mGameType = essencio::GameType::MYSIMS;
         }
 
-        LOG_TRACE("Automatically detected game type %d", static_cast<int>(mGameType));
+        std::string gameType;
+        switch (mGameType) {
+            case essencio::GameType::KINGDOM: gameType = "MySims Kingdom"; break;
+            case essencio::GameType::MYSIMS: gameType = "MySims"; break;
+        }
+
+        LOG_TRACE("Automatically detected game type: %s", gameType.c_str());
         // Build and cache directory tree
         mRootDirectory = File::BuildFileTree(*mDataRoot);
     }
