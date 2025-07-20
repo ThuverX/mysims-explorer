@@ -27,7 +27,7 @@ A tool to easily browse, inspect and view game assets from MySims and MySims Kin
 - **Lightweight, Classic Desktop UI**  
    Features panels for Explorer, Viewport, Properties, and Console, optimized for efficient, smooth inspection.
 
-- **Cross-Platform**
+- **Cross-Platform**  
   Compatible with both Windows and Linux.
 
 ## Usage
