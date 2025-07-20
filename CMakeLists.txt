@@ -25,8 +25,11 @@ set(IMGUI_SOURCES
     # ImGui SDL3 + OpenGL 3.3
     lib/imgui/backends/imgui_impl_sdl3.cpp
     lib/imgui/backends/imgui_impl_opengl3.cpp
-    # ImGui File Dialog
-    lib/imguifiledialog/ImGuiFileDialog.cpp
+)
+
+set(NFD_SOURCES
+    lib/nfd/src/nfd_common.c
+    lib/nfd/src/nfd_win.cpp
 )
 
 file(GLOB MSE_SOURCES
@@ -45,6 +48,7 @@ file(GLOB MSE_SOURCES
 add_executable(mysims-explorer
     ${MSE_SOURCES}
     ${IMGUI_SOURCES}
+    ${NFD_SOURCES}
     # GLAD
     lib/glad/src/gl.c)
 
@@ -54,7 +58,7 @@ target_include_directories(mysims-explorer SYSTEM PRIVATE
     lib/glm
     lib/gli
     lib/imgui
-    lib/imguifiledialog
+    lib/nfd/src/include
     lib/tinyxml)
 target_include_directories(mysims-explorer PRIVATE
     source

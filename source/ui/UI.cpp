@@ -5,13 +5,14 @@
 #include <essencio/GameType.hpp>
 #include <essencio/model/VertexKey.hpp>
 #include <essencio/model/WindowsModel.hpp>
+#include <filesystem>
 #include <string>
 #include <tinyxml2.h>
 
 #include "util/log.hpp"
 #include "imgui.h"
 #include "imgui_internal.h"
-#include "ImGuiFileDialog.h"
+#include "nfd.h"
 #include "version.h"
 
 void UI::DockSpace() {
@@ -75,15 +76,44 @@ void UI::MainMenuBar() {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {
             if (ImGui::MenuItem("Open Data Root...")) {
-                IGFD::FileDialogConfig config;
-                config.path = ".";
-
+                std::string defaultPath = ".";
+                // If data root is set, use it as the default path
                 auto dataRoot = Context::Get().GetDataRoot();
                 if (dataRoot) {
-                    config.path = (*dataRoot).string();
+                    defaultPath = (*dataRoot).string();
                 }
 
-                ImGuiFileDialog::Instance()->OpenDialog("ChooseDataRoot", "Choose Data Root", nullptr, config);
+                fs::path realDefaultPath = fs::absolute(defaultPath);
+                if (!fs::exists(realDefaultPath)) {
+                    realDefaultPath = fs::current_path();
+                }
+
+                // Initialize NFD
+                nfdchar_t *outPath = nullptr;
+                nfdresult_t result = NFD_PickFolder(realDefaultPath.string().c_str(), &outPath);
+
+                if (result == NFD_OKAY) {
+                    std::string selectedPath(outPath);
+                    free(outPath);
+
+                    auto dataRoot = Context::FindDataRoot(selectedPath);
+                    if (!dataRoot) {
+                        LOG_WARN("The selected directory is not a MySims data directory!");
+                    } else {
+                        if (*dataRoot != selectedPath) {
+                            LOG_INFO("Automatically detected data root at %s", dataRoot->string().c_str());
+                        }
+                        Context::Get().ChangeDataRoot(dataRoot);
+                    }
+
+                    Context::Get().ChangeDataRoot(selectedPath);
+                }
+                else if (result == NFD_CANCEL) {
+                    LOG_TRACE("File dialog cancelled by user");
+                }
+                else {
+                    LOG_ERROR("NFD error: %s", NFD_GetError());
+                }
             }
 
             if (ImGui::BeginMenu("Select Game Type")) {
@@ -169,23 +199,5 @@ void UI::MainMenuBar() {
         }
 
         ImGui::EndMainMenuBar();
-    }
-
-    if (ImGuiFileDialog::Instance()->Display("ChooseDataRoot", ImGuiWindowFlags_NoCollapse, ImVec2(500, 250))) {
-        if (ImGuiFileDialog::Instance()->IsOk()) { // action if OK
-            std::string directoryPath = ImGuiFileDialog::Instance()->GetCurrentPath();
-            auto dataRoot = Context::FindDataRoot(directoryPath);
-
-            if (!dataRoot) {
-                LOG_WARN("The selected directory is not a MySims data directory!");
-            } else {
-                if (*dataRoot != directoryPath) {
-                    LOG_INFO("Automatically detected data root at %s", dataRoot->string().c_str());
-                }
-                Context::Get().ChangeDataRoot(dataRoot);
-            }
-        }
-
-        ImGuiFileDialog::Instance()->Close();
     }
 }

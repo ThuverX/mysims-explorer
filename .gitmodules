@@ -20,3 +20,6 @@
 [submodule "lib/tinyxml"]
 	path = lib/tinyxml
 	url = https://github.com/leethomason/tinyxml2.git
+[submodule "lib/nfd"]
+	path = lib/nfd
+	url = https://github.com/mlabbe/nativefiledialog.git
