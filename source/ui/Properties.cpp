@@ -146,9 +146,11 @@ void UI::Properties::DrawMaterial(Loader &loader) {
 
                 std::string typeName;
                 if (gameType == essencio::GameType::KINGDOM) {
-                    typeName = essencio::kingdom::MaterialParameterTypeNameToString(param.type);
+                    auto typeValue = static_cast<essencio::kingdom::MaterialParameterTypeName>(param.type);
+                    typeName = essencio::kingdom::ToString(typeValue);
                 } else {
-                    typeName = essencio::mysims::MaterialParameterTypeNameToString(param.type);
+                    auto typeValue = static_cast<essencio::mysims::MaterialParameterTypeName>(param.type);
+                    typeName = essencio::mysims::ToString(typeValue);
                 }
 
                 if (!typeName.empty()) {
