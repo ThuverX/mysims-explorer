@@ -1,5 +1,6 @@
 #pragma once
 
+#include <SDL3/SDL_stdinc.h>
 #include <glad/gl.h>
 #include <vector>
 
@@ -46,6 +47,8 @@ struct FramebufferHandle {
 namespace Renderer {
 
 static constexpr uint32_t LOG_INFO_SIZE = 512;
+
+bool Initialize(GLADloadfunc loader);
 
 ShaderHandle CreateShader(const ShaderCreateInfo &info);
 void DestroyShader(ShaderHandle &shader);

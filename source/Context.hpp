@@ -29,6 +29,10 @@ enum class ContextType : uint8_t {
 
 class Context {
     MAKE_SINGLETON(Context)
+public:
+    static constexpr int DEFAULT_VIEWPORT_WIDTH = 1280;
+    static constexpr int DEFAULT_VIEWPORT_HEIGHT = 720;
+
 private:
     SDL_Window *mWindow;
     SDL_GLContext mGLContext;
@@ -69,6 +73,11 @@ public:
     static ContextType GetExtensionContextType(const std::string &extension);
 
     bool Initialize(const std::optional<fs::path> &dataRoot);
+private:
+    bool InitializeResources();
+    bool InitializeImGui();
+
+public:
     void Update();
     static void ProcessEvent(SDL_Event *event);
     void Render();
@@ -85,6 +94,8 @@ public:
     void SetIsDarkTheme(bool isDarkTheme);
 
 private:
+    
+
     void LoadFile(const fs::path &path);
 
 public:

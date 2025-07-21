@@ -42,45 +42,8 @@ namespace fs = std::filesystem;
 #include <algorithm> // for std::transform
 #include <string>
 
-#define VERTEX_SHADER_SOURCE "#version 330 core\n" \
-    "layout(location = 0) in vec3 aPos;\n" \
-    "layout(location = 1) in vec2 aTexCoord;\n" \
-    "\n" \
-    "out vec2 TexCoord;\n" \
-    "\n" \
-    "uniform mat4 uMVP;\n" \
-    "\n" \
-    "void main() {\n" \
-    "    gl_Position = uMVP * vec4(aPos, 1.0);\n" \
-    "    TexCoord = aTexCoord;\n" \
-    "}\n"
-
-#define FRAGMENT_SHADER_SOURCE "#version 330 core\n" \
-    "in vec2 TexCoord;\n" \
-    "out vec4 FragColor;\n" \
-    "\n" \
-    "uniform sampler2D uTexture;\n" \
-    "\n" \
-    "void main() {\n" \
-    "    FragColor = texture(uTexture, TexCoord);\n" \
-    "}\n"
-
-static std::vector<float> cubeVertices = {
-    -0.5f, -0.5f, -0.5f,   0.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,   1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,   1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,   0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,   0.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,   1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,   1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,   0.0f, 1.0f,
-};
-
-static std::vector<uint32_t> cubeIndices = {
-    0, 1, 1, 2, 2, 3, 3, 0,
-    4, 5, 5, 6, 6, 7, 7, 4,
-    0, 4, 1, 5, 2, 6, 3, 7
-};
+#include "data/shaders.hpp"
+#include "data/cube.hpp"
 
 // Utility function to do case-insensitive substring check
 static bool StringContainsCaseInsensitive(const std::string& str, const std::string& query) {
@@ -192,7 +155,7 @@ bool Context::Initialize(const std::optional<fs::path> &dataRoot) {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
     std::string title = "MySims Explorer v" + std::string(VERSION_STRING);
-    mWindow = SDL_CreateWindow(title.c_str(), 1280, 720, 
+    mWindow = SDL_CreateWindow(title.c_str(), DEFAULT_VIEWPORT_WIDTH, DEFAULT_VIEWPORT_HEIGHT, 
         SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE);
     if (mWindow == nullptr) {
         LOG_ERROR("Failed to create SDL window: %s", SDL_GetError());
@@ -206,17 +169,24 @@ bool Context::Initialize(const std::optional<fs::path> &dataRoot) {
     }
 
     SDL_GL_MakeCurrent(mWindow, mGLContext);
+    Renderer::Initialize(SDL_GL_GetProcAddress);
 
-    int version = gladLoadGL(SDL_GL_GetProcAddress);
-    if (version == 0) {
-        LOG_ERROR("Failed to initialize OpenGL loader");
-        return false;
-    }
-    
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // Initialize GPU resources such as viewport, shaders, etc.
+    if (!InitializeResources()) return false;
+    // Initialize ImGui, including custom icon fonts, etc.
+    if (!InitializeImGui()) return false;
 
+    // Setup style
+    // TODO: move this to some UI state
+    SetIsDarkTheme(SDL_GetSystemTheme() != SDL_SYSTEM_THEME_LIGHT);
+
+    SDL_ShowWindow(mWindow);
+
+    LOG_INFO("MySims Explorer was successfully initialized!");
+    return true;
+}
+
+bool Context::InitializeResources() {
     // Load a simple default shader
     mShaderHandle = Renderer::CreateShader({
         VERTEX_SHADER_SOURCE,
@@ -226,16 +196,21 @@ bool Context::Initialize(const std::optional<fs::path> &dataRoot) {
 
     // Create a cube mesh which can be used to display bounds in 3D space
     mCubeMesh = Renderer::CreateMesh({
-        cubeVertices,
-        cubeIndices
+        CUBE_VERTICES,
+        CUBE_INDICES
     });
     // TODO: Add error checking
     mCubeTexture = Renderer::CreateColorTexture(255, 255, 255, 255);
-
-    // Create main viewport framebuffer (maybe allow multiple later on?)
-    mViewport = Renderer::CreateFramebuffer(1280, 720);
     // TODO: Add error checking
-    
+
+    // Main viewport buffer
+    mViewport = Renderer::CreateFramebuffer(DEFAULT_VIEWPORT_WIDTH, DEFAULT_VIEWPORT_HEIGHT);
+    // TODO: Add error checking
+
+    return true;
+}
+
+bool Context::InitializeImGui() {
     // Setup ImGui
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -245,34 +220,30 @@ bool Context::Initialize(const std::optional<fs::path> &dataRoot) {
     //io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     io.IniFilename = nullptr;
 
-    // Set up default font and icon font
-    io.Fonts->AddFontDefault();
-    float baseFontSize = 14.0f;
-    //float iconFontSize = baseFontSize * 2.0f / 2.5f;
-    float iconFontSize = baseFontSize;
+    {
+        // Set up default font and icon font
+        io.Fonts->AddFontDefault();
+        float baseFontSize = 14.0f;
+        //float iconFontSize = baseFontSize * 2.0f / 2.5f;
+        float iconFontSize = baseFontSize;
 
-    static const ImWchar iconsRanges[] = { ICON_MIN_LC, ICON_MAX_16_LC, 0 };
-    ImFontConfig iconsConfig;
-    iconsConfig.MergeMode = true;
-    //iconsConfig.PixelSnapH = true;
-    iconsConfig.GlyphOffset.y = 3.0f;
-    iconsConfig.GlyphExtraAdvanceX = 4.0f;
-    iconsConfig.OversampleH = 4;
-    iconsConfig.OversampleV = 4;
-    // Prevent ImGui from freeing our memory
-    iconsConfig.FontDataOwnedByAtlas = false;
-    io.Fonts->AddFontFromMemoryTTF(LUCIDE_TTF, LUCIDE_TTF_LEN, iconFontSize, &iconsConfig, iconsRanges);
-
-    // Setup style
-    SetIsDarkTheme(SDL_GetSystemTheme() != SDL_SYSTEM_THEME_LIGHT);
-
+        static const ImWchar iconsRanges[] = { ICON_MIN_LC, ICON_MAX_16_LC, 0 };
+        ImFontConfig iconsConfig;
+        iconsConfig.MergeMode = true;
+        //iconsConfig.PixelSnapH = true;
+        iconsConfig.GlyphOffset.y = 3.0f;
+        iconsConfig.GlyphExtraAdvanceX = 4.0f;
+        iconsConfig.OversampleH = 4;
+        iconsConfig.OversampleV = 4;
+        // Prevent ImGui from freeing our memory
+        iconsConfig.FontDataOwnedByAtlas = false;
+        io.Fonts->AddFontFromMemoryTTF(LUCIDE_TTF, LUCIDE_TTF_LEN, iconFontSize, &iconsConfig, iconsRanges);
+    }
+    
     // Initialize backends
     ImGui_ImplSDL3_InitForOpenGL(mWindow, mGLContext);
     ImGui_ImplOpenGL3_Init("#version 330");
 
-    SDL_ShowWindow(mWindow);
-
-    LOG_INFO("MySims Explorer was successfully initialized!");
     return true;
 }
 

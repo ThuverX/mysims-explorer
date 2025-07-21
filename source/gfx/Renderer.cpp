@@ -3,6 +3,20 @@
 #include "util/log.hpp"
 #include <glm/gtc/type_ptr.hpp>
 
+bool Renderer::Initialize(GLADloadfunc loader) {
+    int version = gladLoadGL(loader);
+    if (version == 0) {
+        LOG_ERROR("Failed to initialize OpenGL loader");
+        return false;
+    }
+    
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    return true;
+}
+
 GLuint Renderer::CreateShader(const ShaderCreateInfo &info) {
     // Compile the vertex shader
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
