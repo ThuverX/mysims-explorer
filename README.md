@@ -37,8 +37,10 @@ A tool to easily browse, inspect and view game assets from MySims and MySims Kin
 3. Navigate to `File` -> `Open Data Root...`
 4. Select the data directory for your game:
     - On Steam, these are usually the following directories:
-        - MySims Kingdom: `C:\Program Files (x86)\Steam\steamapps\common\MySims Kingdom\data`
-        - MySims: `C:\Program Files (x86)\Steam\steamapps\common\MySims\data`
+        - *MySims Kingdom*  
+          `C:\Program Files (x86)\Steam\steamapps\common\MySims Kingdom\data`
+        - *MySims*  
+          `C:\Program Files (x86)\Steam\steamapps\common\MySims\data`
 5. Browse and explore the game assets
 
 ## Building from Source
