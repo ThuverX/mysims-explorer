@@ -10,10 +10,14 @@ namespace fs = std::filesystem;
 
 #include "essencio/ResourceKey.hpp"
 
+// TODO: Merge this module with Context or something
+
 struct FileEntry {
     fs::path path;
     std::string name;
     bool isDirectory;
+    // Used by the explorer to hide entries if they don't match the search query
+    bool isVisible = true;
     std::vector<FileEntry> children;
 };
 

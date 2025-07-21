@@ -39,6 +39,9 @@ namespace fs = std::filesystem;
 
 #include "version.h"
 
+#include <algorithm> // for std::transform
+#include <string>
+
 #define VERTEX_SHADER_SOURCE "#version 330 core\n" \
     "layout(location = 0) in vec3 aPos;\n" \
     "layout(location = 1) in vec2 aTexCoord;\n" \
@@ -78,6 +81,62 @@ static std::vector<uint32_t> cubeIndices = {
     4, 5, 5, 6, 6, 7, 7, 4,
     0, 4, 1, 5, 2, 6, 3, 7
 };
+
+// Utility function to do case-insensitive substring check
+static bool StringContainsCaseInsensitive(const std::string& str, const std::string& query) {
+    std::string lowerStr = str;
+    std::string lowerQuery = query;
+
+    std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(), ::tolower);
+    std::transform(lowerQuery.begin(), lowerQuery.end(), lowerQuery.begin(), ::tolower);
+
+    return lowerStr.find(lowerQuery) != std::string::npos;
+}
+
+// Recursively update visibility based on the current search query
+// TODO: Properly organize this somewhere
+static bool UpdateFileVisibility(FileEntry& entry, const char* query) {
+    if (query[0] == '\0') {
+        // No filtering, everything visible
+        entry.isVisible = true;
+        for (auto& child : entry.children) {
+            UpdateFileVisibility(child, query);
+        }
+        return true;
+    }
+
+    std::string displayName = entry.name;
+    if (!entry.isDirectory) {
+        // TODO: Compure asset map name while reloading the root directory
+        const auto& path = entry.path;
+        const auto& assetMap = Context::Get().GetAssetMap();
+        
+        displayName = entry.name;
+        if (assetMap && Context::Get().GetGameType() == essencio::GameType::KINGDOM) {
+            auto mapping = assetMap->Get(path.stem().string());
+            if (mapping) {
+                displayName = *mapping + path.extension().string();
+            }
+        }
+    }
+
+    bool matchesSelf = StringContainsCaseInsensitive(entry.name, query) ||
+                       StringContainsCaseInsensitive(displayName, query);
+
+    bool anyChildVisible = false;
+    if (entry.isDirectory) {
+        for (auto& child : entry.children) {
+            if (UpdateFileVisibility(child, query)) {
+                anyChildVisible = true;
+            }
+        }
+    }
+
+    LOG_TRACE("isVisible: %c", entry.isVisible ? '1' : '0');
+
+    entry.isVisible = matchesSelf || anyChildVisible;
+    return entry.isVisible;
+}
 
 std::optional<fs::path> Context::FindDataRoot(const fs::path &path) {
     fs::path current = path;
@@ -224,6 +283,14 @@ void Context::Update() {
         LoadFile(*mNextFile);
         mCurrentFile = mNextFile;
         mNextFile = std::nullopt;
+    }
+
+    static std::string lastSearchQuery;
+    const char* currentQuery = Context::Get().mSearchQuery;
+
+    if (currentQuery != lastSearchQuery) {
+        UpdateFileVisibility(mRootDirectory, currentQuery);
+        lastSearchQuery = currentQuery;
     }
 }
 

@@ -53,6 +53,7 @@ private:
     bool mIsDarkTheme = true;
 
 public:
+    // TODO: Move this section to some separate UI state
     // View options
     bool mShowExplorer = true;
     bool mShowProperties = true;
@@ -61,6 +62,8 @@ public:
     // Rendering options
     bool mWireframeMode = false;
     bool mShowBounds = false;
+
+    char mSearchQuery[256];
 
     static std::optional<fs::path> FindDataRoot(const fs::path &path);
     static ContextType GetExtensionContextType(const std::string &extension);
