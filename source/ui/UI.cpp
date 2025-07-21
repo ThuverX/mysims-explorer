@@ -218,7 +218,9 @@ void UI::MainMenuBar() {
 
                 std::string titleLabel = std::string("MySims Explorer v") + VERSION_STRING;
                 ImGui::Text("%s", titleLabel.c_str());
+                ImGui::Separator();
                 ImGui::TextWrapped("A tool to easily browse, inspect and view game assets from MySims and MySims Kingdom (Cozy Bundle edition).");
+                ImGui::Separator();
                 ImGui::Text("Created by bottledlactose");
                 
                 ImGui::EndMenu();
