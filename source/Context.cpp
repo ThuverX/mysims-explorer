@@ -215,7 +215,7 @@ bool Context::Initialize(const std::optional<fs::path> &dataRoot) {
 
     SDL_ShowWindow(mWindow);
 
-    LOG_SUCCESS("MySims Explorer was successfully initialized!");
+    LOG_INFO("MySims Explorer was successfully initialized!");
     return true;
 }
 

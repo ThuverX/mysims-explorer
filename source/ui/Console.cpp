@@ -23,13 +23,6 @@ void UI::Console::Draw() {
                     color = ImVec4(0.75f, 0.125f, 0.125f, 1.0f); // red
                 }
                 break;
-            case LogLevel::SUCCESS:
-                if (isDarkTheme) {
-                    color = ImVec4(0.25f, 1.0f, 0.25f, 1.0f); // green
-                } else {
-                    color = ImVec4(0.125f, 0.75f, 0.125f, 1.0f); // green
-                }
-                break;
             case LogLevel::WARN:
                 color = ImVec4(1.0f, 0.7f, 0.0f, 1.0f); // orange/yellow
                 break;

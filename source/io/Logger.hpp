@@ -10,7 +10,6 @@ enum class LogLevel : uint8_t {
     INFO,
     WARN,
     ERROR,
-    SUCCESS,
 };
 
 struct LogEntry {
