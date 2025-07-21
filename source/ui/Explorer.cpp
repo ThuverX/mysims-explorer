@@ -1,6 +1,7 @@
 #include "Explorer.hpp"
 
 #include "imgui.h"
+#include "IconsLucide.h"
 
 void UI::Explorer::DrawEntry(const FileEntry &entry) {
     if (entry.isDirectory) {
@@ -21,6 +22,25 @@ void UI::Explorer::DrawEntry(const FileEntry &entry) {
             ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
         }
 
+        const char *icon = nullptr;
+        switch (type) {
+            case ContextType::MODEL:
+                icon = ICON_LC_BOX;
+                break;
+            case ContextType::MATERIAL:
+                icon = ICON_LC_BOXES;
+                break;
+            case ContextType::MATERIALSET:
+                icon = ICON_LC_COMBINE;
+                break;
+            case ContextType::XML:
+                icon = ICON_LC_FILE_CODE_2;
+                break;
+            default:
+                icon = ICON_LC_FILE_QUESTION;
+                break;
+        }
+
         std::string displayName = entry.name;
         // Currently, we're only translating asset map names for Kingdom
         // MySims seems to have some weirdness going on in terms of uniqueness
@@ -32,7 +52,7 @@ void UI::Explorer::DrawEntry(const FileEntry &entry) {
         }
 
         bool isCurrentFile = Context::Get().GetCurrentFile() == path;
-        if (ImGui::Selectable(displayName.c_str(), isCurrentFile)) {
+        if (ImGui::Selectable((icon + displayName).c_str(), isCurrentFile)) {
             Context::Get().SetNextFile(path.string());
         }
 
