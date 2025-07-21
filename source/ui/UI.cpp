@@ -75,48 +75,79 @@ void UI::DockSpace() {
 void UI::MainMenuBar() {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {
-            if (ImGui::MenuItem("Open Data Root...")) {
-                std::string defaultPath = ".";
-                // If data root is set, use it as the default path
-                auto dataRoot = Context::Get().GetDataRoot();
-                if (dataRoot) {
-                    defaultPath = (*dataRoot).string();
-                }
+            if (ImGui::BeginMenu("Open Data Root")) {
 
-                fs::path realDefaultPath = fs::absolute(defaultPath);
-                if (!fs::exists(realDefaultPath)) {
-                    realDefaultPath = fs::current_path();
-                }
+#if defined(_WIN32) || defined(_WIN64)
+                bool isKingdomSelected = Context::Get().GetDataRoot() == KINGDOM_STEAM_PATH;
+                bool isMySimsSelected = Context::Get().GetDataRoot() == MYSIMS_STEAM_PATH;
 
-                // Initialize NFD
-                nfdchar_t *outPath = nullptr;
-                nfdresult_t result = NFD_PickFolder(realDefaultPath.string().c_str(), &outPath);
-
-                if (result == NFD_OKAY) {
-                    std::string selectedPath(outPath);
-                    free(outPath);
-
-                    auto dataRoot = Context::FindDataRoot(selectedPath);
+                if (ImGui::MenuItem("MySims Kingdom (Steam)", nullptr, isKingdomSelected)) {
+                    auto dataRoot = Context::FindDataRoot(KINGDOM_STEAM_PATH);
                     if (!dataRoot) {
-                        LOG_WARN("The selected directory is not a MySims data directory!");
+                        LOG_ERROR("Failed to automatically find data root for MySims Kingdom (Steam) at %s", KINGDOM_STEAM_PATH);
                     } else {
-                        if (*dataRoot != selectedPath) {
-                            LOG_INFO("Automatically detected data root at %s", dataRoot->string().c_str());
-                        }
                         Context::Get().ChangeDataRoot(dataRoot);
                     }
+                }
 
-                    Context::Get().ChangeDataRoot(selectedPath);
+                if (ImGui::MenuItem("MySims (Steam)", nullptr, isMySimsSelected)) {
+                    auto dataRoot = Context::FindDataRoot(MYSIMS_STEAM_PATH);
+                    if (!dataRoot) {
+                        LOG_ERROR("Failed to automatically find data root for MySims Kingdom (Steam) at %s", MYSIMS_STEAM_PATH);
+                    } else {
+                        Context::Get().ChangeDataRoot(dataRoot);
+                    }
                 }
-                else if (result == NFD_CANCEL) {
-                    LOG_TRACE("File dialog cancelled by user");
+#else
+                // Default selection options are disabled on Linux
+                ImGui::MenuItem("MySims Kingdom (Steam)", nullptr, false, false);
+                ImGui::MenuItem("MySims (Steam)", nullptr, false, false);
+#endif
+                if (ImGui::MenuItem("Custom...")) {
+                    std::string defaultPath = ".";
+                    // If data root is set, use it as the default path
+                    auto dataRoot = Context::Get().GetDataRoot();
+                    if (dataRoot) {
+                        defaultPath = (*dataRoot).string();
+                    }
+
+                    fs::path realDefaultPath = fs::absolute(defaultPath);
+                    if (!fs::exists(realDefaultPath)) {
+                        realDefaultPath = fs::current_path();
+                    }
+
+                    // Initialize NFD
+                    nfdchar_t *outPath = nullptr;
+                    nfdresult_t result = NFD_PickFolder(realDefaultPath.string().c_str(), &outPath);
+
+                    if (result == NFD_OKAY) {
+                        std::string selectedPath(outPath);
+                        free(outPath);
+
+                        auto dataRoot = Context::FindDataRoot(selectedPath);
+                        if (!dataRoot) {
+                            LOG_WARN("The selected directory is not a MySims data directory!");
+                        } else {
+                            if (*dataRoot != selectedPath) {
+                                LOG_INFO("Automatically detected data root at %s", dataRoot->string().c_str());
+                            }
+                            Context::Get().ChangeDataRoot(dataRoot);
+                        }
+
+                        Context::Get().ChangeDataRoot(selectedPath);
+                    }
+                    else if (result == NFD_CANCEL) {
+                        LOG_TRACE("File dialog cancelled by user");
+                    }
+                    else {
+                        LOG_ERROR("NFD error: %s", NFD_GetError());
+                    }
                 }
-                else {
-                    LOG_ERROR("NFD error: %s", NFD_GetError());
-                }
+
+                ImGui::EndMenu();
             }
 
-            if (ImGui::BeginMenu("Select Game Type")) {
+            if (ImGui::BeginMenu("Force Game Type")) {
                 auto gameType = Context::Get().GetGameType();
 
                 if (ImGui::MenuItem("MySims", nullptr, 

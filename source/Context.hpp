@@ -14,6 +14,11 @@
 
 #include "essencio/GameType.hpp"
 
+#if defined(_WIN32) || defined(_WIN64)
+    static const char *KINGDOM_STEAM_PATH = R"(C:\Program Files (x86)\Steam\steamapps\common\MySims Kingdom\data)";
+    static const char *MYSIMS_STEAM_PATH = R"(C:\Program Files (x86)\Steam\steamapps\common\MySims\data)";
+#endif
+
 enum class ContextType : uint8_t {
     NONE,
     MODEL,
