@@ -34,6 +34,9 @@ namespace fs = std::filesystem;
 #include "backends/imgui_impl_sdl3.h"
 #include "backends/imgui_impl_opengl3.h"
 
+#include "IconsLucide.h"
+#include "data/lucide.hpp"
+
 #include "version.h"
 
 #define VERTEX_SHADER_SOURCE "#version 330 core\n" \
@@ -184,6 +187,24 @@ bool Context::Initialize(const std::optional<fs::path> &dataRoot) {
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     //io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     io.IniFilename = nullptr;
+
+    // Set up default font and icon font
+    io.Fonts->AddFontDefault();
+    float baseFontSize = 14.0f;
+    //float iconFontSize = baseFontSize * 2.0f / 2.5f;
+    float iconFontSize = baseFontSize;
+
+    static const ImWchar iconsRanges[] = { ICON_MIN_LC, ICON_MAX_16_LC, 0 };
+    ImFontConfig iconsConfig;
+    iconsConfig.MergeMode = true;
+    //iconsConfig.PixelSnapH = true;
+    iconsConfig.GlyphOffset.y = 3.0f;
+    iconsConfig.GlyphExtraAdvanceX = 4.0f;
+    iconsConfig.OversampleH = 4;
+    iconsConfig.OversampleV = 4;
+    // Prevent ImGui from freeing our memory
+    iconsConfig.FontDataOwnedByAtlas = false;
+    io.Fonts->AddFontFromMemoryTTF(LUCIDE_TTF, LUCIDE_TTF_LEN, iconFontSize, &iconsConfig, iconsRanges);
 
     // Setup style
     SetIsDarkTheme(SDL_GetSystemTheme() != SDL_SYSTEM_THEME_LIGHT);

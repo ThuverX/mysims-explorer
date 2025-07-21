@@ -69,7 +69,8 @@ target_include_directories(mysims-explorer SYSTEM PRIVATE
     lib/gli
     lib/imgui
     lib/nfd/src/include
-    lib/tinyxml)
+    lib/tinyxml
+    lib/iconfont)
 target_include_directories(mysims-explorer PRIVATE
     source
     lib/essencio/include

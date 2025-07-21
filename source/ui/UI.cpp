@@ -15,6 +15,8 @@
 #include "nfd.h"
 #include "version.h"
 
+#include "IconsLucide.h"
+
 void UI::DockSpace() {
     static bool opt_fullscreen = true;
     static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
@@ -75,7 +77,7 @@ void UI::DockSpace() {
 void UI::MainMenuBar() {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {
-            if (ImGui::BeginMenu("Open Data Root")) {
+            if (ImGui::BeginMenu(ICON_LC_FILE "Open Data Root")) {
 
 #if defined(_WIN32) || defined(_WIN64)
                 bool isKingdomSelected = Context::Get().GetDataRoot() == KINGDOM_STEAM_PATH;
@@ -147,7 +149,7 @@ void UI::MainMenuBar() {
                 ImGui::EndMenu();
             }
 
-            if (ImGui::BeginMenu("Force Game Type")) {
+            if (ImGui::BeginMenu(ICON_LC_GAMEPAD_2 "Force Game Type")) {
                 auto gameType = Context::Get().GetGameType();
 
                 if (ImGui::MenuItem("MySims", nullptr, 
@@ -165,7 +167,7 @@ void UI::MainMenuBar() {
 
             ImGui::Separator();
 
-            if (ImGui::MenuItem("Quit")) {
+            if (ImGui::MenuItem(ICON_LC_DOOR_OPEN "Quit")) {
                 Context::Quit();
             }
 
@@ -174,29 +176,29 @@ void UI::MainMenuBar() {
 
         if (ImGui::BeginMenu("View")) {
 
-            if (ImGui::MenuItem("Explorer", nullptr, 
+            if (ImGui::MenuItem(ICON_LC_FOLDER_TREE "Explorer", nullptr, 
                 Context::Get().mShowExplorer)) {
                     Context::Get().mShowExplorer = !Context::Get().mShowExplorer;
                 }
 
-            if (ImGui::MenuItem("Properties", nullptr, 
+            if (ImGui::MenuItem(ICON_LC_TABLE_PROPERTIES "Properties", nullptr, 
                 Context::Get().mShowProperties)) {
                     Context::Get().mShowProperties = !Context::Get().mShowProperties;
                 }
 
-            if (ImGui::MenuItem("Console", nullptr, 
+            if (ImGui::MenuItem(ICON_LC_SQUARE_TERMINAL "Console", nullptr, 
                 Context::Get().mShowConsole)) {
                     Context::Get().mShowConsole = !Context::Get().mShowConsole;
                 }
 
             ImGui::Separator();
 
-            if (ImGui::MenuItem("Wireframe Mode", nullptr, 
+            if (ImGui::MenuItem(ICON_LC_WAYPOINTS "Wireframe Mode", nullptr, 
                 Context::Get().mWireframeMode)) {
                     Context::Get().mWireframeMode = !Context::Get().mWireframeMode;
                 }
 
-            if (ImGui::MenuItem("Show Bounds", nullptr, 
+            if (ImGui::MenuItem(ICON_LC_SCAN "Show Bounds", nullptr, 
                 Context::Get().mShowBounds)) {
                     Context::Get().mShowBounds = !Context::Get().mShowBounds;
                 }
@@ -204,7 +206,7 @@ void UI::MainMenuBar() {
             ImGui::Separator();
 
             bool isDarkTheme = Context::Get().GetIsDarkTheme();
-            if (ImGui::MenuItem("Dark Theme", nullptr, isDarkTheme)) {
+            if (ImGui::MenuItem(ICON_LC_MOON "Dark Theme", nullptr, isDarkTheme)) {
                 Context::Get().SetIsDarkTheme(!isDarkTheme);
             }
 
@@ -212,7 +214,7 @@ void UI::MainMenuBar() {
         }
 
         if (ImGui::BeginMenu("Help")) {
-            if (ImGui::BeginMenu("About")) {
+            if (ImGui::BeginMenu(ICON_LC_INFO "About")) {
 
                 std::string titleLabel = std::string("MySims Explorer v") + VERSION_STRING;
                 ImGui::Text("%s", titleLabel.c_str());
@@ -222,7 +224,7 @@ void UI::MainMenuBar() {
                 ImGui::EndMenu();
             }
 
-            if (ImGui::MenuItem("GitHub")) {
+            if (ImGui::MenuItem(ICON_LC_GITHUB "GitHub")) {
                 SDL_OpenURL("https://github.com/bottledlactose/mysims-explorer");
             }
 
