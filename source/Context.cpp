@@ -132,8 +132,6 @@ static bool UpdateFileVisibility(FileEntry& entry, const char* query) {
         }
     }
 
-    LOG_TRACE("isVisible: %c", entry.isVisible ? '1' : '0');
-
     entry.isVisible = matchesSelf || anyChildVisible;
     return entry.isVisible;
 }
@@ -286,11 +284,22 @@ void Context::Update() {
     }
 
     static std::string lastSearchQuery;
-    const char* currentQuery = Context::Get().mSearchQuery;
+    static Uint32 lastChangeTime = 0;
+    static bool visibilityUpdated = false;
 
-    if (currentQuery != lastSearchQuery) {
-        UpdateFileVisibility(mRootDirectory, currentQuery);
-        lastSearchQuery = currentQuery;
+    Uint32 currentTime = SDL_GetTicks();
+
+    // Detect if search query changed
+    if (strcmp(mSearchQuery, lastSearchQuery.c_str()) != 0) {
+        lastSearchQuery = mSearchQuery;
+        lastChangeTime = currentTime;
+        visibilityUpdated = false;
+    }
+
+    // Only update visibility if 250 ms have passed since last input
+    if (!visibilityUpdated && (currentTime - lastChangeTime) > 250) {
+        UpdateFileVisibility(mRootDirectory, mSearchQuery);
+        visibilityUpdated = true;
     }
 }
 
