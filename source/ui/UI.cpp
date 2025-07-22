@@ -92,7 +92,7 @@ void UI::MainMenuBar() {
                     bool isSelected = Context::Get().GetDataRoot() == pair.second;
 
                     if (ImGui::MenuItem(pair.first.c_str(), nullptr, isSelected)) {
-                        auto dataRoot = Context::FindDataRoot(KINGDOM_STEAM_PATH);
+                        auto dataRoot = Context::FindDataRoot(pair.second);
                         if (!dataRoot) {
                             LOG_ERROR("Failed to automatically find data root for MySims Kingdom (Steam) at %s", KINGDOM_STEAM_PATH);
                         } else {
