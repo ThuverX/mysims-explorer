@@ -7,7 +7,7 @@ A tool to easily browse, inspect and view game assets from **MySims** and **MySi
 ## Features
 
 - **Explore Game Assets**  
-   Easily browse and inspect raw asset files from MySims and MySims Kingdom.
+   Easily browse, search and inspect raw asset files from MySims and MySims Kingdom.
 
 - **Real-Time 3D Model Viewer**  
    Visualize 3D models with live material previews in a responsive viewport.
