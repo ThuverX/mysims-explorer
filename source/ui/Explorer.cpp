@@ -10,9 +10,7 @@ void UI::Explorer::DrawEntry(const FileEntry &entry) {
 
     if (entry.isDirectory) {
         if (ImGui::TreeNodeEx(entry.name.c_str(), ImGuiTreeNodeFlags_OpenOnArrow)) {
-            for (const auto& child : entry.children) {
-                DrawEntry(child);
-            }
+            DrawDirectoryChildren(entry.children);
             ImGui::TreePop();
         }
     } else {        
@@ -63,6 +61,33 @@ void UI::Explorer::DrawEntry(const FileEntry &entry) {
         if (type == ContextType::NONE) {
             ImGui::PopStyleColor();
             ImGui::EndDisabled();
+        }
+    }
+}
+
+void UI::Explorer::DrawDirectoryChildren(const std::vector<FileEntry>& children) {
+    std::vector<std::reference_wrapper<const FileEntry>> visibleChildren;
+    visibleChildren.reserve(children.size());
+
+    for (const auto& child : children) {
+        if (child.isVisible) {
+            visibleChildren.emplace_back(child);
+        }
+    }
+
+    // If there are a lot of children to render, use a clipper to improve performance
+    if (visibleChildren.size() > 200) {
+        ImGuiListClipper clipper;
+        clipper.Begin(visibleChildren.size());
+
+        while (clipper.Step()) {
+            for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; ++i) {
+                DrawEntry(visibleChildren[i]);
+            }
+        }
+    } else {
+        for (const auto& child : visibleChildren) {
+            DrawEntry(child);
         }
     }
 }
