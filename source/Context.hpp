@@ -14,6 +14,7 @@
 #include "ui/UIState.hpp"
 
 #include "essencio/GameType.hpp"
+#include "ContextType.hpp"
 
 #if defined(_WIN32) || defined(_WIN64)
     // Default Steam paths
@@ -24,14 +25,6 @@
     static const char *MYSIMS_EA_PATH = R"(C:\Program Files\EA Games\MYSIMS)";
 #endif
 
-enum class ContextType : uint8_t {
-    NONE,
-    MODEL,
-    MATERIAL,
-    MATERIALSET,
-    XML,
-};
-
 class Context {
     MAKE_SINGLETON(Context)
 public:
@@ -41,6 +34,7 @@ public:
     // Static helper functions
     static std::optional<fs::path> FindDataRoot(const fs::path &path);
     static ContextType GetExtensionContextType(const std::string &extension);
+    static std::string GetFileEntryDisplayName(FileEntry &entry, const AssetMap& assetMap);
 
     // Static flow functions
     static void ProcessEvent(SDL_Event *event);    
@@ -102,7 +96,7 @@ public:
     [[nodiscard]] inline ContextType GetContextType() const { return mContextType; }
 
     [[nodiscard]] inline const std::optional<AssetMap> &GetAssetMap() const { return mAssetMap; }
-    [[nodiscard]] inline const FileEntry &GetRootDirectory() const { return mRootDirectory; }
+    [[nodiscard]] inline FileEntry &GetRootDirectory() { return mRootDirectory; }
     [[nodiscard]] inline const UIState &GetUIState() const { return mUIState; }
 
     inline Loader &GetLoader() { return mLoader; }

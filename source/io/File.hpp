@@ -9,8 +9,7 @@
 namespace fs = std::filesystem;
 
 #include "essencio/ResourceKey.hpp"
-
-// TODO: Merge this module with Context or something
+#include "ContextType.hpp"
 
 struct FileEntry {
     fs::path path;
@@ -19,6 +18,7 @@ struct FileEntry {
     // Used by the explorer to hide entries if they don't match the search query
     bool isVisible = true;
     std::vector<FileEntry> children;
+    ContextType type;
 };
 
 namespace File {

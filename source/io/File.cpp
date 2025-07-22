@@ -1,4 +1,5 @@
 #include "File.hpp"
+#include "Context.hpp"
 
 #include <filesystem>
 #include <fstream>
@@ -47,6 +48,8 @@ FileEntry File::BuildFileTree(const fs::path &directory) {
         for (const auto& entry : fs::directory_iterator(directory)) {
             node.children.push_back(BuildFileTree(entry.path()));
         }
+    } else {
+        node.type = Context::GetExtensionContextType(directory.extension().string());
     }
 
     return node;

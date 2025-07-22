@@ -87,6 +87,22 @@ ContextType Context::GetExtensionContextType(const std::string &extension) {
     return ContextType::NONE;
 }
 
+std::string Context::GetFileEntryDisplayName(FileEntry &entry, const AssetMap &assetMap) {
+    // TODO: Cache display name based on entry
+
+    std::string displayName = entry.name;
+    // Currently, we're only translating asset map names for Kingdom
+    // MySims seems to have some weirdness going on in terms of uniqueness
+    if (Context::Get().GetGameType() == essencio::GameType::KINGDOM) {
+        auto mapping = assetMap.Get(entry.path.stem().string());
+        if (mapping) {
+            displayName = *mapping + entry.path.extension().string();
+        }
+    }
+
+    return displayName;
+}
+
 bool Context::Initialize(const std::optional<fs::path> &dataRoot) {
     LOG_INFO("MySims Explorer v%s is initializing...", VERSION_STRING);
     ChangeDataRoot(dataRoot);
@@ -420,16 +436,10 @@ bool Context::ApplySearchQuery(FileEntry& entry, const char* query) {
 
     std::string displayName = entry.name;
     if (!entry.isDirectory) {
-        // TODO: Compure asset map name while reloading the root directory
-        const auto& path = entry.path;
         const auto& assetMap = Context::Get().GetAssetMap();
-        
         displayName = entry.name;
-        if (assetMap && Context::Get().GetGameType() == essencio::GameType::KINGDOM) {
-            auto mapping = assetMap->Get(path.stem().string());
-            if (mapping) {
-                displayName = *mapping + path.extension().string();
-            }
+        if (assetMap) {
+            displayName = GetFileEntryDisplayName(entry, *assetMap);
         }
     }
 
@@ -453,7 +463,6 @@ void Context::LoadFile(const fs::path &path) {
     mLoader.UnloadAll();
     mCamera.Reset();
 
-    // TODO: Pre-calculate extension when building directory tree
     mContextType = GetExtensionContextType(path.extension().string());
 
     switch (mContextType) {
