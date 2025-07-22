@@ -45,60 +45,6 @@ namespace fs = std::filesystem;
 #include "data/shaders.hpp"
 #include "data/cube.hpp"
 
-// Utility function to do case-insensitive substring check
-static bool StringContainsCaseInsensitive(const std::string& str, const std::string& query) {
-    std::string lowerStr = str;
-    std::string lowerQuery = query;
-
-    std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(), ::tolower);
-    std::transform(lowerQuery.begin(), lowerQuery.end(), lowerQuery.begin(), ::tolower);
-
-    return lowerStr.find(lowerQuery) != std::string::npos;
-}
-
-// Recursively update visibility based on the current search query
-// TODO: Properly organize this somewhere
-static bool UpdateFileVisibility(FileEntry& entry, const char* query) {
-    if (query[0] == '\0') {
-        // No filtering, everything visible
-        entry.isVisible = true;
-        for (auto& child : entry.children) {
-            UpdateFileVisibility(child, query);
-        }
-        return true;
-    }
-
-    std::string displayName = entry.name;
-    if (!entry.isDirectory) {
-        // TODO: Compure asset map name while reloading the root directory
-        const auto& path = entry.path;
-        const auto& assetMap = Context::Get().GetAssetMap();
-        
-        displayName = entry.name;
-        if (assetMap && Context::Get().GetGameType() == essencio::GameType::KINGDOM) {
-            auto mapping = assetMap->Get(path.stem().string());
-            if (mapping) {
-                displayName = *mapping + path.extension().string();
-            }
-        }
-    }
-
-    bool matchesSelf = StringContainsCaseInsensitive(entry.name, query) ||
-                       StringContainsCaseInsensitive(displayName, query);
-
-    bool anyChildVisible = false;
-    if (entry.isDirectory) {
-        for (auto& child : entry.children) {
-            if (UpdateFileVisibility(child, query)) {
-                anyChildVisible = true;
-            }
-        }
-    }
-
-    entry.isVisible = matchesSelf || anyChildVisible;
-    return entry.isVisible;
-}
-
 std::optional<fs::path> Context::FindDataRoot(const fs::path &path) {
     fs::path current = path;
 
@@ -275,7 +221,7 @@ void Context::Update() {
 
     // Only update visibility if 250 ms have passed since last input
     if (!visibilityUpdated && (currentTime - lastChangeTime) > 250) {
-        UpdateFileVisibility(mRootDirectory, mUIState.mSearchQuery);
+        ApplySearchQuery(mRootDirectory, mUIState.mSearchQuery);
         visibilityUpdated = true;
     }
 
@@ -448,6 +394,59 @@ void Context::ReloadAssetMap() {
 
     fs::path assetMapPath = fs::path(*dataRoot) / "BuildData" / "AssetGenerator" / "AssetMap.xml";
     mAssetMap = AssetMap::Read(assetMapPath.string());
+}
+
+// Utility function to do case-insensitive substring check
+static bool StringContainsCaseInsensitive(const std::string& str, const std::string& query) {
+    std::string lowerStr = str;
+    std::string lowerQuery = query;
+
+    std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(), ::tolower);
+    std::transform(lowerQuery.begin(), lowerQuery.end(), lowerQuery.begin(), ::tolower);
+
+    return lowerStr.find(lowerQuery) != std::string::npos;
+}
+
+// Recursively update visibility based on the current search query
+bool Context::ApplySearchQuery(FileEntry& entry, const char* query) {
+    if (query[0] == '\0') {
+        // No filtering, everything visible
+        entry.isVisible = true;
+        for (auto& child : entry.children) {
+            ApplySearchQuery(child, query);
+        }
+        return true;
+    }
+
+    std::string displayName = entry.name;
+    if (!entry.isDirectory) {
+        // TODO: Compure asset map name while reloading the root directory
+        const auto& path = entry.path;
+        const auto& assetMap = Context::Get().GetAssetMap();
+        
+        displayName = entry.name;
+        if (assetMap && Context::Get().GetGameType() == essencio::GameType::KINGDOM) {
+            auto mapping = assetMap->Get(path.stem().string());
+            if (mapping) {
+                displayName = *mapping + path.extension().string();
+            }
+        }
+    }
+
+    bool matchesSelf = StringContainsCaseInsensitive(entry.name, query) ||
+        StringContainsCaseInsensitive(displayName, query);
+
+    bool anyChildVisible = false;
+    if (entry.isDirectory) {
+        for (auto& child : entry.children) {
+            if (ApplySearchQuery(child, query)) {
+                anyChildVisible = true;
+            }
+        }
+    }
+
+    entry.isVisible = matchesSelf || anyChildVisible;
+    return entry.isVisible;
 }
 
 void Context::LoadFile(const fs::path &path) {

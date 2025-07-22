@@ -91,6 +91,9 @@ private:
     bool InitializeResources();
     bool InitializeImGui();
 
+    // Applies the current search query to all file entries recursively
+    static bool ApplySearchQuery(FileEntry& entry, const char* query);
+
     void LoadFile(const fs::path &path);
 
 public:
