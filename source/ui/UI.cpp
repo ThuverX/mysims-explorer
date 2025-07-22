@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <string>
 #include <tinyxml2.h>
+#include <unordered_map>
 
 #include "util/log.hpp"
 #include "imgui.h"
@@ -80,30 +81,31 @@ void UI::MainMenuBar() {
             if (ImGui::BeginMenu(ICON_LC_FILE "Open Data Root")) {
 
 #if defined(_WIN32) || defined(_WIN64)
-                bool isKingdomSelected = Context::Get().GetDataRoot() == KINGDOM_STEAM_PATH;
-                bool isMySimsSelected = Context::Get().GetDataRoot() == MYSIMS_STEAM_PATH;
+                static std::vector<std::pair<std::string, std::string>> paths = {
+                    {"MySims Kingdom (Steam)", KINGDOM_STEAM_PATH},
+                    {"MySims (Steam)", MYSIMS_STEAM_PATH},
+                    {"MySims Kingdom (EA)", KINGDOM_EA_PATH},
+                    {"MySims (EA)", MYSIMS_EA_PATH},
+                };
 
-                if (ImGui::MenuItem("MySims Kingdom (Steam)", nullptr, isKingdomSelected)) {
-                    auto dataRoot = Context::FindDataRoot(KINGDOM_STEAM_PATH);
-                    if (!dataRoot) {
-                        LOG_ERROR("Failed to automatically find data root for MySims Kingdom (Steam) at %s", KINGDOM_STEAM_PATH);
-                    } else {
-                        Context::Get().ChangeDataRoot(dataRoot);
-                    }
-                }
+                for (const auto &pair : paths) {
+                    bool isSelected = Context::Get().GetDataRoot() == pair.second;
 
-                if (ImGui::MenuItem("MySims (Steam)", nullptr, isMySimsSelected)) {
-                    auto dataRoot = Context::FindDataRoot(MYSIMS_STEAM_PATH);
-                    if (!dataRoot) {
-                        LOG_ERROR("Failed to automatically find data root for MySims Kingdom (Steam) at %s", MYSIMS_STEAM_PATH);
-                    } else {
-                        Context::Get().ChangeDataRoot(dataRoot);
+                    if (ImGui::MenuItem(pair.first.c_str(), nullptr, isSelected)) {
+                        auto dataRoot = Context::FindDataRoot(KINGDOM_STEAM_PATH);
+                        if (!dataRoot) {
+                            LOG_ERROR("Failed to automatically find data root for MySims Kingdom (Steam) at %s", KINGDOM_STEAM_PATH);
+                        } else {
+                            Context::Get().ChangeDataRoot(dataRoot);
+                        }
                     }
                 }
 #else
                 // Default selection options are disabled on Linux
                 ImGui::MenuItem("MySims Kingdom (Steam)", nullptr, false, false);
                 ImGui::MenuItem("MySims (Steam)", nullptr, false, false);
+                ImGui::MenuItem("MySims Kingdom (EA)", nullptr, false, false);
+                ImGui::MenuItem("MySims (EA)", nullptr, false, false);
 #endif
                 if (ImGui::MenuItem("Custom...")) {
                     std::string defaultPath = ".";

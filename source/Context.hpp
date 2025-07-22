@@ -15,8 +15,12 @@
 #include "essencio/GameType.hpp"
 
 #if defined(_WIN32) || defined(_WIN64)
+    // Default Steam paths
     static const char *KINGDOM_STEAM_PATH = R"(C:\Program Files (x86)\Steam\steamapps\common\MySims Kingdom\data)";
     static const char *MYSIMS_STEAM_PATH = R"(C:\Program Files (x86)\Steam\steamapps\common\MySims\data)";
+    // Default EA App paths
+    static const char *KINGDOM_EA_PATH = R"(C:\Program Files\EA Games\MYSIMS KINGDOM)";
+    static const char *MYSIMS_EA_PATH = R"(C:\Program Files\EA Games\MYSIMS)";
 #endif
 
 enum class ContextType : uint8_t {
