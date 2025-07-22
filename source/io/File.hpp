@@ -14,6 +14,7 @@ namespace fs = std::filesystem;
 struct FileEntry {
     fs::path path;
     std::string name;
+    std::optional<std::string> displayName; // The cached unhashed file name
     bool isDirectory;
     // Used by the explorer to hide entries if they don't match the search query
     bool isVisible = true;

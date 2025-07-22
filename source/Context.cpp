@@ -88,7 +88,10 @@ ContextType Context::GetExtensionContextType(const std::string &extension) {
 }
 
 std::string Context::GetFileEntryDisplayName(FileEntry &entry, const AssetMap &assetMap) {
-    // TODO: Cache display name based on entry
+    
+    if (entry.displayName != std::nullopt) {
+        return *entry.displayName;
+    }
 
     std::string displayName = entry.name;
     // Currently, we're only translating asset map names for Kingdom
@@ -100,6 +103,7 @@ std::string Context::GetFileEntryDisplayName(FileEntry &entry, const AssetMap &a
         }
     }
 
+    entry.displayName = displayName;
     return displayName;
 }
 
