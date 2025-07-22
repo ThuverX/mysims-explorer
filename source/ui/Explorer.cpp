@@ -55,7 +55,7 @@ void UI::Explorer::DrawEntry(const FileEntry &entry) {
 
         bool isCurrentFile = Context::Get().GetCurrentFile() == path;
         if (ImGui::Selectable((icon + displayName).c_str(), isCurrentFile)) {
-            Context::Get().SetNextFile(path.string());
+            Context::Get().SetEnqueuedFile(path.string());
         }
 
         if (type == ContextType::NONE) {
@@ -92,14 +92,14 @@ void UI::Explorer::DrawDirectoryChildren(const std::vector<FileEntry>& children)
     }
 }
 
-void UI::Explorer::Draw() {
+void UI::Explorer::Draw(UIState &state) {
     ImGui::Begin("Explorer", nullptr, ImGuiWindowFlags_HorizontalScrollbar);
 
     const auto& context = Context::Get();
     const auto& root = context.GetRootDirectory();
 
     if (!root.path.empty()) {
-        ImGui::InputText("Search", Context::Get().mSearchQuery, 255);
+        ImGui::InputText("Search", state.mSearchQuery, 255);
         ImGui::Separator();
 
         for (const auto& child : root.children) {

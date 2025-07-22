@@ -60,7 +60,7 @@ void UI::Properties::DrawModel(Loader &loader) {
                         if (texture != 0) {
                             std::string materialButtonLabel = "MaterialButton##" + std::to_string(i) + "_" + std::to_string(j);
                             if (ImGui::ImageButton(materialButtonLabel.c_str(), texture, ImVec2(128, 128))) {
-                                Context::Get().SetNextFile(meshData.materials[0]->path.c_str());
+                                Context::Get().SetEnqueuedFile(meshData.materials[0]->path.c_str());
                             }
                         }
 

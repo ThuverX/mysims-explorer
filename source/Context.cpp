@@ -176,9 +176,15 @@ bool Context::Initialize(const std::optional<fs::path> &dataRoot) {
     // Initialize ImGui, including custom icon fonts, etc.
     if (!InitializeImGui()) return false;
 
-    // Setup style
-    // TODO: move this to some UI state
-    SetIsDarkTheme(SDL_GetSystemTheme() != SDL_SYSTEM_THEME_LIGHT);
+    // Setup initial style
+    mIsDarkTheme = SDL_GetSystemTheme() != SDL_SYSTEM_THEME_LIGHT;
+    mUIState.mIsDarkTheme = mIsDarkTheme;
+
+    if (mUIState.mIsDarkTheme) {
+        ImGui::StyleColorsDark();
+    } else {
+        ImGui::StyleColorsLight();
+    }
 
     SDL_ShowWindow(mWindow);
 
@@ -248,10 +254,10 @@ bool Context::InitializeImGui() {
 }
 
 void Context::Update() {
-    if (mNextFile) {
-        LoadFile(*mNextFile);
-        mCurrentFile = mNextFile;
-        mNextFile = std::nullopt;
+    if (mEnqueuedFile) {
+        LoadFile(*mEnqueuedFile);
+        mCurrentFile = mEnqueuedFile;
+        mEnqueuedFile = std::nullopt;
     }
 
     static std::string lastSearchQuery;
@@ -261,16 +267,25 @@ void Context::Update() {
     Uint32 currentTime = SDL_GetTicks();
 
     // Detect if search query changed
-    if (strcmp(mSearchQuery, lastSearchQuery.c_str()) != 0) {
-        lastSearchQuery = mSearchQuery;
+    if (strcmp(mUIState.mSearchQuery, lastSearchQuery.c_str()) != 0) {
+        lastSearchQuery = mUIState.mSearchQuery;
         lastChangeTime = currentTime;
         visibilityUpdated = false;
     }
 
     // Only update visibility if 250 ms have passed since last input
     if (!visibilityUpdated && (currentTime - lastChangeTime) > 250) {
-        UpdateFileVisibility(mRootDirectory, mSearchQuery);
+        UpdateFileVisibility(mRootDirectory, mUIState.mSearchQuery);
         visibilityUpdated = true;
+    }
+
+    if (mIsDarkTheme != mUIState.mIsDarkTheme) {
+        if (mUIState.mIsDarkTheme) {
+            ImGui::StyleColorsDark();
+        } else {
+            ImGui::StyleColorsLight();
+        }
+        mIsDarkTheme = mUIState.mIsDarkTheme;
     }
 }
 
@@ -283,17 +298,12 @@ void Context::Render() {
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
-    UI::MainMenuBar();
-    UI::DockSpace();
-
-    // NOLINTBEGIN(readability-braces-around-statements)
-    if (mShowExplorer) UI::Explorer::Draw();
-    if (mShowProperties) UI::Properties::Draw();
-    if (mShowConsole) UI::Console::Draw();
-    // NOLINTEND(readability-braces-around-statements)
-
-    // ImGui::UpdatePlatformWindows();
-    // ImGui::RenderPlatformWindowsDefault();
+    UI::DrawMainMenuBar(mUIState);
+    UI::SetupDockSpace();
+    
+    if (mUIState.mShowExplorer) UI::Explorer::Draw(mUIState);
+    if (mUIState.mShowProperties) UI::Properties::Draw();
+    if (mUIState.mShowConsole) UI::Console::Draw(mUIState);
 
     // Any 3D scenes that should be displayed are rendered to a framebuffer first
     if (mContextType == ContextType::MODEL) {
@@ -316,7 +326,7 @@ void Context::RenderScene() {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    if (mWireframeMode) {
+    if (mUIState.mWireframeMode) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     } else {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -344,7 +354,7 @@ void Context::RenderScene() {
                 Renderer::DrawMesh(mesh.handle, mShaderHandle, mvp);
             }
 
-            if (mShowBounds) {
+            if (mUIState.mShowBounds) {
                 auto boundsModel = glm::mat4(1.0f);
                 boundsModel = glm::translate(boundsModel, mesh.boundsCenter);
                 boundsModel = glm::scale(boundsModel, mesh.boundsSize);
@@ -421,21 +431,12 @@ void Context::ChangeGameType(const essencio::GameType &gameType) {
     LOG_INFO("Game type was changed to %d", static_cast<int>(mGameType));
 }
 
-void Context::SetNextFile(const std::optional<std::string> &path) {
+void Context::SetEnqueuedFile(const std::optional<std::string> &path) {
     if (mCurrentFile == path) {
         return;
     }
 
-    mNextFile = path;
-}
-
-void Context::SetIsDarkTheme(bool isDarkTheme) {
-    mIsDarkTheme = isDarkTheme;
-    if (mIsDarkTheme) {
-        ImGui::StyleColorsDark();
-    } else {
-        ImGui::StyleColorsLight();
-    }
+    mEnqueuedFile = path;
 }
 
 void Context::ReloadAssetMap() {

@@ -8,17 +8,20 @@
 #include <filesystem>
 #include <string>
 #include <tinyxml2.h>
-#include <unordered_map>
 
-#include "util/log.hpp"
+#define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui.h"
 #include "imgui_internal.h"
+
+#include "util/log.hpp"
+
+
 #include "nfd.h"
 #include "version.h"
 
 #include "IconsLucide.h"
 
-void UI::DockSpace() {
+void UI::SetupDockSpace() {
     static bool opt_fullscreen = true;
     static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
 
@@ -75,7 +78,7 @@ void UI::DockSpace() {
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
-void UI::MainMenuBar() {
+void UI::DrawMainMenuBar(UIState &state) {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {
             if (ImGui::BeginMenu(ICON_LC_FILE "Open Data Root")) {
@@ -178,38 +181,35 @@ void UI::MainMenuBar() {
 
         if (ImGui::BeginMenu("View")) {
 
-            if (ImGui::MenuItem(ICON_LC_FOLDER_TREE "Explorer", nullptr, 
-                Context::Get().mShowExplorer)) {
-                    Context::Get().mShowExplorer = !Context::Get().mShowExplorer;
-                }
+            if (ImGui::MenuItem(ICON_LC_FOLDER_TREE "Explorer", nullptr, state.mShowExplorer)) {
+                state.mShowExplorer = !state.mShowExplorer;
+            }
 
-            if (ImGui::MenuItem(ICON_LC_TABLE_PROPERTIES "Properties", nullptr, 
-                Context::Get().mShowProperties)) {
-                    Context::Get().mShowProperties = !Context::Get().mShowProperties;
-                }
+            if (ImGui::MenuItem(ICON_LC_TABLE_PROPERTIES "Properties", nullptr,  state.mShowProperties)) {
+                state.mShowProperties = !state.mShowProperties;
+            }
 
             if (ImGui::MenuItem(ICON_LC_SQUARE_TERMINAL "Console", nullptr, 
-                Context::Get().mShowConsole)) {
-                    Context::Get().mShowConsole = !Context::Get().mShowConsole;
+                state.mShowConsole)) {
+                    state.mShowConsole = !state.mShowConsole;
                 }
 
             ImGui::Separator();
 
             if (ImGui::MenuItem(ICON_LC_WAYPOINTS "Wireframe Mode", nullptr, 
-                Context::Get().mWireframeMode)) {
-                    Context::Get().mWireframeMode = !Context::Get().mWireframeMode;
+                state.mWireframeMode)) {
+                    state.mWireframeMode = !state.mWireframeMode;
                 }
 
             if (ImGui::MenuItem(ICON_LC_SCAN "Show Bounds", nullptr, 
-                Context::Get().mShowBounds)) {
-                    Context::Get().mShowBounds = !Context::Get().mShowBounds;
+                state.mShowBounds)) {
+                    state.mShowBounds = !state.mShowBounds;
                 }
 
             ImGui::Separator();
 
-            bool isDarkTheme = Context::Get().GetIsDarkTheme();
-            if (ImGui::MenuItem(ICON_LC_MOON "Dark Theme", nullptr, isDarkTheme)) {
-                Context::Get().SetIsDarkTheme(!isDarkTheme);
+            if (ImGui::MenuItem(ICON_LC_MOON "Dark Theme", nullptr, state.mIsDarkTheme)) {
+                state.mIsDarkTheme = !state.mIsDarkTheme;
             }
 
             ImGui::EndMenu();

@@ -84,7 +84,7 @@ void UI::Viewport::Draw(ContextType type, FramebufferHandle &framebuffer) {
                     std::string materialLabel = "Material##" + std::to_string(count++);
                     TextureHandle texture = material.second.texture;
                     if (ImGui::ImageButton(materialLabel.c_str(), texture, ImVec2(256, 256))) {
-                        Context::Get().SetNextFile(material.second.path);
+                        Context::Get().SetEnqueuedFile(material.second.path);
                     }
                 }
             }

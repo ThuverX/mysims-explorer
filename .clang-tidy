@@ -12,7 +12,8 @@ Checks: >
   -readability-else-after-return,
   -readability-uppercase-literal-suffix,
   -readability-magic-numbers,
-  -readability-isolate-declaration
+  -readability-isolate-declaration,
+  -readability-braces-around-statements
 WarningsAsErrors: ''
 HeaderFilterRegex: '.*'
 FormatStyle: file

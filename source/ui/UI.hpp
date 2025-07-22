@@ -1,11 +1,10 @@
 #pragma once
 
-#define IMGUI_DEFINE_MATH_OPERATORS
-#include "imgui.h"
+#include "UIState.hpp"
 
 namespace UI {
 
-void DockSpace();
-void MainMenuBar();
+void SetupDockSpace();
+void DrawMainMenuBar(UIState &state);
 
 } // namespace UI
