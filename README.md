@@ -18,7 +18,7 @@ A tool to easily browse, inspect and view game assets from **MySims** and **MySi
 - **Detailed Property Inspector**  
   Inspect metadata such as meshes, materials, bounding boxes, and additional asset details.
 
-- **Integrated Console Panel**
+- **Integrated Console Panel**  
   View live log messages and asset loading traces in a built-in console.
 
 - **Asset Map & Filename Unhashing**  
