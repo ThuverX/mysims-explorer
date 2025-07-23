@@ -29,7 +29,7 @@ void UI::Viewport::DrawScene(FramebufferHandle &framebuffer, const ImVec2 &size)
         }
 
         if (ImGui::IsMouseDragging(ImGuiMouseButton_Right)) {
-            camera.Pan(deltaX * 0.005f, deltaY * 0.005f);
+            camera.Pan(deltaX * 0.0075f, deltaY * 0.0075f);
         }
     }
 }
