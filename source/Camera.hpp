@@ -28,6 +28,8 @@ public:
         Update();
     }
 
+    void SetTarget(const glm::vec3 &target);
+
     void Orbit(float deltaYaw, float deltaPitch);
     void Zoom(float deltaZoom);
     void Pan(float deltaX, float deltaY);

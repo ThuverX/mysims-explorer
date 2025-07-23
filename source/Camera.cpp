@@ -17,6 +17,10 @@ void Camera::Update() {
     up = glm::vec3(0.0f, 1.0f, 0.0f);
 }
 
+void Camera::SetTarget(const glm::vec3 &target) {
+    this->target = target;
+}
+
 void Camera::Orbit(float deltaYaw, float deltaPitch) {
     yaw += deltaYaw;
     pitch += deltaPitch;

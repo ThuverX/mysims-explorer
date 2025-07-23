@@ -472,6 +472,17 @@ void Context::LoadFile(const fs::path &path) {
     switch (mContextType) {
         case ContextType::MODEL:
             mLoader.LoadModel(path.string(), mGameType);
+            {
+                // Automatically target the first loaded model's mesh
+                const auto &models = mLoader.GetModels();
+                if (models.size() > 0) {
+                    const auto &model = models.begin();
+                    if (model->second.meshes.size() > 0) {
+                        const auto &mesh = model->second.meshes.begin();
+                        mCamera.SetTarget(mesh->boundsCenter);
+                    }
+                }
+            }
             break;
         case ContextType::MATERIAL:
             mLoader.LoadMaterial(path.string(), mGameType);
