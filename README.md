@@ -43,6 +43,13 @@ A tool to easily browse, inspect and view game assets from **MySims** and **MySi
           `C:\Program Files (x86)\Steam\steamapps\common\MySims\data`
 5. Browse and explore the game assets
 
+### Controls
+
+The viewport camera is controlled through the left and right mouse buttons:
+
+- **Left Mouse Button** - Rotate the camera around the subject
+- **Right Mouse Button** - Pan the camera to move around
+
 ## Building from Source
 
 ### Windows
