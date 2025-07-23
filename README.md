@@ -43,6 +43,10 @@ A tool to easily browse, inspect and view game assets from **MySims** and **MySi
           `C:\Program Files (x86)\Steam\steamapps\common\MySims\data`
 5. Browse and explore the game assets
 
+If you run into any issues or if you'd like to share some feedback, feel free to open an issue
+on the [Issues](https://github.com/bottledlactose/mysims-explorer/issues) page or join the
+[MySims Clubhouse](https://discord.com/invite/2j9mU6zNJH) Discord server!
+
 ### Controls
 
 The viewport camera is controlled through the left and right mouse buttons:
