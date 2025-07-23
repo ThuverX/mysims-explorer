@@ -15,7 +15,7 @@ void UI::Viewport::DrawScene(FramebufferHandle &framebuffer, const ImVec2 &size)
     ImGui::Image((ImTextureID)(intptr_t)framebuffer.texture, size, ImVec2(0, 1), ImVec2(1, 0));
 
     if (ImGui::IsWindowHovered()) {
-        ImGuiIO& io = ImGui::GetIO(); // NOLINT(readability-identifier-length)
+        ImGuiIO& io = ImGui::GetIO();
 
         float deltaX = io.MouseDelta.x;
         float deltaY = io.MouseDelta.y;

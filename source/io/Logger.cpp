@@ -23,7 +23,7 @@ std::string Logger::GetTimestamp() {
     auto now = system_clock::now();
     std::time_t timeT = system_clock::to_time_t(now);
     
-    std::tm tm{}; // NOLINT(readability-identifier-length)
+    std::tm tm{};
 #if defined(_WIN32) || defined(_WIN64)
     if (localtime_s(&tm, &timeT) != 0) {
         return {};

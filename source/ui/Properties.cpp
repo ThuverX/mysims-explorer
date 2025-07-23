@@ -5,7 +5,6 @@
 #include "imgui.h"
 #include "Context.hpp"
 
-// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void UI::Properties::DrawModel(Loader &loader) {
     for (auto &pair : loader.GetModels()) {
         const essencio::WindowsModel &model = pair.second.data;
@@ -109,7 +108,6 @@ void UI::Properties::DrawModel(Loader &loader) {
     }
 }
 
-// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void UI::Properties::DrawMaterial(Loader &loader) {
     const auto &gameType = Context::Get().GetGameType();
 

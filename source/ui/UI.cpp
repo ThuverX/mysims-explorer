@@ -77,7 +77,6 @@ void UI::SetupDockSpace() {
     ImGui::End();
 }
 
-// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 void UI::DrawMainMenuBar(UIState &state) {
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {

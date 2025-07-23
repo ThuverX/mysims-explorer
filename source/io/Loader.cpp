@@ -49,14 +49,12 @@ std::vector<float> Loader::GetMeshVertices(const essencio::WindowsMesh &mesh) {
     for (size_t i = 0; i < mesh.numVertices; ++i) {
         size_t base = i * stride;
 
-        // NOLINTBEGIN(readability-identifier-length)
         float x = *reinterpret_cast<const float*>(&mesh.vertices[base + positionOffset + 0]);
         float y = *reinterpret_cast<const float*>(&mesh.vertices[base + positionOffset + 4]);
         float z = *reinterpret_cast<const float*>(&mesh.vertices[base + positionOffset + 8]);
 
         float u = *reinterpret_cast<const float*>(&mesh.vertices[base + uvOffset + 0]);
         float v = *reinterpret_cast<const float*>(&mesh.vertices[base + uvOffset + 4]);
-        // NOLINTEND(readability-identifier-length)
 
         vertices.push_back(x);
         vertices.push_back(y);
@@ -286,7 +284,7 @@ MaterialData *Loader::LoadMaterial(const std::string &path, const essencio::Game
                             return nullptr;
                         }
 
-                        gli::gl GL(gli::gl::PROFILE_GL33); // NOLINT(readability-identifier-length)
+                        gli::gl GL(gli::gl::PROFILE_GL33);
                         gli::gl::format const format = GL.translate(texture.format(), texture.swizzles());
                         auto const levels = static_cast<GLsizei>(texture.levels());
 
