@@ -40,7 +40,7 @@ A tool to easily browse, inspect and view game assets from **MySims** and **MySi
 
 If you run into any issues or if you'd like to share some feedback, feel free to open an issue
 on the [Issues](https://github.com/bottledlactose/mysims-explorer/issues) page or join the
-[MySims Clubhouse](https://discord.com/invite/2j9mU6zNJH) Discord server!
+[MySims Clubhouse Discord](https://discord.com/invite/2j9mU6zNJH)!
 
 ### Controls
 
