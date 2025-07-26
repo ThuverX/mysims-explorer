@@ -85,13 +85,13 @@ if (UNIX)
 endif()
 
 if(MSVC)
-    # Enable all warnings
-    target_compile_options(mysims-explorer PRIVATE /W4 /permissive- /Zc:__cplusplus)
-    # Disable RTTI and exceptions
-    target_compile_options(mysims-explorer PRIVATE /GR- /EHs-c-)
+    target_compile_options(mysims-explorer PRIVATE 
+        /W4 /permissive- /Zc:__cplusplus  # All warnings
+        /GR- /EHs-c-                      # No RTTI, no exceptions
+    )
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
-    # Enable all warnings
-    target_compile_options(mysims-explorer PRIVATE -Wall -Wextra -Wpedantic)
-    # Disable RTTI and exceptions
-    target_compile_options(mysims-explorer PRIVATE -fno-rtti -fno-exceptions)
+    target_compile_options(mysims-explorer PRIVATE 
+        -Wall -Wextra -Wpedantic         # All warnings
+        -fno-rtti -fno-exceptions        # No RTTI, no exceptions
+    )
 endif()
