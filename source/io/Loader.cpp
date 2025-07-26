@@ -2,8 +2,10 @@
 
 #include <filesystem>
 
+#include "essencio/bin/BinFileStream.hpp"
+#include "essencio/bin/BinMode.hpp"
 #include "gfx/Renderer.hpp"
-#include "essencio/BinReader.hpp"
+#include "essencio/bin/BinMemoryStream.hpp"
 #include "essencio/model/WindowsModel.hpp"
 #include "essencio/material/Material.hpp"
 #include "essencio/material/MaterialSet.hpp"
@@ -187,13 +189,7 @@ ModelData *Loader::LoadModel(const std::string &path, const essencio::GameType &
     ModelData modelData;
     modelData.path = path;
 
-    auto file = File::ReadFile(path);
-    if (!file) {
-        LOG_ERROR("Failed to open/read file: %s", path.c_str());
-        return nullptr;
-    }
-
-    essencio::BinReader reader(file.value().data(), file.value().size());
+    essencio::BinFileStream reader(path, essencio::BinMode::Read);
     essencio::WindowsModel::Read(modelData.data, reader);
 
     for (const auto &mesh : modelData.data.meshes) {
@@ -266,13 +262,7 @@ MaterialData *Loader::LoadMaterial(const std::string &path, const essencio::Game
     MaterialData materialData;
     materialData.path = path;
 
-    auto file = File::ReadFile(path);
-    if (!file) {
-        LOG_ERROR("Failed to open/read file: %s", path.c_str());
-        return nullptr;
-    }
-
-    essencio::BinReader reader(file.value().data(), file.value().size());
+    essencio::BinFileStream reader(path, essencio::BinMode::Read);
     essencio::Material::Read(materialData.data, reader, gameType);
 
     materialData.shaderHandle = Context::Get().GetShaderHandle(static_cast<ShaderId>(materialData.data.shaderHash));
@@ -312,15 +302,9 @@ std::vector<MaterialData *> Loader::LoadMaterialSet(const std::string &path, con
     std::vector<MaterialData *> materialSetData;
     materialSetData.clear();
 
-    auto file = File::ReadFile(path);
-    if (!file) {
-        LOG_ERROR("Failed to open/read file: %s", path.c_str());
-        return materialSetData;
-    }
-
     essencio::MaterialSet materialSet;
 
-    essencio::BinReader reader(file.value().data(), file.value().size());
+    essencio::BinFileStream reader(path, essencio::BinMode::Read);
     essencio::MaterialSet::Read(materialSet, reader, gameType);
 
     for (const auto &material : materialSet.materials) {
