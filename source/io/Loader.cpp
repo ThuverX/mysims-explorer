@@ -2,8 +2,9 @@
 
 #include <filesystem>
 
+#include "essencio/bin/BinMode.hpp"
 #include "gfx/Renderer.hpp"
-#include "essencio/BinReader.hpp"
+#include "essencio/bin/BinStream.hpp"
 #include "essencio/model/WindowsModel.hpp"
 #include "essencio/material/Material.hpp"
 #include "essencio/material/MaterialSet.hpp"
@@ -178,7 +179,7 @@ ModelData *Loader::LoadModel(const std::string &path, const essencio::GameType &
         return nullptr;
     }
 
-    essencio::BinReader reader(file.value().data(), file.value().size());
+    essencio::BinStream reader(file.value().data(), file.value().size(), essencio::BinMode::Read);
     essencio::WindowsModel::Read(modelData.data, reader);
 
     for (const auto &mesh : modelData.data.meshes) {
@@ -263,7 +264,7 @@ MaterialData *Loader::LoadMaterial(const std::string &path, const essencio::Game
         return nullptr;
     }
 
-    essencio::BinReader reader(file.value().data(), file.value().size());
+    essencio::BinStream reader(file.value().data(), file.value().size(), essencio::BinMode::Read);
     essencio::Material::Read(materialData.data, reader, gameType);
 
     // Read material parameters in reverse, since this somehow gives us the right texture
@@ -321,7 +322,7 @@ std::vector<MaterialData *> Loader::LoadMaterialSet(const std::string &path, con
 
     essencio::MaterialSet materialSet;
 
-    essencio::BinReader reader(file.value().data(), file.value().size());
+    essencio::BinStream reader(file.value().data(), file.value().size(), essencio::BinMode::Read);
     essencio::MaterialSet::Read(materialSet, reader, gameType);
 
     for (const auto &material : materialSet.materials) {
