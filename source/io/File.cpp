@@ -2,27 +2,8 @@
 #include "Context.hpp"
 
 #include <filesystem>
-#include <fstream>
 #include <sstream>
 #include <iomanip>
-
-std::optional<std::vector<uint8_t>> File::ReadFile(const std::string &path) {
-
-    std::ifstream in_file(path, std::ios::binary | std::ios::ate);
-    if (!in_file) {
-        return std::nullopt;
-    }
-
-    std::streamsize in_size = in_file.tellg();
-    in_file.seekg(0, std::ios::beg);
-
-    std::vector<uint8_t> in_buffer(in_size);
-    if (!in_file.read(reinterpret_cast<char*>(in_buffer.data()), in_size)) {
-        return std::nullopt;
-    }
-
-    return in_buffer;
-}
 
 std::string File::GetResourceKeyPath(const essencio::ResourceKey &key, const std::string &extension) {
     std::stringstream stream;
