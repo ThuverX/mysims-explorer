@@ -53,6 +53,10 @@ file(GLOB MSE_SOURCES
     source/util/*.hpp
     source/ui/*.cpp
     source/ui/*.hpp
+    source/data/*.cpp
+    source/data/*.hpp
+    source/data/shaders/*.cpp
+    source/data/shaders/*.hpp
 )
 
 add_executable(mysims-explorer

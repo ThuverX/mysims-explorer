@@ -69,9 +69,11 @@ void UI::Viewport::Draw(ContextType type, FramebufferHandle &framebuffer) {
             {
                 const auto &materials = loader.GetMaterials();
 
-                if (materials.size() > 0) {
-                    TextureHandle texture = materials.begin()->second.texture;
-                    ImGui::Image(texture, ImVec2(256, 256));
+                if (!materials.empty()) {
+                    for (const auto & value : materials.begin()->second.textures) {
+                        ImGui::Text("%x", value.first);
+                        ImGui::Image(value.second, ImVec2(256, 256));
+                    }
                 }
             }
             break;
@@ -82,9 +84,10 @@ void UI::Viewport::Draw(ContextType type, FramebufferHandle &framebuffer) {
 
                 for (const auto &material : materials) {
                     std::string materialLabel = "Material##" + std::to_string(count++);
-                    TextureHandle texture = material.second.texture;
-                    if (ImGui::ImageButton(materialLabel.c_str(), texture, ImVec2(256, 256))) {
-                        Context::Get().SetEnqueuedFile(material.second.path);
+                    for (const auto & value : material.second.textures) {
+                        if (ImGui::ImageButton(materialLabel.c_str(), value.second, ImVec2(256, 256))) {
+                            Context::Get().SetEnqueuedFile(material.second.path);
+                        }
                     }
                 }
             }

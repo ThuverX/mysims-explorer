@@ -7,7 +7,10 @@
 // DDS texture loading
 #include "gli/gl.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
+#include "essencio/GameType.hpp"
 #include "gli/texture.hpp"
+
+struct MeshData;
 
 using ShaderHandle = GLuint;
 using TextureHandle = GLuint;
@@ -59,8 +62,8 @@ TextureHandle CreateColorTexture(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 void DestroyTexture(TextureHandle &texture);
 
 MeshHandle CreateMesh(const MeshCreateInfo &info);
-void DrawMesh(const MeshHandle &mesh, const ShaderHandle &shader, const glm::mat4 mvp, const TextureHandle &texture = 0, bool drawLines = false);
-void DestroyMesh(MeshHandle &mesh);
+void DrawMesh(const MeshData&mesh, const glm::mat4 &mvp, const essencio::GameType &gameType, bool drawLines = false);
+void DestroyMesh(const MeshData &mesh);
 
 FramebufferHandle CreateFramebuffer(int width, int height);
 void DestroyFramebuffer(const FramebufferHandle &framebuffer);

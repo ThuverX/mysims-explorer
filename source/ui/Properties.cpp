@@ -40,33 +40,33 @@ void UI::Properties::DrawModel(Loader &loader) {
 
                 std::string isVisibleLabel = "Is Visible##" + std::to_string(i);
                 ImGui::Checkbox(isVisibleLabel.c_str(), &meshData.isVisible);
-
-                for (uint32_t j = 0; j < meshData.materials.size(); ++j) {
-                    TextureHandle texture = meshData.handle.textures[j];
-
-                    std::string materialLabel = "Material #" + std::to_string(j + 1) + "##" + std::to_string(i);
-                    if (ImGui::CollapsingHeader(materialLabel.c_str())) {
-                        ImGui::Indent();
-
-                        bool isCurrent = (meshData.materialIndex == j);
-                        std::string isCurrentLabel = "Is Current##" + std::to_string(i) + "_" + std::to_string(j);
-                        if (ImGui::Checkbox(isCurrentLabel.c_str(), &isCurrent)) {
-                            if (isCurrent) {
-                                meshData.materialIndex = j;
-                            }
-                        }
-
-                        if (texture != 0) {
-                            std::string materialButtonLabel = "MaterialButton##" + std::to_string(i) + "_" + std::to_string(j);
-                            if (ImGui::ImageButton(materialButtonLabel.c_str(), texture, ImVec2(128, 128))) {
-                                Context::Get().SetEnqueuedFile(meshData.materials[0]->path.c_str());
-                            }
-                        }
-
-                        ImGui::Unindent();
-                    }
-
-                }
+                //
+                // for (uint32_t j = 0; j < meshData.materials.size(); ++j) {
+                //     TextureHandle texture = meshData.handle.textures[j];
+                //
+                //     std::string materialLabel = "Material #" + std::to_string(j + 1) + "##" + std::to_string(i);
+                //     if (ImGui::CollapsingHeader(materialLabel.c_str())) {
+                //         ImGui::Indent();
+                //
+                //         bool isCurrent = (meshData.materialIndex == j);
+                //         std::string isCurrentLabel = "Is Current##" + std::to_string(i) + "_" + std::to_string(j);
+                //         if (ImGui::Checkbox(isCurrentLabel.c_str(), &isCurrent)) {
+                //             if (isCurrent) {
+                //                 meshData.materialIndex = j;
+                //             }
+                //         }
+                //
+                //         if (texture != 0) {
+                //             std::string materialButtonLabel = "MaterialButton##" + std::to_string(i) + "_" + std::to_string(j);
+                //             if (ImGui::ImageButton(materialButtonLabel.c_str(), texture, ImVec2(128, 128))) {
+                //                 Context::Get().SetEnqueuedFile(meshData.materials[0]->path.c_str());
+                //             }
+                //         }
+                //
+                //         ImGui::Unindent();
+                //     }
+                //
+                // }
 
                 ImGui::Text("Min. Bounds: %.3f,%.3f,%.3f",
                     mesh.boundsMin.x, mesh.boundsMin.y, mesh.boundsMin.z);
@@ -98,6 +98,47 @@ void UI::Properties::DrawModel(Loader &loader) {
                         ImGui::Text("Index: %d", key.index);
                         ImGui::Text("Sub Index: %d", key.subIndex);
 
+                        ImGui::Unindent();
+                    }
+                }
+
+                for (uint32_t j = 0; j < meshData.materials.size(); ++j) {
+                    std::string materialLabel = "Material #" + std::to_string(j + 1)
+                            + "##mesh" + std::to_string(i) + "_material" + std::to_string(j);
+
+                    if (ImGui::CollapsingHeader(materialLabel.c_str())) {
+                        ImGui::Indent();
+                        const auto material = meshData.materials[j];
+                        ImGui::Text("Shader: %X (bound to %i)", material->data.shaderHash, material->shaderHandle);
+
+                        for (auto & param : material->data.params) {
+
+                            std::string paramName = "";
+
+                            if (Context::Get().GetGameType() == essencio::GameType::KINGDOM) {
+                                paramName = essencio::kingdom::ToString(static_cast<essencio::kingdom::MaterialParameterTypeName>(param.type));
+                            } else if (Context::Get().GetGameType() == essencio::GameType::MYSIMS) {
+                                paramName = essencio::mysims::ToString(static_cast<essencio::mysims::MaterialParameterTypeName>(param.type));
+                            }
+
+                            switch (param.valueType) {
+                                case essencio::MaterialParameterType::COLOR:
+                                    ImGui::Text("Color: %s (%x)", paramName.c_str(), param.type);
+                                    for (uint32_t k = 0; k < param.color.size(); ++k) {
+                                        ImGui::Text("Color[%i]: %.3f", k, param.color[k]);
+                                    }
+                                    break;
+                                case essencio::MaterialParameterType::VALUE:
+                                    ImGui::Text("Value: %s (%x)", paramName.c_str(), param.type);
+                                    ImGui::Text("%i", param.value);
+
+                                    break;
+                                case essencio::MaterialParameterType::RESOURCE_KEY:
+                                    int bound = material->textures[param.type];
+                                    ImGui::Text("Resource key: %s (%x) (bound to %i)", paramName.c_str(), param.type, bound);
+                                    break;
+                            }
+                        }
                         ImGui::Unindent();
                     }
                 }

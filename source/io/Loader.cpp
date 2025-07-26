@@ -23,14 +23,14 @@ std::vector<float> Loader::GetMeshVertices(const essencio::WindowsMesh &mesh) {
     std::vector<float> vertices;
 
     uint32_t positionOffset = UINT32_MAX;
-    uint32_t uvOffset = UINT32_MAX;
+    std::vector<uint32_t> uvOffsets;
 
     for (const auto& key : mesh.vertexKeys) {
         //if (key.index == 0 && key.type == essencio::VertexKeyType::FLOAT3) {
         if (key.type == essencio::VertexKeyType::FLOAT3 && positionOffset == UINT32_MAX) {
             positionOffset = key.offset;
-        } else if (key.type == essencio::VertexKeyType::FLOAT2 && uvOffset == UINT32_MAX) {
-            uvOffset = key.offset;
+        } else if (key.type == essencio::VertexKeyType::FLOAT2) {
+            uvOffsets.emplace_back(key.offset);
         }
     }
 
@@ -38,13 +38,14 @@ std::vector<float> Loader::GetMeshVertices(const essencio::WindowsMesh &mesh) {
         LOG_WARN("No FLOAT3 position key found in vertexKeys!");
         return vertices;
     }
-    if (uvOffset == UINT32_MAX) {
+    if (uvOffsets.size() == 0) {
         LOG_WARN("No FLOAT2 UV key found in vertexKeys!");
         return vertices;
     }
 
     size_t stride = mesh.vertexArraySize / mesh.numVertices;
-    vertices.reserve(static_cast<size_t>(mesh.numVertices) * 5); // 3 for pos + 2 for UV
+    size_t vertex_size = 3 + 2 + 2; // position - uv0 - uv1
+    vertices.reserve(static_cast<size_t>(mesh.numVertices) * vertex_size);
 
     for (size_t i = 0; i < mesh.numVertices; ++i) {
         size_t base = i * stride;
@@ -53,14 +54,28 @@ std::vector<float> Loader::GetMeshVertices(const essencio::WindowsMesh &mesh) {
         float y = *reinterpret_cast<const float*>(&mesh.vertices[base + positionOffset + 4]);
         float z = *reinterpret_cast<const float*>(&mesh.vertices[base + positionOffset + 8]);
 
-        float u = *reinterpret_cast<const float*>(&mesh.vertices[base + uvOffset + 0]);
-        float v = *reinterpret_cast<const float*>(&mesh.vertices[base + uvOffset + 4]);
+        float u0 = 0;
+        float v0 = 0;
+        float u1 = 0;
+        float v1 = 0;
+
+        if (uvOffsets.size() > 0) {
+            u0 = *reinterpret_cast<const float*>(&mesh.vertices[base + uvOffsets[0] + 0]);
+            v0 = *reinterpret_cast<const float*>(&mesh.vertices[base + uvOffsets[0] + 4]);
+        }
+
+        if (uvOffsets.size() > 1) {
+            u1 = *reinterpret_cast<const float*>(&mesh.vertices[base + uvOffsets[1] + 0]);
+            v1 = *reinterpret_cast<const float*>(&mesh.vertices[base + uvOffsets[1] + 4]);
+        }
 
         vertices.push_back(x);
         vertices.push_back(y);
         vertices.push_back(z);
-        vertices.push_back(u);
-        vertices.push_back(v);
+        vertices.push_back(u0);
+        vertices.push_back(v0);
+        vertices.push_back(u1);
+        vertices.push_back(v1);
     }
 
     return vertices;
@@ -168,7 +183,7 @@ ModelData *Loader::LoadModel(const std::string &path, const essencio::GameType &
     if (loaded != models.end()) {
         return &loaded->second;
     }
-    
+
     ModelData modelData;
     modelData.path = path;
 
@@ -211,29 +226,23 @@ ModelData *Loader::LoadModel(const std::string &path, const essencio::GameType &
         });
 
         const auto &resourcePath = File::GetResourceKeyPath(mesh.material, "Material");
-        auto materialPath = FindMaterialPath(resourcePath, path);
 
-        if (materialPath) {
+        if (auto materialPath = FindMaterialPath(resourcePath, path)) {
             auto *materialData = LoadMaterial(*materialPath, gameType);
 
             if (materialData != nullptr) {
                 meshData.materials.push_back(materialData);
-                meshData.handle.textures.reserve(1);
-                // Attach this material to the current mesh
-                meshData.handle.textures.push_back(materialData->texture);
             } else {
                 LOG_WARN("Material data could not be loaded");
             }
         } else {
             const auto &resourcePathSet = File::GetResourceKeyPath(mesh.material, "MaterialSet");
-            auto materialSetPath = FindMaterialPath(resourcePathSet);
 
-            if (materialSetPath) {
+            if (auto materialSetPath = FindMaterialPath(resourcePathSet)) {
                 std::vector<MaterialData *> materialSet = LoadMaterialSet(*materialSetPath, gameType);
 
-                for (const auto &material : materialSet) {
+                for (const auto &material: materialSet) {
                     meshData.materials.push_back(material);
-                    meshData.handle.textures.push_back(material->texture);
                 }
             } else {
                 LOG_WARN("Material path not found for resource %s", resourcePath.c_str());
@@ -253,7 +262,7 @@ MaterialData *Loader::LoadMaterial(const std::string &path, const essencio::Game
     if (loaded != materials.end()) {
         return &loaded->second;
     }
-    
+
     MaterialData materialData;
     materialData.path = path;
 
@@ -266,41 +275,31 @@ MaterialData *Loader::LoadMaterial(const std::string &path, const essencio::Game
     essencio::BinReader reader(file.value().data(), file.value().size());
     essencio::Material::Read(materialData.data, reader, gameType);
 
-    // Read material parameters in reverse, since this somehow gives us the right texture
-    // instead of a weird purple-to-white gradient it sometimes returned
-    for (auto it = materialData.data.params.rbegin(); it != materialData.data.params.rend(); ++it) {
-        const auto& param = *it;
-        switch (param.valueType) {
-            case essencio::MaterialParameterType::RESOURCE_KEY:
-                {
-                    const auto &resourcePath = File::GetResourceKeyPath(param.mapKey, "dds");
-                    auto texturePath = FindTexturePath(resourcePath);
+    materialData.shaderHandle = Context::Get().GetShaderHandle(static_cast<ShaderId>(materialData.data.shaderHash));
 
-                    if (texturePath) {
-                        // Load the DDS texture using gli
-                        gli::texture texture = gli::load((*texturePath).c_str());
-                        if (texture.empty()) {
-                            LOG_WARN("Failed to load texture: %s", (*texturePath).c_str());
-                            return nullptr;
-                        }
+    for (const auto & param : materialData.data.params) {
+        if (param.valueType == essencio::MaterialParameterType::RESOURCE_KEY) {
+            const auto &resourcePath = File::GetResourceKeyPath(param.mapKey, "dds");
+            auto texturePath = FindTexturePath(resourcePath);
 
-                        gli::gl GL(gli::gl::PROFILE_GL33);
-                        gli::gl::format const format = GL.translate(texture.format(), texture.swizzles());
-                        auto const levels = static_cast<GLsizei>(texture.levels());
-
-                        materialData.texture = Renderer::CreateTexture({
-                            texture,
-                            format,
-                            levels,
-                        });
-                    } else {
-                        LOG_WARN("Texture path not found for resource %s", resourcePath.c_str());
-                    }
+            if (texturePath) {
+                // Load the DDS texture using gli
+                gli::texture texture = gli::load(texturePath->c_str());
+                if (texture.empty()) {
+                    LOG_WARN("Failed to load texture: %s", texturePath->c_str());
+                    return nullptr;
                 }
-                break;
-            default:
-                // Just do nothing for now
-                break;
+
+                gli::gl GL(gli::gl::PROFILE_GL33);
+                gli::gl::format const format = GL.translate(texture.format(), texture.swizzles());
+                auto const levels = static_cast<GLsizei>(texture.levels());
+
+                materialData.textures[param.type] = Renderer::CreateTexture({
+                    texture,
+                    format,
+                    levels,
+                });
+            }
         }
     }
 
@@ -344,7 +343,7 @@ std::vector<MaterialData *> Loader::LoadMaterialSet(const std::string &path, con
 XmlData *Loader::LoadXml(const std::string &path) {
 
     tinyxml2::XMLDocument doc;
-    
+
     if (doc.LoadFile(path.c_str()) != tinyxml2::XML_SUCCESS) {
         LOG_ERROR("Failed to load XML file");
         return nullptr;
@@ -362,13 +361,15 @@ void Loader::UnloadAll() {
     xml.clear();
 
     for (auto &material : materials) {
-        Renderer::DestroyTexture(material.second.texture);
+        for (auto &texture : material.second.textures) {
+            Renderer::DestroyTexture(texture.second);
+        }
     }
     materials.clear();
 
     for (auto &model : models) {
         for (auto &mesh : model.second.meshes) {
-            Renderer::DestroyMesh(mesh.handle);
+            Renderer::DestroyMesh(mesh);
         }
     }
     models.clear();

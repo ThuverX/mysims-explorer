@@ -16,8 +16,9 @@
 
 struct MaterialData {
     std::string path;
-    TextureHandle texture;
+    std::unordered_map<uint32_t, TextureHandle> textures;
     essencio::Material data;
+    ShaderHandle shaderHandle;
 };
 
 struct MeshData {

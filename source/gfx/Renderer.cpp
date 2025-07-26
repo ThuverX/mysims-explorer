@@ -3,6 +3,9 @@
 #include "util/log.hpp"
 #include <glm/gtc/type_ptr.hpp>
 
+#include "essencio/material/MaterialParameterTypeName.hpp"
+#include "io/Loader.hpp"
+
 bool Renderer::Initialize(GLADloadfunc loader) {
     int version = gladLoadGL(loader);
     if (version == 0) {
@@ -140,35 +143,69 @@ MeshHandle Renderer::CreateMesh(const MeshCreateInfo &info) {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, info.indices.size() * sizeof(uint32_t), info.indices.data(), GL_STATIC_DRAW);
 
     // position attribute (location = 0)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
     // texcoord attribute (location = 1)
     // NOLINTNEXTLINE(performance-no-int-to-ptr)
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    // texcoord2 attribute (location = 2)
+    // NOLINTNEXTLINE(performance-no-int-to-ptr)
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(5 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     return mesh;
 }
 
-void Renderer::DrawMesh(const MeshHandle &mesh, const ShaderHandle &shader, const glm::mat4 mvp, const TextureHandle &texture, bool drawLines) {
-    GLint mvpLoc = glGetUniformLocation(shader, "uMVP");
-    glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
-
-    if (texture != 0) {
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glUniform1i(glGetUniformLocation(shader, "uTexture"), 0);
+void Renderer::DrawMesh(const MeshData&mesh, const glm::mat4 &mvp, const essencio::GameType &gameType, const bool drawLines) {
+    auto *const activeMaterial = mesh.materials[mesh.materialIndex];
+    if (activeMaterial == nullptr) {
+        return;
     }
 
-    glBindVertexArray(mesh.VAO);
-    glDrawElements(drawLines ? GL_LINES : GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
+    glUseProgram(activeMaterial->shaderHandle);
+    const GLint mvpLoc = glGetUniformLocation(activeMaterial->shaderHandle, "uMVP");
+    glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
+
+    int textureID = 0;
+    for (const auto & param : activeMaterial->data.params) {
+        std::string paramName = "";
+
+        if (gameType == essencio::GameType::KINGDOM) {
+            paramName = essencio::kingdom::ToString(static_cast<essencio::kingdom::MaterialParameterTypeName>(param.type));
+        } else if (gameType == essencio::GameType::MYSIMS) {
+            paramName = essencio::mysims::ToString(static_cast<essencio::mysims::MaterialParameterTypeName>(param.type));
+        }
+
+        if (paramName == "") continue;
+
+        switch (param.valueType) {
+            case essencio::MaterialParameterType::COLOR:
+                break;
+            case essencio::MaterialParameterType::VALUE:
+                break;
+            case essencio::MaterialParameterType::RESOURCE_KEY: {
+                int location = glGetUniformLocation(activeMaterial->shaderHandle, paramName.c_str());
+                if (location == -1) continue;
+                glActiveTexture(GL_TEXTURE0 + textureID);
+                glBindTexture(GL_TEXTURE_2D, activeMaterial->textures[param.type]);
+                glUniform1i(location, textureID);
+                textureID++;
+                break;
+            }
+        }
+    }
+
+    glBindVertexArray(mesh.handle.VAO);
+    glDrawElements(drawLines ? GL_LINES : GL_TRIANGLES, mesh.handle.indexCount, GL_UNSIGNED_INT, 0);
 }
 
-void Renderer::DestroyMesh(MeshHandle &mesh) {
-    glDeleteBuffers(1, &mesh.EBO);
-    glDeleteBuffers(1, &mesh.VBO);
-    glDeleteVertexArrays(1, &mesh.VAO);
+void Renderer::DestroyMesh(const MeshData &mesh) {
+    glDeleteBuffers(1, &mesh.handle.EBO);
+    glDeleteBuffers(1, &mesh.handle.VBO);
+    glDeleteVertexArrays(1, &mesh.handle.VAO);
 }
 
 FramebufferHandle Renderer::CreateFramebuffer(int width, int height) {

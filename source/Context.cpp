@@ -18,6 +18,8 @@
 #include <SDL3/SDL_timer.h>
 #include <filesystem>
 
+#include "data/shaders/shaders.hpp"
+
 namespace fs = std::filesystem;
 
 #include "SDL3/SDL_init.h"
@@ -42,7 +44,6 @@ namespace fs = std::filesystem;
 #include <algorithm> // for std::transform
 #include <string>
 
-#include "data/shaders.hpp"
 #include "data/cube.hpp"
 
 std::optional<fs::path> Context::FindDataRoot(const fs::path &path) {
@@ -160,10 +161,13 @@ bool Context::Initialize(const std::optional<fs::path> &dataRoot) {
 
 bool Context::InitializeResources() {
     // Load a simple default shader
-    mShaderHandle = Renderer::CreateShader({
-        VERTEX_SHADER_SOURCE,
-        FRAGMENT_SHADER_SOURCE
-    });
+
+    for (const auto & shader : SHADERS) {
+        mShaderHandles[shader.first] = Renderer::CreateShader({
+            shader.second.vertexSource.c_str(),
+            shader.second.fragmentSource.c_str(),
+        });
+    }
     // TODO: Add error checking
 
     // Create a cube mesh which can be used to display bounds in 3D space
@@ -298,8 +302,6 @@ void Context::RenderScene() {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
-    glUseProgram(mShaderHandle);
-
     glm::mat4 projection = Camera::GetProjectionMatrix(
         glm::vec2(mViewport.width, mViewport.height));
     glm::mat4 view = mCamera.GetViewMatrix();
@@ -313,18 +315,13 @@ void Context::RenderScene() {
                 continue;
             }
 
-            if (mesh.handle.textures.size() > 0 && mesh.materialIndex < mesh.handle.textures.size()) {
-                TextureHandle texture = mesh.handle.textures[mesh.materialIndex];
-                Renderer::DrawMesh(mesh.handle, mShaderHandle, mvp, texture);
-            } else {
-                Renderer::DrawMesh(mesh.handle, mShaderHandle, mvp);
-            }
+            Renderer::DrawMesh(mesh, mvp, GetGameType());
 
             if (mUIState.mShowBounds) {
                 auto boundsModel = glm::mat4(1.0f);
                 boundsModel = glm::translate(boundsModel, mesh.boundsCenter);
                 boundsModel = glm::scale(boundsModel, mesh.boundsSize);
-                Renderer::DrawMesh(mCubeMesh, mShaderHandle, projection * view * boundsModel, mCubeTexture, true);
+                // Renderer::DrawMesh(mCubeMesh, mShaderHandle, projection * view * boundsModel, mCubeTexture, true);
             }
         }
     }
@@ -338,7 +335,9 @@ void Context::Shutdown() {
     ImGui::DestroyContext();
 
     mLoader.UnloadAll();
-    Renderer::DestroyShader(mShaderHandle);
+    for (auto & mShader : mShaderHandles) {
+        Renderer::DestroyShader(mShader.second);
+    }
 
     SDL_GL_DestroyContext(mGLContext);
     SDL_DestroyWindow(mWindow);

@@ -15,6 +15,7 @@
 
 #include "essencio/GameType.hpp"
 #include "ContextType.hpp"
+#include "data/shaders/shaders.hpp"
 
 #if defined(_WIN32) || defined(_WIN64)
     // Default Steam paths
@@ -46,7 +47,7 @@ private:
     SDL_GLContext mGLContext;
 
     // Graphics resources
-    ShaderHandle mShaderHandle;
+    std::unordered_map<ShaderId, ShaderHandle> mShaderHandles;
     MeshHandle mCubeMesh;
     TextureHandle mCubeTexture;
     FramebufferHandle mViewport;
@@ -94,6 +95,10 @@ public:
     [[nodiscard]] inline std::optional<fs::path> GetDataRoot() const { return mDataRoot; }
     [[nodiscard]] inline essencio::GameType GetGameType() const { return mGameType; }
     [[nodiscard]] inline ContextType GetContextType() const { return mContextType; }
+    [[nodiscard]] inline ShaderHandle GetShaderHandle(const ShaderId shaderId) const {
+        const auto it = mShaderHandles.find(shaderId);
+        return it != mShaderHandles.end() ? it->second : mShaderHandles.at(ShaderId::FALLBACK);
+    }
 
     [[nodiscard]] inline const std::optional<AssetMap> &GetAssetMap() const { return mAssetMap; }
     [[nodiscard]] inline FileEntry &GetRootDirectory() { return mRootDirectory; }
